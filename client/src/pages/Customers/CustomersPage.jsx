@@ -1,0 +1,163 @@
+import React, { useState, useEffect } from 'react';
+import Sidebar from '../../components/layout/Sidebar';
+import { Users, Plus, Search, Phone, MapPin, ChevronRight, Trash2 } from 'lucide-react';
+import { getCustomers, deleteCustomer, createCustomer, updateCustomer } from '../../services';
+import CustomerModal from '../../components/modals/CustomerModal';
+
+const CustomersPage = () => {
+    const [customers, setCustomers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingCustomer, setEditingCustomer] = useState(null);
+
+    const fetchCustomers = async () => {
+        try {
+            const { data } = await getCustomers();
+            setCustomers(data);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching customers', error);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCustomers();
+    }, []);
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this customer?')) {
+            try {
+                await deleteCustomer(id);
+                fetchCustomers();
+            } catch (error) {
+                alert('Failed to delete customer');
+            }
+        }
+    };
+
+    const handleSaveCustomer = async (formData) => {
+        try {
+            if (editingCustomer) {
+                await updateCustomer(editingCustomer._id, formData);
+            } else {
+                await createCustomer(formData);
+            }
+            setIsModalOpen(false);
+            setEditingCustomer(null);
+            fetchCustomers();
+        } catch (error) {
+            alert('Failed to save customer');
+        }
+    };
+
+    const openEditModal = (customer) => {
+        setEditingCustomer(customer);
+        setIsModalOpen(true);
+    };
+
+    const openAddModal = () => {
+        setEditingCustomer(null);
+        setIsModalOpen(true);
+    };
+
+    return (
+        <div className="dashboard-container" style={{ background: '#F9FAFB' }}>
+            <Sidebar role="admin" />
+
+            <main className="content" style={{ padding: '2rem 3rem' }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Customers</h2>
+                        <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>Manage your customer base and jug balances.</p>
+                    </div>
+                    <button 
+                        onClick={openAddModal}
+                        className="btn-primary" 
+                        style={{ background: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.75rem', fontWeight: '600', color: 'white', border: 'none', cursor: 'pointer' }}
+                    >
+                        <Plus size={20} />
+                        <span>Add Customer</span>
+                    </button>
+                </header>
+
+                <div className="glass" style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ position: 'relative', width: '320px' }}>
+                            <Search style={{ position: 'absolute', top: '10px', left: '12px', color: '#9CA3AF' }} size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Search by name or phone..." 
+                                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
+                            />
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', padding: '1.5rem' }}>
+                        {customers.length > 0 ? customers.map((customer) => (
+                            <div key={customer._id} 
+                                onClick={() => openEditModal(customer)}
+                                className="customer-card" 
+                                style={{ padding: '1.5rem', background: 'white', borderRadius: '1rem', border: '1px solid #E5E7EB', transition: 'all 0.3s ease', cursor: 'pointer' }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                    <div style={{ width: '48px', height: '48px', background: '#F3F4F6', borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '1.2rem', fontWeight: '700', color: '#4F46E5' }}>
+                                        {customer.name[0]}
+                                    </div>
+                                    <span style={{ 
+                                        padding: '0.25rem 0.625rem', 
+                                        borderRadius: '1rem', 
+                                        fontSize: '0.7rem', 
+                                        fontWeight: '700',
+                                        background: customer.jugBalance > 0 ? '#FEF2F2' : '#ECFDF5',
+                                        color: customer.jugBalance > 0 ? '#EF4444' : '#10B981'
+                                    }}>
+                                        {customer.jugBalance > 0 ? `Owes ${customer.jugBalance} Jugs` : 'Clear Balance'}
+                                    </span>
+                                </div>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111827', marginBottom: '0.5rem' }}>{customer.name}</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6B7280', fontSize: '0.85rem' }}>
+                                        <Phone size={14} />
+                                        <span>{customer.phone}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6B7280', fontSize: '0.85rem' }}>
+                                        <MapPin size={14} />
+                                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {customer.addresses?.[0]?.street}, {customer.addresses?.[0]?.barangay}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid #F3F4F6' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <span style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>{customer.totalOrders} total orders</span>
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); handleDelete(customer._id); }}
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', display: 'flex', alignItems: 'center' }}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                    <ChevronRight size={18} color="#9CA3AF" />
+                                </div>
+                            </div>
+                        )) : (
+                            <div style={{ gridColumn: '1 / -1', padding: '3rem', textAlign: 'center', color: '#9CA3AF' }}>
+                                {loading ? 'Loading customers...' : 'No customers found.'}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </main>
+
+            <CustomerModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveCustomer}
+                customer={editingCustomer}
+            />
+        </div>
+    );
+};
+
+export default CustomersPage;

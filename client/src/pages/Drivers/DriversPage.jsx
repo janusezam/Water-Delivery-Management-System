@@ -1,0 +1,215 @@
+import React, { useState, useEffect } from 'react';
+import Sidebar from '../../components/layout/Sidebar';
+import { Truck, Plus, User, Info, MoreVertical, Smartphone, Search, Mail, Package } from 'lucide-react';
+import { getDrivers, createDriver, updateDriver, getOrders } from '../../services';
+import DriverModal from '../../components/modals/DriverModal';
+
+const DriversPage = () => {
+    const [drivers, setDrivers] = useState([]);
+    const [orders, setOrders] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingDriver, setEditingDriver] = useState(null);
+
+    const fetchData = async () => {
+        try {
+            const [driversRes, ordersRes] = await Promise.all([
+                getDrivers(),
+                getOrders()
+            ]);
+            setDrivers(driversRes.data);
+            setOrders(ordersRes.data);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching data', error);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const handleSaveDriver = async (formData) => {
+        try {
+            if (editingDriver) {
+                await updateDriver(editingDriver._id, formData);
+            } else {
+                await createDriver(formData);
+            }
+            setIsModalOpen(false);
+            setEditingDriver(null);
+            fetchData();
+        } catch (error) {
+            alert('Failed to save driver');
+        }
+    };
+
+    const openEditModal = (driver) => {
+        setEditingDriver(driver);
+        setIsModalOpen(true);
+    };
+
+    const openAddModal = () => {
+        setEditingDriver(null);
+        setIsModalOpen(true);
+    };
+
+    const getDriverDeliveryStatus = (driverId) => {
+        const driverOrders = orders.filter(o => o.assignedDriver?._id === driverId || o.assignedDriver === driverId);
+        
+        if (driverOrders.length === 0) {
+            return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669', count: 0 };
+        }
+        
+        const activeOrders = driverOrders.filter(o => !['delivered', 'Completed', 'Cancelled', 'cancelled'].includes(o.status));
+        
+        if (activeOrders.length === 0) {
+            return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669', count: 0 };
+        }
+        
+        const hasInProgress = activeOrders.some(o => o.status === 'In Progress');
+        if (hasInProgress) {
+            return { label: 'ON DELIVERY', bg: '#DBEAFE', color: '#1D4ED8', count: activeOrders.length };
+        }
+        
+        const hasPending = activeOrders.some(o => ['Pending', 'dispatched', 'Dispatched'].includes(o.status));
+        if (hasPending) {
+            return { label: 'PENDING DELIVERY', bg: '#FEF3C7', color: '#D97706', count: activeOrders.length };
+        }
+        
+        return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669', count: 0 };
+    };
+
+    const filteredDrivers = drivers.filter(d => 
+        (d.user?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (d.plateNo || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (d.licenseNo || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return (
+        <div className="dashboard-container" style={{ background: '#F9FAFB' }}>
+            <Sidebar role="admin" />
+
+            <main className="content" style={{ padding: '2rem 3rem' }}>
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Drivers</h2>
+                        <p style={{ color: '#6B7280', fontSize: '0.925rem', marginBottom: '1.25rem' }}>Manage your delivery personnel and vehicles.</p>
+                        
+                        <div style={{ position: 'relative', width: '320px' }}>
+                            <Search style={{ position: 'absolute', top: '10px', left: '12px', color: '#9CA3AF' }} size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Search by name, plate, or license..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem', background: 'white' }}
+                            />
+                        </div>
+                    </div>
+                    <button 
+                        onClick={openAddModal}
+                        className="btn-primary" 
+                        style={{ background: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.75rem', fontWeight: '600', color: 'white', border: 'none', cursor: 'pointer' }}
+                    >
+                        <Plus size={20} />
+                        <span>Add Driver</span>
+                    </button>
+                </header>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+                    {loading ? (
+                        <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center' }}>
+                            <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #EEF2FF', borderTopColor: '#4F46E5', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
+                            <p style={{ color: '#6B7280' }}>Loading drivers...</p>
+                        </div>
+                    ) : filteredDrivers.length > 0 ? filteredDrivers.map((driver) => {
+                        const status = getDriverDeliveryStatus(driver._id);
+                        
+                        return (
+                            <div key={driver._id} style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <div style={{ width: '48px', height: '48px', background: '#EEF2FF', borderRadius: '1rem', display: 'grid', placeItems: 'center', color: '#4F46E5' }}>
+                                            <User size={24} />
+                                        </div>
+                                        <div>
+                                            <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#111827' }}>{driver.user?.name || 'Unknown'}</h4>
+                                            <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>ID: {driver._id.slice(-6).toUpperCase()}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
+                                        <span style={{ 
+                                            padding: '0.25rem 0.625rem', 
+                                            borderRadius: '1rem', 
+                                            fontSize: '0.7rem', 
+                                            fontWeight: '800',
+                                            background: status.bg,
+                                            color: status.color,
+                                            textTransform: 'uppercase'
+                                        }}>
+                                            {status.label}
+                                        </span>
+                                        {status.count > 0 && (
+                                            <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                <Package size={12} /> {status.count} Active
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div style={{ background: '#F9FAFB', borderRadius: '1rem', padding: '1rem', marginBottom: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', marginBottom: '0.25rem', fontWeight: '600' }}>VEHICLE</p>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#374151' }}>{driver.vehicleType || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', marginBottom: '0.25rem', fontWeight: '600' }}>PLATE NO</p>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#374151' }}>{driver.plateNo || 'N/A'}</p>
+                                    </div>
+                                    <div style={{ gridColumn: '1 / -1' }}>
+                                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', marginBottom: '0.25rem', fontWeight: '600' }}>LICENSE NO</p>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#374151', fontFamily: 'monospace' }}>{driver.licenseNo || 'Not provided'}</p>
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                    <a 
+                                        href={`mailto:${driver.user?.email || ''}`}
+                                        style={{ flex: 1, padding: '0.625rem', background: 'white', border: '1px solid #E5E7EB', borderRadius: '0.75rem', fontSize: '0.85rem', fontWeight: '600', color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textDecoration: 'none' }}
+                                    >
+                                        <Mail size={16} />
+                                        Email
+                                    </a>
+                                    <button 
+                                        onClick={() => openEditModal(driver)}
+                                        style={{ padding: '0.625rem', background: 'white', border: '1px solid #E5E7EB', borderRadius: '0.75rem', cursor: 'pointer', title: 'Edit Driver' }}
+                                    >
+                                        <Info size={18} color="#6B7280" />
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    }) : (
+                        <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: '#9CA3AF', background: 'white', borderRadius: '1.25rem', border: '1px dashed #E5E7EB' }}>
+                            <Truck size={48} color="#D1D5DB" style={{ margin: '0 auto 1rem' }} />
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>No drivers found</h3>
+                            <p style={{ fontSize: '0.9rem' }}>{searchQuery ? 'Try adjusting your search terms.' : 'Add your first driver to get started.'}</p>
+                        </div>
+                    )}
+                </div>
+            </main>
+
+            <DriverModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveDriver}
+                driver={editingDriver}
+            />
+        </div>
+    );
+};
+
+export default DriversPage;

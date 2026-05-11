@@ -12,7 +12,8 @@ import {
     User,
     X,
     ExternalLink,
-    Map
+    Map,
+    AlertTriangle
 } from 'lucide-react';
 import useSocket from '../../hooks/useSocket';
 import axios from 'axios';
@@ -55,6 +56,7 @@ const DriverDashboard = () => {
     const [activeOrders, setActiveOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [mapOrder, setMapOrder] = useState(null); // order to show in modal map
+    const [reportOrder, setReportOrder] = useState(null); // order to report issue for
     const [driverPosition, setDriverPosition] = useState(null);
     const [routeCoords, setRouteCoords] = useState(null);
     const socket = useSocket('http://localhost:5000');
@@ -69,7 +71,7 @@ const DriverDashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
-            const completedStatuses = ['delivered', 'Completed'];
+            const completedStatuses = ['delivered', 'Completed', 'Cancelled', 'cancelled'];
             const active = data.filter(o => !completedStatuses.includes(o.status));
             
             setActiveOrders(active);
@@ -110,10 +112,12 @@ const DriverDashboard = () => {
 
     const handleUpdateStatus = async (orderId, newStatus) => {
         const messages = {
-            'In Progress': 'Start this delivery? This will mark it as In Progress.',
+            'Delivering': 'Start this delivery? This will mark it as Delivering.',
             'delivered': 'Mark this order as delivered and complete?'
         };
-        if (!window.confirm(messages[newStatus] || 'Update status?')) return;
+        const currentOrder = activeOrders.find(o => o._id === orderId);
+        const confirmMsg = messages[newStatus] || 'Update status?';
+        if (!window.confirm(confirmMsg)) return;
         try {
             const token = localStorage.getItem('token');
             await axios.put(`http://localhost:5000/api/orders/${orderId}`,
@@ -127,10 +131,27 @@ const DriverDashboard = () => {
         }
     };
 
+    const handleReportIssueSubmit = async (orderId, reason, note) => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:5000/api/orders/${orderId}`,
+                { status: 'Failed Attempt', failedReason: reason, failedNote: note },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setReportOrder(null);
+            fetchOrders();
+        } catch (error) {
+            console.error('Error reporting issue:', error);
+            alert('Failed to report issue');
+        }
+    };
+
     const getStatusBadge = (status) => {
         const map = {
             'Pending':    { bg: '#FEF9C3', color: '#92400E', label: 'Pending' },
-            'In Progress':{ bg: '#DBEAFE', color: '#1D4ED8', label: 'In Progress' },
+            'Dispatched': { bg: '#EEF2FF', color: '#4F46E5', label: 'Dispatched' },
+            'Delivering':{ bg: '#DBEAFE', color: '#1D4ED8', label: 'Delivering' },
+            'Failed Attempt': { bg: '#FEE2E2', color: '#991B1B', label: 'Failed Attempt' },
         };
         return map[status] || { bg: '#F3F4F6', color: '#374151', label: status };
     };
@@ -228,7 +249,7 @@ const DriverDashboard = () => {
                         <Map size={18} /> View Route Map
                     </button>
 
-                    {order.status === 'Pending' && (
+                    {(order.status === 'Pending' || order.status === 'Dispatched') && (
                         <button
                             style={{
                                 width: '100%', padding: '0.875rem', background: '#F59E0B',
@@ -236,24 +257,46 @@ const DriverDashboard = () => {
                                 fontWeight: '700', cursor: 'pointer',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
                             }}
-                            onClick={() => handleUpdateStatus(order._id, 'In Progress')}
+                            onClick={() => handleUpdateStatus(order._id, 'Delivering')}
                         >
                             <Truck size={18} /> Start Delivery
                         </button>
                     )}
-                    {order.status === 'In Progress' && (
-                        <button
-                            style={{
-                                width: '100%', padding: '0.875rem', background: '#10B981',
-                                color: 'white', border: 'none', borderRadius: '0.75rem',
-                                fontWeight: '700', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
-                            }}
-                            onClick={() => handleUpdateStatus(order._id, 'delivered')}
-                        >
-                            <CheckCircle size={18} /> Mark as Delivered
-                        </button>
+                    {order.status === 'Delivering' && (
+                        <>
+                            <button
+                                style={{
+                                    width: '100%', padding: '0.875rem', background: '#10B981',
+                                    color: 'white', border: 'none', borderRadius: '0.75rem',
+                                    fontWeight: '700', cursor: 'pointer',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                                }}
+                                onClick={() => handleUpdateStatus(order._id, 'delivered')}
+                            >
+                                <CheckCircle size={18} /> Mark as Delivered
+                            </button>
+                            <button
+                                style={{
+                                    width: '100%', padding: '0.75rem', background: '#FEF2F2',
+                                    color: '#DC2626', border: '1px solid #FECACA', borderRadius: '0.75rem',
+                                    fontWeight: '700', cursor: 'pointer',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
+                                }}
+                                onClick={() => setReportOrder(order)}
+                            >
+                                <AlertTriangle size={18} /> Report Issue
+                            </button>
+                        </>
+                    )}
+                    {order.status === 'Failed Attempt' && (
+                        <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginTop: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#DC2626', fontWeight: '700', marginBottom: '0.25rem' }}>
+                                <AlertTriangle size={16} /> Failure Reported
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.85rem', color: '#991B1B' }}><strong>Reason:</strong> {order.failedReason}</p>
+                            {order.failedNote && <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#991B1B' }}><strong>Note:</strong> {order.failedNote}</p>}
+                        </div>
                     )}
                 </div>
             </div>
@@ -308,6 +351,78 @@ const DriverDashboard = () => {
 
             {/* Route Map Modal */}
             {mapOrder && <RouteMapModal order={mapOrder} driverPosition={driverPosition} onClose={() => setMapOrder(null)} />}
+
+            {/* Report Issue Modal */}
+            {reportOrder && <ReportIssueModal order={reportOrder} onClose={() => setReportOrder(null)} onSubmit={handleReportIssueSubmit} />}
+        </div>
+    );
+};
+
+// ─── Report Issue Modal ─────────────────────────────────────────
+const ReportIssueModal = ({ order, onClose, onSubmit }) => {
+    const [reason, setReason] = useState('Customer unavailable');
+    const [note, setNote] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        await onSubmit(order._id, reason, note);
+        setLoading(false);
+    };
+
+    return (
+        <div style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+            <div style={{
+                width: '90vw', maxWidth: '500px', background: 'white', borderRadius: '1.5rem',
+                padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ margin: 0, fontWeight: '800', fontSize: '1.25rem', color: '#111827' }}>Report Delivery Issue</h3>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} color="#9CA3AF" /></button>
+                </div>
+                
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>Reason for Failure</label>
+                        <select 
+                            value={reason} 
+                            onChange={e => setReason(e.target.value)}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #D1D5DB', boxSizing: 'border-box' }}
+                        >
+                            <option value="Customer unavailable">Customer unavailable</option>
+                            <option value="Wrong address">Wrong address</option>
+                            <option value="Vehicle issue">Vehicle issue</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>Additional Notes</label>
+                        <textarea 
+                            value={note} 
+                            onChange={e => setNote(e.target.value)}
+                            rows={3}
+                            placeholder="Provide any details here..."
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #D1D5DB', boxSizing: 'border-box' }}
+                        />
+                    </div>
+                    <button 
+                        type="submit" 
+                        disabled={loading}
+                        style={{
+                            padding: '1rem', background: '#EF4444', color: 'white', borderRadius: '0.75rem',
+                            fontWeight: '700', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                            marginTop: '0.5rem'
+                        }}
+                    >
+                        {loading ? 'Submitting...' : 'Submit Issue'}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

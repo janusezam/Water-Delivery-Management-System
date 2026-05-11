@@ -15,10 +15,22 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'In Progress', 'Completed', 'Cancelled', 'delivered', 'dispatched', 'Dispatched'],
+        enum: ['Pending', 'Delivering', 'Completed', 'Cancelled', 'delivered', 'dispatched', 'Dispatched', 'Failed Attempt'],
         default: 'Pending'
     },
     deliveryProofUrl: {
+        type: String
+    },
+    failedReason: {
+        type: String
+    },
+    failedNote: {
+        type: String
+    },
+    cancelReason: {
+        type: String
+    },
+    cancelMessage: {
         type: String
     },
     coordinates: {

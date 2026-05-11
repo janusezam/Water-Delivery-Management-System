@@ -20,7 +20,7 @@ const createDriverIcon = (heading, isSelected) => L.divIcon({
 
 // Custom Order Icon
 const createOrderIcon = (status) => {
-    const color = status === 'In Progress' ? '#10B981' : '#F59E0B';
+    const color = status === 'Delivering' ? '#10B981' : '#F59E0B';
     return L.divIcon({
         className: 'custom-order-icon',
         html: `<div style="background: ${color}; color: white; padding: 8px; border-radius: 50%; border: 2px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;">
@@ -155,7 +155,7 @@ const LiveMapPage = () => {
             setDrivers(initialDrivers);
 
             const activeOrders = ordersData.filter(o => 
-                ['Pending', 'In Progress', 'dispatched', 'Dispatched'].includes(o.status)
+                ['Pending', 'Delivering', 'dispatched', 'Dispatched'].includes(o.status)
             );
             setOrders(activeOrders);
             setLoading(false);
@@ -206,7 +206,7 @@ const LiveMapPage = () => {
         if (driverOrders.length === 0) {
             return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669' };
         }
-        const hasInProgress = driverOrders.some(o => o.status === 'In Progress');
+        const hasInProgress = driverOrders.some(o => o.status === 'Delivering');
         if (hasInProgress) {
             return { label: 'ON DELIVERY', bg: '#DBEAFE', color: '#1D4ED8' };
         }
@@ -432,8 +432,8 @@ const LiveMapPage = () => {
                                             <span style={{ 
                                                 fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
                                                 padding: '0.2rem 0.5rem', borderRadius: '1rem',
-                                                background: o.status === 'In Progress' ? '#DBEAFE' : '#FEF3C7',
-                                                color: o.status === 'In Progress' ? '#1E40AF' : '#92400E'
+                                                background: o.status === 'Delivering' ? '#DBEAFE' : '#FEF3C7',
+                                                color: o.status === 'Delivering' ? '#1E40AF' : '#92400E'
                                             }}>
                                                 {o.status}
                                             </span>

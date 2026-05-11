@@ -69,7 +69,7 @@ const DriversPage = () => {
             return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669', count: 0 };
         }
         
-        const hasInProgress = activeOrders.some(o => o.status === 'In Progress');
+        const hasInProgress = activeOrders.some(o => o.status === 'Delivering');
         if (hasInProgress) {
             return { label: 'ON DELIVERY', bg: '#DBEAFE', color: '#1D4ED8', count: activeOrders.length };
         }

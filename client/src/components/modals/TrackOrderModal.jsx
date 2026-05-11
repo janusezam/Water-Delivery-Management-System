@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, Package, Truck, CheckCircle, Clock, XCircle, User, DollarSign, Map, ExternalLink } from 'lucide-react';
+import { X, MapPin, Package, Truck, CheckCircle, Clock, XCircle, User, DollarSign, Map, ExternalLink, AlertTriangle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -37,7 +37,7 @@ const FitBounds = ({ points }) => {
 
 const STATUS_STEPS = [
     { key: 'Pending',     label: 'Order Placed',    icon: Clock },
-    { key: 'In Progress', label: 'Out for Delivery', icon: Truck },
+    { key: 'Delivering',  label: 'Delivering',       icon: Truck },
     { key: 'delivered',   label: 'Delivered',        icon: CheckCircle },
 ];
 
@@ -125,7 +125,17 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                                 <XCircle size={24} color="#EF4444" />
                                 <div>
                                     <p style={{ fontWeight: '800', color: '#DC2626', margin: 0 }}>Order Cancelled</p>
-                                    <p style={{ fontSize: '0.8rem', color: '#EF4444', margin: 0 }}>This order has been cancelled.</p>
+                                    <p style={{ fontSize: '0.8rem', color: '#EF4444', margin: '0.25rem 0 0' }}>Reason: <strong>{order.cancelReason || 'Not specified'}</strong></p>
+                                    {order.cancelMessage && <p style={{ fontSize: '0.8rem', color: '#EF4444', margin: '0.125rem 0 0' }}>{order.cancelMessage}</p>}
+                                </div>
+                            </div>
+                        ) : order.status === 'Failed Attempt' ? (
+                            <div style={{ background: '#FEF2F2', borderRadius: '1rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid #FECACA' }}>
+                                <AlertTriangle size={24} color="#EF4444" />
+                                <div>
+                                    <p style={{ fontWeight: '800', color: '#DC2626', margin: 0 }}>Delivery Failed</p>
+                                    <p style={{ fontSize: '0.8rem', color: '#EF4444', margin: '0.25rem 0 0' }}>We attempted to deliver your order but encountered an issue: <strong>{order.failedReason}</strong></p>
+                                    {order.failedNote && <p style={{ fontSize: '0.8rem', color: '#EF4444', margin: '0.125rem 0 0' }}>{order.failedNote}</p>}
                                 </div>
                             </div>
                         ) : (

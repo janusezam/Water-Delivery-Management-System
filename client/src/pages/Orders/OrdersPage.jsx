@@ -7,6 +7,7 @@ import OrderModal from '../../components/modals/OrderModal';
 import StorefrontModal from '../../components/modals/StorefrontModal';
 import ManageOrderModal from '../../components/modals/ManageOrderModal';
 import TrackOrderModal from '../../components/modals/TrackOrderModal';
+import CancelOrderModal from '../../components/modals/CancelOrderModal';
 
 const OrdersPage = () => {
     const userProfile = JSON.parse(localStorage.getItem('user') || '{}');
@@ -17,6 +18,7 @@ const OrdersPage = () => {
     const [isStorefrontOpen, setIsStorefrontOpen] = useState(false);
     const [isManageOpen, setIsManageOpen] = useState(false);
     const [isTrackOpen, setIsTrackOpen] = useState(false);
+    const [isCancelOpen, setIsCancelOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
 
     const fetchOrders = async () => {
@@ -74,7 +76,11 @@ const OrdersPage = () => {
             case 'delivered': return { bg: '#ECFDF5', color: '#10B981', icon: <CheckCircle size={16} /> };
             case 'Cancelled':
             case 'cancelled': return { bg: '#FEF2F2', color: '#EF4444', icon: <XCircle size={16} /> };
-            case 'In Progress': return { bg: '#F0F9FF', color: '#0EA5E9', icon: <Clock size={16} /> };
+            case 'Delivering': return { 
+                bg: '#E0F2FE', 
+                color: '#0369A1', 
+                icon: <Truck size={16} style={{ animation: 'pulse 2s infinite' }} /> 
+            };
             default: return { bg: '#F3F4F6', color: '#6B7280', icon: null };
         }
     };
@@ -176,6 +182,7 @@ const OrdersPage = () => {
                                 <tr>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Order ID</th>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Customer</th>
+                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Address</th>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Items</th>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Total</th>
                                     <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Status</th>
@@ -192,8 +199,10 @@ const OrdersPage = () => {
                                         <tr key={order._id} style={{ borderBottom: '1px solid #F3F4F6', transition: 'background 0.2s' }}>
                                             <td style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', fontWeight: '600', color: '#4F46E5' }}>#{order._id.slice(-6).toUpperCase()}</td>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
-                                                <div style={{ fontWeight: '600', color: '#111827' }}>{order.customerName || order.customer?.name}</div>
-                                                <div style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{order.address || order.deliveryAddress}</div>
+                                                <div style={{ fontWeight: '600', color: '#111827', whiteSpace: 'nowrap' }}>{order.customerName || order.customer?.name}</div>
+                                            </td>
+                                            <td style={{ padding: '1.25rem 1.5rem', maxWidth: '200px' }}>
+                                                <div style={{ fontSize: '0.85rem', color: '#4B5563', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{order.address || order.deliveryAddress}</div>
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem', fontSize: '0.85rem', color: '#4B5563' }}>
                                                 {(() => {
@@ -232,30 +241,49 @@ const OrdersPage = () => {
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                    {userProfile.role === 'user' || (activeTab === 'completed') ? (
-                                                        <button
-                                                            onClick={() => { setSelectedOrder(order); setIsTrackOpen(true); }}
-                                                            style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: '#EEF2FF', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
-                                                        >
-                                                            🔍 Details
-                                                        </button>
-                                                    ) : (
-                                                        <>
+                                                    {userProfile.role === 'user' ? (
+                                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                             <button
-                                                                onClick={() => { setSelectedOrder(order); setIsManageOpen(true); }}
-                                                                style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #E5E7EB', background: 'white', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
+                                                                onClick={() => { setSelectedOrder(order); setIsTrackOpen(true); }}
+                                                                style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: '#EEF2FF', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
                                                             >
-                                                                Manage
+                                                                🔍 Details
                                                             </button>
-                                                            {userProfile.role === 'admin' && (
+                                                            {order.status === 'Pending' && (
                                                                 <button
-                                                                    onClick={() => handleDeleteOrder(order._id, order._id.slice(-6).toUpperCase())}
+                                                                    onClick={() => { setSelectedOrder(order); setIsCancelOpen(true); }}
                                                                     style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #FEE2E2', background: '#FEF2F2', fontSize: '0.75rem', fontWeight: '700', color: '#EF4444', cursor: 'pointer' }}
                                                                 >
-                                                                    Delete
+                                                                    Cancel
                                                                 </button>
                                                             )}
-                                                        </>
+                                                        </div>
+                                                    ) : (
+                                                        activeTab === 'completed' ? (
+                                                            <button
+                                                                onClick={() => { setSelectedOrder(order); setIsTrackOpen(true); }}
+                                                                style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: '#EEF2FF', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
+                                                            >
+                                                                🔍 Details
+                                                            </button>
+                                                        ) : (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => { setSelectedOrder(order); setIsManageOpen(true); }}
+                                                                    style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #E5E7EB', background: 'white', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
+                                                                >
+                                                                    Manage
+                                                                </button>
+                                                                {userProfile.role === 'admin' && (
+                                                                    <button
+                                                                        onClick={() => handleDeleteOrder(order._id, order._id.slice(-6).toUpperCase())}
+                                                                        style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #FEE2E2', background: '#FEF2F2', fontSize: '0.75rem', fontWeight: '700', color: '#EF4444', cursor: 'pointer' }}
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                )}
+                                                            </>
+                                                        )
                                                     )}
                                                 </div>
                                             </td>
@@ -263,7 +291,7 @@ const OrdersPage = () => {
                                     );
                                 }) : (
                                     <tr>
-                                        <td colSpan="7" style={{ padding: '3rem', textAlign: 'center', color: '#9CA3AF' }}>
+                                        <td colSpan="8" style={{ padding: '3rem', textAlign: 'center', color: '#9CA3AF' }}>
                                             {loading ? 'Loading orders...' : `No ${activeTab} orders found.`}
                                         </td>
                                     </tr>
@@ -305,6 +333,21 @@ const OrdersPage = () => {
                     order={selectedOrder}
                 />
             )}
+            {isCancelOpen && (
+                <CancelOrderModal
+                    isOpen={isCancelOpen}
+                    onClose={() => setIsCancelOpen(false)}
+                    order={selectedOrder}
+                    onCancelSuccess={fetchOrders}
+                />
+            )}
+            <style>{`
+                @keyframes pulse {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.7; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+            `}</style>
         </div>
     );
 };

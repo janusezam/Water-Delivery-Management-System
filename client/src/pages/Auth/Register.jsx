@@ -140,15 +140,15 @@ const Register = () => {
             {/* Left Side */}
             <div className="login-left-pane">
                 <img src={logo} alt="Logo" className="brand-logo" />
-                <h1 style={{ fontSize: '3rem', fontWeight: '800', margin: 0, fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em', textShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>WRS-DMS</h1>
-                <p style={{ fontSize: '1.25rem', opacity: 0.9, marginTop: '0.75rem', fontWeight: '500', letterSpacing: '0.05em' }}>Water Refilling System</p>
+                <h1 style={{ fontSize: '3rem', fontWeight: '800', margin: 0, fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em', textShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>AquaDeliver</h1>
+                <p style={{ fontSize: '1.25rem', opacity: 0.9, marginTop: '0.75rem', fontWeight: '500', letterSpacing: '0.05em' }}>A Water Refilling Station Delivery Management System</p>
             </div>
 
             {/* Right Side */}
             <div className="login-right-pane">
                 <div className="login-card">
                     <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem', fontFamily: "'Outfit', sans-serif" }}>Create Account</h2>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '2rem' }}>Join the WRS-DMS network today</p>
+                    <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '2rem' }}>Join the AquaDeliver network today</p>
 
                     {message && (
                         <div style={{ 

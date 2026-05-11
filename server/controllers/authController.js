@@ -169,7 +169,7 @@ const forgotPassword = async (req, res) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: user.email,
-        subject: 'WRS-DMS Password Reset OTP',
+        subject: 'AquaDeliver Password Reset OTP',
         text: `Your OTP for password reset is: ${otp}. It will expire in 10 minutes.`,
     };
 

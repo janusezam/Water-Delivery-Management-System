@@ -6,7 +6,7 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.get('/', protect, authorize('admin', 'staff', 'driver', 'user'), getOrders);
 router.post('/', protect, createOrder);
-router.put('/:id', protect, authorize('admin', 'staff', 'driver'), upload.single('deliveryProof'), updateOrder);
+router.put('/:id', protect, authorize('admin', 'staff', 'driver', 'user'), upload.single('deliveryProof'), updateOrder);
 router.delete('/:id', protect, authorize('admin'), deleteOrder);
 
 module.exports = router;

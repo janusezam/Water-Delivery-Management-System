@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Truck, User, MapPin, Package, CheckCircle2 } from 'lucide-react';
+import { X, Truck, User, MapPin, Package, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { getUsers, updateOrder } from '../../services';
 import { toast } from 'react-hot-toast';
 
@@ -7,6 +7,7 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
     const [drivers, setDrivers] = useState([]);
     const [status, setStatus] = useState(order?.status || 'Pending');
     const [assignedDriver, setAssignedDriver] = useState(order?.assignedDriver?._id || order?.assignedDriver || '');
+    const [overrideStatus, setOverrideStatus] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -47,7 +48,17 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
         }
     };
 
-    const statusOptions = ['Pending', 'In Progress', 'Completed', 'Cancelled'];
+    const statusOptions = ['Pending', 'Dispatched', 'Delivering', 'Completed', 'Cancelled', 'Failed Attempt'];
+
+    const handleStatusChange = (newStatus) => {
+        setStatus(newStatus);
+        if (newStatus === 'Cancelled') {
+            setAssignedDriver('');
+        }
+    };
+
+    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     return (
         <div style={{
@@ -96,15 +107,68 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    {order?.status === 'Failed Attempt' && (
+                        <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#DC2626', fontWeight: '700', marginBottom: '0.25rem' }}>
+                                <AlertTriangle size={16} /> Delivery Failed
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.85rem', color: '#991B1B' }}><strong>Reason:</strong> {order.failedReason}</p>
+                            {order.failedNote && <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#991B1B' }}><strong>Note:</strong> {order.failedNote}</p>}
+                        </div>
+                    )}
+
+                    {order?.status === 'Cancelled' && (order.cancelReason || order.cancelMessage) && (
+                        <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#DC2626', fontWeight: '700', marginBottom: '0.25rem' }}>
+                                <AlertTriangle size={16} /> Cancellation Details
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.85rem', color: '#991B1B' }}><strong>Reason:</strong> {order.cancelReason || 'Not specified'}</p>
+                            {order.cancelMessage && <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#991B1B' }}><strong>Message:</strong> {order.cancelMessage}</p>}
+                        </div>
+                    )}
+
                     <div>
                         <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>Order Status</label>
                         <select 
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
+                            onChange={(e) => handleStatusChange(e.target.value)}
                             style={{ width: '100%', padding: '0.875rem', borderRadius: '0.75rem', border: '1px solid #D1D5DB', background: 'white', outline: 'none' }}
                         >
-                            {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                            {statusOptions.map(opt => {
+                                const isDriverOnlyStatus = ['Delivering', 'Completed', 'Failed Attempt', 'delivered'].includes(opt);
+                                const isDisabled = !overrideStatus && (
+                                    (assignedDriver && isDriverOnlyStatus && order?.status !== opt) || 
+                                    (!assignedDriver && isDriverOnlyStatus)
+                                );
+                                return <option key={opt} value={opt} disabled={isDisabled}>{opt}</option>;
+                            })}
                         </select>
+                        
+                        {/* Admin-only Override section */}
+                        {currentUser.role === 'admin' && assignedDriver && (
+                            <div style={{ marginTop: '0.75rem' }}>
+                                <button 
+                                    type="button"
+                                    onClick={() => setShowAdvanced(!showAdvanced)}
+                                    style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: '0.75rem', cursor: 'pointer', padding: 0, textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                                >
+                                    {showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}
+                                </button>
+                                
+                                {showAdvanced && (
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#EF4444', marginTop: '0.5rem', padding: '0.75rem', background: '#FEF2F2', borderRadius: '0.75rem', border: '1px dashed #FECACA' }}>
+                                        <input type="checkbox" checked={overrideStatus} onChange={e => setOverrideStatus(e.target.checked)} />
+                                        Override Driver Workflow (Allow direct status changes)
+                                    </label>
+                                )}
+                            </div>
+                        )}
+
+                        {!assignedDriver && (
+                            <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: '#9CA3AF', fontStyle: 'italic' }}>
+                                * Assign a driver to enable "Delivering" or "Completed" statuses.
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -112,7 +176,8 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
                         <select 
                             value={assignedDriver}
                             onChange={(e) => setAssignedDriver(e.target.value)}
-                            style={{ width: '100%', padding: '0.875rem', borderRadius: '0.75rem', border: '1px solid #D1D5DB', background: 'white', outline: 'none' }}
+                            disabled={status === 'Cancelled' || status === 'Pending'}
+                            style={{ width: '100%', padding: '0.875rem', borderRadius: '0.75rem', border: '1px solid #D1D5DB', background: (status === 'Cancelled' || status === 'Pending') ? '#F3F4F6' : 'white', outline: 'none' }}
                         >
                             <option value="">-- Select a Driver --</option>
                             {drivers.map(d => (
@@ -121,6 +186,16 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
                                 </option>
                             ))}
                         </select>
+                        {status === 'Cancelled' && (
+                            <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: '#EF4444' }}>
+                                Driver assignment is disabled for cancelled orders.
+                            </p>
+                        )}
+                        {status === 'Pending' && (
+                            <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: '#4F46E5', fontWeight: '600' }}>
+                                * Dispatch the order first to assign a driver.
+                            </p>
+                        )}
                     </div>
 
                     <button 

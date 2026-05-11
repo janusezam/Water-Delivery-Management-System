@@ -117,7 +117,19 @@ const Sidebar = ({ role }) => {
                     transition: 'all 0.3s ease',
                     overflow: 'hidden'
                 }}>
-                    <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <div style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        backgroundColor: '#4F46E5', 
+                        WebkitMaskImage: `url(${logo})`,
+                        WebkitMaskSize: 'contain',
+                        WebkitMaskPosition: 'center',
+                        WebkitMaskRepeat: 'no-repeat',
+                        maskImage: `url(${logo})`,
+                        maskSize: 'contain',
+                        maskPosition: 'center',
+                        maskRepeat: 'no-repeat'
+                    }} title="AquaDeliver Logo" />
                 </div>
                 {!isCollapsed && (
                     <h1 style={{

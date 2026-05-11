@@ -66,7 +66,7 @@ const DeliveryHistory = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
-            const completedStatuses = ['delivered', 'Completed'];
+            const completedStatuses = ['delivered', 'Completed', 'Cancelled', 'cancelled'];
             const delivered = data.filter(o => completedStatuses.includes(o.status));
             
             // Sort by most recent first
@@ -99,9 +99,10 @@ const DeliveryHistory = () => {
                 <span style={{
                     padding: '0.25rem 0.75rem', borderRadius: '2rem',
                     fontSize: '0.75rem', fontWeight: '700',
-                    background: '#D1FAE5', color: '#065F46'
+                    background: ['Cancelled', 'cancelled'].includes(order.status) ? '#FEE2E2' : '#D1FAE5', 
+                    color: ['Cancelled', 'cancelled'].includes(order.status) ? '#991B1B' : '#065F46'
                 }}>
-                    Completed
+                    {['Cancelled', 'cancelled'].includes(order.status) ? 'Cancelled' : 'Completed'}
                 </span>
             </div>
 

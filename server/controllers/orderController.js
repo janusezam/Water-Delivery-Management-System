@@ -110,12 +110,56 @@ const updateOrder = async (req, res) => {
         // Build update payload
         const updateData = {};
         if (newStatus) updateData.status = newStatus;
+        
+        const assignedDriverId = req.body.assignedDriver !== undefined ? req.body.assignedDriver : currentOrder.assignedDriver;
+        
+        // Validation: Driver-only statuses require an assigned driver
+        const driverOnlyStatuses = ['Delivering', 'Completed', 'delivered', 'Failed Attempt'];
+        if (newStatus && driverOnlyStatuses.includes(newStatus) && !assignedDriverId) {
+            return res.status(400).json({ 
+                message: `Status '${newStatus}' requires an assigned driver.` 
+            });
+        }
+
+        // Validation: Cannot assign driver if Pending
+        const targetStatus = newStatus || oldStatus;
+        if (targetStatus === 'Pending' && assignedDriverId) {
+            return res.status(400).json({ 
+                message: "Drivers cannot be assigned to Pending orders. Dispatch the order first." 
+            });
+        }
+
+        // Validation: Users can only cancel if Pending
+        if (req.user && req.user.role === 'user') {
+            if (newStatus && newStatus !== 'Cancelled') {
+                return res.status(403).json({ message: 'Users are only authorized to cancel their orders.' });
+            }
+            if (newStatus === 'Cancelled') {
+                if (oldStatus !== 'Pending') {
+                    return res.status(400).json({ 
+                        message: `Order cannot be cancelled once it is ${oldStatus}.` 
+                    });
+                }
+                if (!req.body.cancelReason) {
+                    return res.status(400).json({ message: 'Cancellation reason is required.' });
+                }
+            }
+            // Prevent users from updating other fields
+            delete req.body.assignedDriver;
+            delete req.body.customerName;
+            delete req.body.address;
+        }
+
         if (req.body.assignedDriver !== undefined) {
             updateData.assignedDriver = req.body.assignedDriver || null;
         }
         if (req.body.customerName) updateData.customerName = req.body.customerName;
         if (req.body.address) updateData.address = req.body.address;
         if (req.file) updateData.deliveryProofUrl = req.file.path;
+        if (req.body.failedReason !== undefined) updateData.failedReason = req.body.failedReason;
+        if (req.body.failedNote !== undefined) updateData.failedNote = req.body.failedNote;
+        if (req.body.cancelReason !== undefined) updateData.cancelReason = req.body.cancelReason;
+        if (req.body.cancelMessage !== undefined) updateData.cancelMessage = req.body.cancelMessage;
 
         // Inventory Logic: Deduct stock when status moves to 'delivered' or 'Completed'
         const completionStatuses = ['delivered', 'Completed'];

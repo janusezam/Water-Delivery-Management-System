@@ -42,55 +42,55 @@ const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
                     <X size={24} />
                 </button>
                 
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-dark)' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-main)' }}>
                     {driver ? 'Edit Driver' : 'Register New Driver'}
                 </h3>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Full Name</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Full Name</label>
                         <input 
                             type="text" 
                             required
                             className="input-field"
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     {!driver && (
                         <>
                             <div>
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Email Address</label>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Email Address</label>
                                 <input 
                                     type="email" 
                                     required
                                     className="input-field"
                                     value={formData.email}
                                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                                 />
                             </div>
                             <div>
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Password</label>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Password</label>
                                 <input 
                                     type="password" 
                                     required
                                     className="input-field"
                                     value={formData.password}
                                     onChange={(e) => setFormData({...formData, password: e.target.value})}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                                 />
                             </div>
                         </>
                     )}
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Vehicle Type</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Vehicle Type</label>
                         <select 
                             className="input-field"
                             value={formData.vehicleType}
                             onChange={(e) => setFormData({...formData, vehicleType: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         >
                             <option value="tricycle">Tricycle</option>
                             <option value="motorcycle">Motorcycle</option>
@@ -99,14 +99,14 @@ const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
                         </select>
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Plate Number</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Plate Number</label>
                         <input 
                             type="text" 
                             required
                             className="input-field"
                             value={formData.plateNo}
                             onChange={(e) => setFormData({...formData, plateNo: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     <button type="submit" className="btn-primary" style={{ marginTop: '1rem', padding: '1rem', borderRadius: '0.75rem', background: 'var(--accent-indigo)', color: 'white', fontWeight: '700', border: 'none', cursor: 'pointer' }}>

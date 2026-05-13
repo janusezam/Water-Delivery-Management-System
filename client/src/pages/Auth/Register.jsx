@@ -63,7 +63,7 @@ const Register = () => {
                     padding: 2rem;
                 }
                 .login-card {
-                    background: white;
+                    background: var(--input-bg);
                     padding: 3rem;
                     border-radius: 1.5rem;
                     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -84,7 +84,7 @@ const Register = () => {
                 .login-input:focus {
                     border-color: var(--accent-blue);
                     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-                    background: white;
+                    background: var(--input-bg);
                 }
                 .login-btn {
                     width: 100%;

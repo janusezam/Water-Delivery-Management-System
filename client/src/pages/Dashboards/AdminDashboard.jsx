@@ -46,14 +46,14 @@ const AdminDashboard = () => {
     }, []);
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#F9FAFB' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="admin" />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Header breadcrumbs={['Dashboard']} />
 
                 {loading ? (
-                    <div style={{ flex: 1, display: 'grid', placeItems: 'center', color: '#6B7280' }}>
+                    <div style={{ flex: 1, display: 'grid', placeItems: 'center', color: 'var(--text-muted)' }}>
                         <div style={{ textAlign: 'center' }}>
                             <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #EEF2FF', borderTopColor: '#4F46E5', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
                             <p style={{ fontSize: '0.9rem', fontWeight: '500' }}>Syncing data...</p>
@@ -64,8 +64,8 @@ const AdminDashboard = () => {
                         {/* Summary Header */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                             <div>
-                                <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Overview</h2>
-                                <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>Welcome back, here is what's happening today.</p>
+                                <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Overview</h2>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>Welcome back, here is what's happening today.</p>
                             </div>
                             <button style={{ 
                                 background: '#4F46E5', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', 
@@ -85,13 +85,13 @@ const AdminDashboard = () => {
                                 { label: 'Active Drivers', value: (stats?.activeDrivers || 0).toString(), icon: <Users size={20} color="#F59E0B" />, trend: 'Available', bg: '#FFFBEB' },
                                 { label: 'Outstanding Jugs', value: (stats?.jugs?.outstanding || 0).toString(), icon: <AlertTriangle size={20} color="#EF4444" />, trend: 'At Customers', bg: '#FEF2F2' }
                             ].map((stat, i) => (
-                                <div key={i} style={{ padding: '1.5rem', background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <div key={i} style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                                         <div style={{ padding: '0.75rem', background: stat.bg, borderRadius: '0.85rem' }}>{stat.icon}</div>
                                         <span style={{ fontSize: '0.75rem', fontWeight: '700', color: stat.icon.props.color, padding: '0.25rem 0.5rem', background: stat.bg, borderRadius: '2rem' }}>{stat.trend}</span>
                                     </div>
-                                    <h4 style={{ color: '#6B7280', fontSize: '0.85rem', fontWeight: '500', marginBottom: '0.25rem' }}>{stat.label}</h4>
-                                    <p style={{ fontSize: '1.75rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>{stat.value}</p>
+                                    <h4 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '500', marginBottom: '0.25rem' }}>{stat.label}</h4>
+                                    <p style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>{stat.value}</p>
                                 </div>
                             ))}
                         </div>
@@ -99,47 +99,47 @@ const AdminDashboard = () => {
                         {/* Bottom Grid */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.5rem' }}>
                             {/* Ongoing Trips */}
-                            <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                            <div style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                    <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: '#111827' }}>Active Delivery Trips</h3>
-                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', background: '#EEF2FF', padding: '0.35rem 0.75rem', borderRadius: '2rem' }}>Live Tracking</span>
+                                    <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: 'var(--text-main)' }}>Active Delivery Trips</h3>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', background: 'var(--badge-blue-bg)', padding: '0.35rem 0.75rem', borderRadius: '2rem' }}>Live Tracking</span>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {trips.length > 0 ? trips.map((trip, i) => (
-                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: '#F9FAFB', borderRadius: '1rem', border: '1px solid #F3F4F6' }}>
-                                            <div style={{ width: '40px', height: '40px', background: 'white', borderRadius: '0.75rem', display: 'grid', placeItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px solid var(--surface-hover)' }}>
+                                            <div style={{ width: '40px', height: '40px', background: 'var(--surface-bg)', borderRadius: '0.75rem', display: 'grid', placeItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                                                 <MapPin size={20} color="#4F46E5" />
                                             </div>
                                             <div style={{ flex: 1 }}>
-                                                <div style={{ fontWeight: '700', color: '#111827', fontSize: '0.9rem' }}>{trip.driverName}</div>
-                                                <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>{trip.destination || 'On Route'} • {trip.status}</div>
+                                                <div style={{ fontWeight: '700', color: 'var(--text-main)', fontSize: '0.9rem' }}>{trip.driverName}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{trip.destination || 'On Route'} • {trip.status}</div>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
                                                 <div style={{ fontWeight: '700', color: '#10B981', fontSize: '0.9rem' }}>Active</div>
-                                                <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>Started 10m ago</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Started 10m ago</div>
                                             </div>
                                         </div>
                                     )) : (
-                                        <div style={{ textAlign: 'center', padding: '3rem 2rem', background: '#F9FAFB', borderRadius: '1rem', border: '1px dashed #E5E7EB' }}>
-                                            <Package size={40} color="#D1D5DB" style={{ marginBottom: '1rem' }} />
-                                            <p style={{ color: '#9CA3AF', fontSize: '0.9rem' }}>No active trips right now.</p>
+                                        <div style={{ textAlign: 'center', padding: '3rem 2rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px dashed var(--border-light)' }}>
+                                            <Package size={40} color="var(--text-light)" style={{ marginBottom: '1rem' }} />
+                                            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>No active trips right now.</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
                             {/* Recent Activity Placeholder */}
-                            <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: '#111827', marginBottom: '1.5rem' }}>System Status</h3>
+                            <div style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '1.5rem' }}>System Status</h3>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                                     {[
                                         { label: 'Database Status', value: 'Connected', color: '#10B981' },
                                         { label: 'Cloudinary Storage', value: 'Active', color: '#10B981' },
                                         { label: 'Map Services', value: 'Operational', color: '#10B981' },
-                                        { label: 'Last System Sync', value: 'Just now', color: '#6B7280' }
+                                        { label: 'Last System Sync', value: 'Just now', color: 'var(--text-muted)' }
                                     ].map((item, i) => (
-                                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 3 ? '1px solid #F3F4F6' : 'none' }}>
-                                            <span style={{ fontSize: '0.9rem', color: '#6B7280' }}>{item.label}</span>
+                                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 3 ? '1px solid var(--surface-hover)' : 'none' }}>
+                                            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{item.label}</span>
                                             <span style={{ fontSize: '0.9rem', fontWeight: '700', color: item.color }}>{item.value}</span>
                                         </div>
                                     ))}

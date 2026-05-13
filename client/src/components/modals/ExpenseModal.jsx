@@ -181,7 +181,7 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                 </button>
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
                         {expense ? 'Edit Gas Expense' : 'Log Gas Expense'}
                     </h3>
                     {expense?.createdBy?.role === 'admin' ? (
@@ -200,26 +200,26 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                         <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Date</label>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Date</label>
                             <input 
                                 type="date" 
                                 required
                                 disabled={isLocked}
                                 value={formData.date}
                                 onChange={(e) => setFormData({...formData, date: e.target.value})}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none' }}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                             />
                         </div>
                         
                         {!isDriver ? (
                             <div>
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Driver</label>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Driver</label>
                                 <select 
                                     required
                                     disabled={isLocked}
                                     value={formData.driver}
                                     onChange={(e) => setFormData({...formData, driver: e.target.value})}
-                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none' }}
+                                    style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                                 >
                                     <option value="">-- Select Driver --</option>
                                     {drivers.map(d => <option key={d._id} value={d._id}>{d.user?.name}</option>)}
@@ -227,8 +227,8 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                             </div>
                         ) : (
                             <div>
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Logging as</label>
-                                <div style={{ background: '#F3F4F6', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', fontWeight: '600', color: 'var(--text-dark)' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Logging as</label>
+                                <div style={{ background: 'var(--surface-hover)', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', fontWeight: '600', color: 'var(--text-main)' }}>
                                     {user.name}
                                 </div>
                             </div>
@@ -236,12 +236,12 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Link to Trip (Optional)</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Link to Trip (Optional)</label>
                         <select 
                             value={formData.trip}
                             disabled={isLocked}
                             onChange={(e) => setFormData({...formData, trip: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                         >
                             <option value="">-- No Trip Linked --</option>
                             {trips.map(t => (
@@ -254,7 +254,7 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
                         <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Trip Distance</label>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Trip Distance</label>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input 
                                     type="number" 
@@ -264,13 +264,13 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                                     placeholder="e.g. 50"
                                     value={formData.inputDistance}
                                     onChange={(e) => setFormData({...formData, inputDistance: e.target.value})}
-                                    style={{ flex: 1, padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none' }}
+                                    style={{ flex: 1, padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                                 />
                                 <select 
                                     value={unitDistance}
                                     onChange={(e) => setUnitDistance(e.target.value)}
                                     disabled={isLocked}
-                                    style={{ width: '120px', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none', color: 'var(--text-dark)' }}
+                                    style={{ width: '120px', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none', color: 'var(--text-main)' }}
                                 >
                                     <option value="kilometers">kilometers (km)</option>
                                     <option value="miles">miles</option>
@@ -279,7 +279,7 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                         </div>
 
                         <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Fuel Efficiency</label>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Fuel Efficiency</label>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input 
                                     type="number" 
@@ -289,13 +289,13 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                                     placeholder="e.g. 10.5"
                                     value={formData.inputEfficiency}
                                     onChange={(e) => setFormData({...formData, inputEfficiency: e.target.value})}
-                                    style={{ flex: 1, padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none' }}
+                                    style={{ flex: 1, padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                                 />
                                 <select 
                                     value={unitEfficiency}
                                     onChange={(e) => setUnitEfficiency(e.target.value)}
                                     disabled={isLocked}
-                                    style={{ width: '180px', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none', color: 'var(--text-dark)' }}
+                                    style={{ width: '180px', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none', color: 'var(--text-main)' }}
                                 >
                                     <option value="km/L">kilometers per liter (km/L)</option>
                                     <option value="mpg">miles per gallon (mpg)</option>
@@ -306,7 +306,7 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                         </div>
 
                         <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Gas/Fuel Price</label>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Gas/Fuel Price</label>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <input 
                                     type="number" 
@@ -316,13 +316,13 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                                     placeholder="0.00"
                                     value={formData.inputPrice}
                                     onChange={(e) => setFormData({...formData, inputPrice: e.target.value})}
-                                    style={{ flex: 1, padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none' }}
+                                    style={{ flex: 1, padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                                 />
                                 <select 
                                     value={unitPrice}
                                     onChange={(e) => setUnitPrice(e.target.value)}
                                     disabled={isLocked}
-                                    style={{ width: '120px', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none', color: 'var(--text-dark)' }}
+                                    style={{ width: '120px', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none', color: 'var(--text-main)' }}
                                 >
                                     <option value="per liter">per liter</option>
                                     <option value="per gallon">per gallon</option>
@@ -343,25 +343,25 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Fuel Station (Optional)</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Fuel Station (Optional)</label>
                         <input 
                             type="text" 
                             disabled={isLocked}
                             placeholder="e.g. Shell, Petron..."
                             value={formData.fuel_station}
                             onChange={(e) => setFormData({...formData, fuel_station: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                         />
                     </div>
                     
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Notes</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Notes</label>
                         <textarea 
                             disabled={isLocked}
                             placeholder="Any additional details..."
                             value={formData.notes}
                             onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: isLocked ? '#F3F4F6' : 'white', outline: 'none', resize: 'vertical', minHeight: '80px' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none', resize: 'vertical', minHeight: '80px' }}
                         />
                     </div>
 
@@ -369,7 +369,7 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                         onClick={() => !isLocked && fileInputRef.current.click()}
                         style={{ 
                             padding: '1.5rem', border: '2px dashed var(--border-light)', borderRadius: '1rem', 
-                            textAlign: 'center', cursor: isLocked ? 'default' : 'pointer', background: isLocked ? '#F3F4F6' : 'white'
+                            textAlign: 'center', cursor: isLocked ? 'default' : 'pointer', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)'
                         }}
                     >
                         {previewUrl ? (

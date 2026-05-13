@@ -1,9 +1,32 @@
-import React from 'react';
-import { Bell, Search, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Search, ChevronRight, Moon, Sun } from 'lucide-react';
 
 const Header = ({ breadcrumbs = [] }) => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??';
+
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    useEffect(() => {
+        // Check local storage or system preference on load
+        const savedMode = localStorage.getItem('theme');
+        if (savedMode === 'dark' || (!savedMode && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            setIsDarkMode(true);
+            document.body.classList.add('dark-mode');
+        }
+    }, []);
+
+    const toggleTheme = () => {
+        if (isDarkMode) {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+            setIsDarkMode(false);
+        } else {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+            setIsDarkMode(true);
+        }
+    };
 
     return (
         <header style={{
@@ -11,16 +34,16 @@ const Header = ({ breadcrumbs = [] }) => {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '1.25rem 2rem',
-            background: 'white',
-            borderBottom: '1px solid #E5E7EB',
+            background: 'var(--surface-bg)',
+            borderBottom: '1px solid var(--border-light)',
             position: 'sticky',
             top: 0,
             zIndex: 50,
             animation: 'fadeIn 0.3s ease-out'
         }}>
             {/* Breadcrumbs */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6B7280', fontSize: '0.85rem', fontWeight: '500' }}>
-                <span style={{ color: '#111827', fontWeight: '700', textTransform: 'capitalize' }}>{user.role || 'Admin'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '500' }}>
+                <span style={{ color: 'var(--text-main)', fontWeight: '700', textTransform: 'capitalize' }}>{user.role || 'Admin'}</span>
                 {breadcrumbs.map((crumb, index) => (
                     <React.Fragment key={index}>
                         <ChevronRight size={14} />
@@ -33,17 +56,36 @@ const Header = ({ breadcrumbs = [] }) => {
 
             {/* Right Section: Notifications & Profile */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                <div style={{ position: 'relative', color: '#6B7280', cursor: 'pointer' }}>
+                <button 
+                    onClick={toggleTheme}
+                    style={{ 
+                        background: 'transparent', 
+                        border: 'none', 
+                        cursor: 'pointer', 
+                        color: 'var(--text-muted)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '0.5rem',
+                        borderRadius: '0.5rem',
+                        transition: 'background 0.2s'
+                    }}
+                    title="Toggle Dark Mode"
+                >
+                    {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+
+                <div style={{ position: 'relative', color: 'var(--text-muted)', cursor: 'pointer' }}>
                     <Bell size={20} />
-                    <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: '#EF4444', borderRadius: '50%', border: '2px solid white' }}></span>
+                    <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: '#EF4444', borderRadius: '50%', border: '2px solid var(--surface-bg)' }}></span>
                 </div>
 
-                <div style={{ height: '24px', width: '1px', background: '#E5E7EB' }}></div>
+                <div style={{ height: '24px', width: '1px', background: 'var(--border-light)' }}></div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.875rem', fontWeight: '700', color: '#111827' }}>{user.name || 'Admin'}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#6B7280', textTransform: 'capitalize' }}>{user.role || 'Super Admin'}</div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)' }}>{user.name || 'Admin'}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>{user.role || 'Super Admin'}</div>
                     </div>
                     <div style={{ 
                         width: '40px', 

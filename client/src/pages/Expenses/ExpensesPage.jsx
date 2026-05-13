@@ -136,17 +136,17 @@ const ExpensesPage = () => {
 
     // Efficiency highlighting
     const getRowStyle = (expense) => {
-        if (!isAdmin || !summary?.avg_km_per_liter || !expense.km_per_liter) return { borderBottom: '1px solid #F3F4F6' };
+        if (!isAdmin || !summary?.avg_km_per_liter || !expense.km_per_liter) return { borderBottom: '1px solid var(--surface-hover)' };
         
         const threshold = summary.avg_km_per_liter * 0.7; // < 70% of average
         if (expense.km_per_liter < threshold) {
-            return { borderBottom: '1px solid #F3F4F6', background: '#FEF3C7' }; // Amber warning
+            return { borderBottom: '1px solid var(--surface-hover)', background: '#FEF3C7' }; // Amber warning
         }
-        return { borderBottom: '1px solid #F3F4F6' };
+        return { borderBottom: '1px solid var(--surface-hover)' };
     };
 
     return (
-        <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: '#F9FAFB' }}>
+        <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role={user.role} />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -155,8 +155,8 @@ const ExpensesPage = () => {
                 <main className="content" style={{ padding: '2rem 3rem', animation: 'fadeIn 0.5s ease-out', maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
                     <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                         <div>
-                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Gas Expenses</h2>
-                            <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>
+                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Gas Expenses</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>
                                 {isDriver ? 'Track your fuel costs and maintenance records.' : 'Monitor fuel costs and efficiency across the fleet.'}
                             </p>
                         </div>
@@ -165,8 +165,8 @@ const ExpensesPage = () => {
                                 <button 
                                     onClick={handleExport}
                                     style={{ 
-                                        background: 'white', color: '#374151', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', 
-                                        border: '1px solid #E5E7EB', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', 
+                                        background: 'var(--surface-bg)', color: 'var(--text-muted)', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', 
+                                        border: '1px solid var(--border-light)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', 
                                         cursor: 'pointer', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
                                     }}
                                 >
@@ -190,59 +190,59 @@ const ExpensesPage = () => {
 
                     {isAdmin && summary && (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
-                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Spend</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>₱{(summary.total_spend || 0).toLocaleString()}</p>
+                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Spend</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>₱{(summary.total_spend || 0).toLocaleString()}</p>
                             </div>
-                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Liters</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>{(summary.total_liters || 0).toLocaleString()}L</p>
+                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Liters</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{(summary.total_liters || 0).toLocaleString()}L</p>
                             </div>
-                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Avg Efficiency</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>{summary.avg_km_per_liter ? `${summary.avg_km_per_liter} KM/L` : 'N/A'}</p>
+                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Avg Efficiency</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.avg_km_per_liter ? `${summary.avg_km_per_liter} KM/L` : 'N/A'}</p>
                             </div>
-                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Fill-ups</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>{summary.number_of_fillups || 0}</p>
+                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Fill-ups</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.number_of_fillups || 0}</p>
                             </div>
-                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Cost per Gallon</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>
-                                    {summary.fuel_cost_per_gallon_delivered ? `₱${summary.fuel_cost_per_gallon_delivered}` : <span style={{ fontSize: '1.2rem', color: '#9CA3AF' }}>N/A (No deliveries)</span>}
+                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Cost per Gallon</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                                    {summary.fuel_cost_per_gallon_delivered ? `₱${summary.fuel_cost_per_gallon_delivered}` : <span style={{ fontSize: '1.2rem', color: 'var(--text-light)' }}>N/A (No deliveries)</span>}
                                 </p>
                             </div>
                         </div>
                     )}
 
 
-                    <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #F3F4F6', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--surface-hover)', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ position: 'relative', width: '320px', flex: '1 1 auto', maxWidth: '400px' }}>
-                                <Search style={{ position: 'absolute', top: '10px', left: '12px', color: '#9CA3AF' }} size={18} />
+                                <Search style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-light)' }} size={18} />
                                 <input 
                                     type="text" 
                                     placeholder="Search driver or station..." 
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
+                                    style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem' }}
                                 />
                             </div>
                             
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                                <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: '600' }}>Filter Date:</span>
+                                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Filter Date:</span>
                                 <input 
                                     type="date" 
                                     value={dateFrom}
                                     onChange={(e) => setDateFrom(e.target.value)}
-                                    style={{ padding: '0.625rem 1rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
+                                    style={{ padding: '0.625rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem' }}
                                 />
-                                <span style={{ color: '#9CA3AF' }}>to</span>
+                                <span style={{ color: 'var(--text-light)' }}>to</span>
                                 <input 
                                     type="date" 
                                     value={dateTo}
                                     onChange={(e) => setDateTo(e.target.value)}
-                                    style={{ padding: '0.625rem 1rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
+                                    style={{ padding: '0.625rem 1rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem' }}
                                 />
                                 {(dateFrom || dateTo) && (
                                     <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: '0.85rem', cursor: 'pointer', fontWeight: '600' }}>
@@ -254,56 +254,56 @@ const ExpensesPage = () => {
 
                         <div style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1000px' }}>
-                                <thead style={{ background: '#F9FAFB', borderBottom: '1px solid #F3F4F6' }}>
+                                <thead style={{ background: 'var(--page-bg)', borderBottom: '1px solid var(--surface-hover)' }}>
                                     <tr>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Date</th>
-                                        {!isDriver && <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Driver</th>}
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Station</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Volume & Price</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Efficiency</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Cost</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Status</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', textAlign: 'center' }}>Receipt</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Date</th>
+                                        {!isDriver && <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Driver</th>}
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Station</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Volume & Price</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Efficiency</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Cost</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'center' }}>Receipt</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredExpenses.length > 0 ? filteredExpenses.map((expense) => (
                                         <tr key={expense._id} style={getRowStyle(expense)}>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#374151', fontSize: '0.9rem', fontWeight: '600' }}>
-                                                    <Calendar size={16} color="#9CA3AF" />
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '600' }}>
+                                                    <Calendar size={16} color="var(--text-light)" />
                                                     {new Date(expense.date).toLocaleDateString()}
                                                 </div>
                                             </td>
                                             {!isDriver && (
                                                 <td style={{ padding: '1.25rem 1.5rem' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                        <div style={{ width: '28px', height: '28px', background: '#EEF2FF', borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5' }}>
+                                                        <div style={{ width: '28px', height: '28px', background: 'var(--badge-blue-bg)', borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5' }}>
                                                             {expense.driver?.user?.name?.[0] || '?'}
                                                         </div>
-                                                        <span style={{ fontWeight: '600', color: '#111827' }}>{expense.driver?.user?.name || 'Unknown'}</span>
+                                                        <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{expense.driver?.user?.name || 'Unknown'}</span>
                                                     </div>
                                                 </td>
                                             )}
-                                            <td style={{ padding: '1.25rem 1.5rem', color: '#4B5563', fontSize: '0.9rem' }}>
-                                                {expense.fuel_station || <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>Not specified</span>}
+                                            <td style={{ padding: '1.25rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                                                {expense.fuel_station || <span style={{ color: 'var(--text-light)', fontStyle: 'italic' }}>Not specified</span>}
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
                                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <span style={{ fontWeight: '600', color: '#374151' }}>{expense.liters}L</span>
-                                                    <span style={{ fontSize: '0.8rem', color: '#6B7280' }}>@ ₱{expense.pricePerLiter.toFixed(2)}/L</span>
+                                                    <span style={{ fontWeight: '600', color: 'var(--text-muted)' }}>{expense.liters}L</span>
+                                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>@ ₱{expense.pricePerLiter.toFixed(2)}/L</span>
                                                 </div>
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
                                                 {expense.km_per_liter ? (
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                        <span style={{ fontWeight: '600', color: '#374151' }}>{expense.km_per_liter} KM/L</span>
+                                                        <span style={{ fontWeight: '600', color: 'var(--text-muted)' }}>{expense.km_per_liter} KM/L</span>
                                                         {isAdmin && summary?.avg_km_per_liter && expense.km_per_liter < (summary.avg_km_per_liter * 0.7) && (
                                                             <AlertTriangle size={14} color="#D97706" title={`Low efficiency! Fleet average is ${summary.avg_km_per_liter} KM/L`} />
                                                         )}
                                                     </div>
-                                                ) : <span style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>N/A</span>}
+                                                ) : <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>N/A</span>}
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem', fontWeight: '800', color: '#EF4444' }}>₱{expense.totalCost.toFixed(2)}</td>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
@@ -316,7 +316,7 @@ const ExpensesPage = () => {
                                                         <CheckCircle size={12} /> Reviewed
                                                     </span>
                                                 ) : (
-                                                    <span style={{ background: '#F3F4F6', color: '#4B5563', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600' }}>
+                                                    <span style={{ background: 'var(--surface-hover)', color: 'var(--text-muted)', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600' }}>
                                                         Pending
                                                     </span>
                                                 )}
@@ -326,10 +326,10 @@ const ExpensesPage = () => {
                                                     <img 
                                                         src={expense.receiptPhoto} 
                                                         alt="Receipt" 
-                                                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.5rem', cursor: 'pointer', border: '1px solid #E5E7EB' }}
+                                                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.5rem', cursor: 'pointer', border: '1px solid var(--border-light)' }}
                                                         onClick={() => setLightboxImage(expense.receiptPhoto)}
                                                     />
-                                                ) : <span style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>—</span>}
+                                                ) : <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>—</span>}
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
@@ -365,7 +365,7 @@ const ExpensesPage = () => {
                                         </tr>
                                     )) : (
                                         <tr>
-                                            <td colSpan={isDriver ? "8" : "9"} style={{ padding: '4rem', textAlign: 'center', color: '#9CA3AF' }}>
+                                            <td colSpan={isDriver ? "8" : "9"} style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-light)' }}>
                                                 {loading ? 'Fetching records...' : 'No expenses found.'}
                                             </td>
                                         </tr>

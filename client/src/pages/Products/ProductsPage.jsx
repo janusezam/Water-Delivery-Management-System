@@ -142,7 +142,7 @@ const ProductsPage = () => {
     };
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#F9FAFB' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role={user.role} />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -151,10 +151,10 @@ const ProductsPage = () => {
                 <main style={{ padding: '2rem 3rem' }}>
                     <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                         <div>
-                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>
+                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>
                                 {isCustomer ? 'Our Products' : 'Inventory Management'}
                             </h2>
-                            <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>
                                 {isCustomer ? 'High-quality water delivered right to your door.' : 'Manage your water products and stock levels.'}
                             </p>
                         </div>
@@ -174,7 +174,7 @@ const ProductsPage = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
                             {products.map(product => (
                                 <div key={product._id} className="product-card-hover" style={{ 
-                                    background: 'white', border: '1px solid #E5E7EB', borderRadius: '1.5rem', 
+                                    background: 'var(--surface-bg)', border: '1px solid var(--border-light)', borderRadius: '1.5rem', 
                                     overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
                                     display: 'flex', flexDirection: 'column', height: '100%'
                                 }}>
@@ -207,11 +207,11 @@ const ProductsPage = () => {
                                     </div>
                                     
                                     {/* Details */}
-                                        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', background: 'white' }}>
+                                        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', background: 'var(--surface-bg)' }}>
                                             <div>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#111827', margin: 0 }}>{product.name}</h3>
-                                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', background: '#F1F5F9', padding: '0.25rem 0.5rem', borderRadius: '0.5rem' }}>{product.type}</span>
+                                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>{product.name}</h3>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', background: '#F1F5F9', padding: '0.25rem 0.5rem', borderRadius: '0.5rem' }}>{product.type}</span>
                                                 </div>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                     <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: product.stockQty > 0 ? '#10B981' : '#EF4444' }}></div>
@@ -223,7 +223,7 @@ const ProductsPage = () => {
 
                                             {/* Price */}
                                             <div style={{ marginTop: 'auto' }}>
-                                                <p style={{ fontSize: '0.65rem', color: '#9CA3AF', fontWeight: '800', textTransform: 'uppercase', marginBottom: '0.1rem', letterSpacing: '0.05em' }}>Price</p>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--text-light)', fontWeight: '800', textTransform: 'uppercase', marginBottom: '0.1rem', letterSpacing: '0.05em' }}>Price</p>
                                                 <p style={{ fontSize: '1.5rem', fontWeight: '900', color: '#4F46E5', margin: 0 }}>₱{product.pricePerUnit}</p>
                                             </div>
 
@@ -232,8 +232,8 @@ const ProductsPage = () => {
                                                     onClick={() => openSelection(product, 'cart')}
                                                     disabled={product.stockQty <= 0}
                                                     style={{ 
-                                                        flex: 1, padding: '0.75rem', borderRadius: '1rem', border: '1px solid #E5E7EB', 
-                                                        background: 'white', color: product.stockQty > 0 ? '#4F46E5' : '#9CA3AF', 
+                                                        flex: 1, padding: '0.75rem', borderRadius: '1rem', border: '1px solid var(--border-light)', 
+                                                        background: 'var(--surface-bg)', color: product.stockQty > 0 ? '#4F46E5' : '#9CA3AF', 
                                                         fontWeight: '700', fontSize: '0.85rem', cursor: product.stockQty > 0 ? 'pointer' : 'not-allowed',
                                                         transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem'
                                                     }}
@@ -246,7 +246,7 @@ const ProductsPage = () => {
                                                     disabled={product.stockQty <= 0}
                                                     style={{ 
                                                         flex: 1, padding: '0.75rem', borderRadius: '1rem', border: 'none', 
-                                                        background: product.stockQty > 0 ? '#4F46E5' : '#F3F4F6', 
+                                                        background: product.stockQty > 0 ? '#4F46E5' : 'var(--surface-hover)', 
                                                         color: product.stockQty > 0 ? 'white' : '#9CA3AF', 
                                                         fontWeight: '700', fontSize: '0.85rem', cursor: product.stockQty > 0 ? 'pointer' : 'not-allowed',
                                                         transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
@@ -262,38 +262,38 @@ const ProductsPage = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="glass" style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                            <div style={{ padding: '1.5rem', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="glass" style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                            <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--surface-hover)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ position: 'relative', width: '320px' }}>
-                                    <Search style={{ position: 'absolute', top: '10px', left: '12px', color: '#9CA3AF' }} size={18} />
+                                    <Search style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-light)' }} size={18} />
                                     <input 
                                         type="text" 
                                         placeholder="Search products..." 
-                                        style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
+                                        style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem' }}
                                     />
                                 </div>
                             </div>
 
                             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead style={{ background: '#F9FAFB', borderBottom: '1px solid #F3F4F6' }}>
+                                <thead style={{ background: 'var(--page-bg)', borderBottom: '1px solid var(--surface-hover)' }}>
                                     <tr>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Product Name</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Type</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Price</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Stock</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase' }}>Deposit</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: '#6B7280', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Product Name</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Type</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Price</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Stock</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Deposit</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {products.length > 0 ? products.map((product) => (
-                                        <tr key={product._id} style={{ borderBottom: '1px solid #F3F4F6', transition: 'background 0.2s' }} className="table-row-hover">
+                                        <tr key={product._id} style={{ borderBottom: '1px solid var(--surface-hover)', transition: 'background 0.2s' }} className="table-row-hover">
                                             <td style={{ padding: '1rem 1.5rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                     <div style={{ 
                                                         width: '40px', 
                                                         height: '40px', 
-                                                        background: '#EEF2FF', 
+                                                        background: 'var(--badge-blue-bg)', 
                                                         borderRadius: '0.75rem',
                                                         overflow: 'hidden',
                                                         display: 'grid',
@@ -306,11 +306,11 @@ const ProductsPage = () => {
                                                             <Package size={20} color="#4F46E5" />
                                                         )}
                                                     </div>
-                                                    <span style={{ fontWeight: '600', color: '#111827' }}>{product.name}</span>
+                                                    <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{product.name}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '1rem 1.5rem', textTransform: 'capitalize', color: '#4B5563' }}>{product.type}</td>
-                                            <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#111827' }}>₱{product.pricePerUnit.toFixed(2)}</td>
+                                            <td style={{ padding: '1rem 1.5rem', textTransform: 'capitalize', color: 'var(--text-muted)' }}>{product.type}</td>
+                                            <td style={{ padding: '1rem 1.5rem', fontWeight: '600', color: 'var(--text-main)' }}>₱{product.pricePerUnit.toFixed(2)}</td>
                                             <td style={{ padding: '1rem 1.5rem' }}>
                                                 <span style={{ 
                                                     padding: '0.25rem 0.75rem', 
@@ -323,18 +323,18 @@ const ProductsPage = () => {
                                                     {product.stockQty} Units
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '1rem 1.5rem', color: '#6B7280' }}>₱{product.containerDeposit}</td>
+                                            <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>₱{product.containerDeposit}</td>
                                             <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                     <button 
                                                         onClick={() => openEditModal(product)}
-                                                        style={{ padding: '0.4rem', borderRadius: '0.5rem', border: '1px solid #E5E7EB', background: 'white', color: '#6B7280', cursor: 'pointer' }}
+                                                        style={{ padding: '0.4rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: 'var(--surface-bg)', color: 'var(--text-muted)', cursor: 'pointer' }}
                                                     >
                                                         <Edit2 size={16} />
                                                     </button>
                                                     <button 
                                                         onClick={() => handleDelete(product._id)}
-                                                        style={{ padding: '0.4rem', borderRadius: '0.5rem', border: '1px solid #FCA5A5', background: '#FEF2F2', color: '#EF4444', cursor: 'pointer' }}
+                                                        style={{ padding: '0.4rem', borderRadius: '0.5rem', border: '1px solid #FCA5A5', background: 'var(--badge-red-bg)', color: '#EF4444', cursor: 'pointer' }}
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
@@ -343,7 +343,7 @@ const ProductsPage = () => {
                                         </tr>
                                     )) : (
                                         <tr>
-                                            <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: '#9CA3AF' }}>
+                                            <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-light)' }}>
                                                 {loading ? 'Loading products...' : 'No products found. Start by adding one!'}
                                             </td>
                                         </tr>

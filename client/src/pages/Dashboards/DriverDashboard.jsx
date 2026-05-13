@@ -153,21 +153,21 @@ const DriverDashboard = () => {
             'Delivering':{ bg: '#DBEAFE', color: '#1D4ED8', label: 'Delivering' },
             'Failed Attempt': { bg: '#FEE2E2', color: '#991B1B', label: 'Failed Attempt' },
         };
-        return map[status] || { bg: '#F3F4F6', color: '#374151', label: status };
+        return map[status] || { bg: 'var(--surface-hover)', color: 'var(--text-muted)', label: status };
     };
 
     const OrderCard = ({ order }) => {
         const badge = getStatusBadge(order.status);
         return (
             <div style={{
-                background: 'white', borderRadius: '1.25rem',
-                border: '1px solid #E5E7EB', padding: '1.5rem',
+                background: 'var(--surface-bg)', borderRadius: '1.25rem',
+                border: '1px solid var(--border-light)', padding: '1.5rem',
                 boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                 display: 'flex', flexDirection: 'column', gap: '1rem'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Hash size={14} color="#9CA3AF" />
+                        <Hash size={14} color="var(--text-light)" />
                         <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#4F46E5' }}>
                             {order._id.slice(-6).toUpperCase()}
                         </span>
@@ -182,56 +182,56 @@ const DriverDashboard = () => {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ padding: '0.5rem', background: '#EEF2FF', borderRadius: '0.5rem', flexShrink: 0 }}>
+                    <div style={{ padding: '0.5rem', background: 'var(--badge-blue-bg)', borderRadius: '0.5rem', flexShrink: 0 }}>
                         <User size={18} color="#4F46E5" />
                     </div>
                     <div>
-                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', margin: 0, fontWeight: '600', textTransform: 'uppercase' }}>Customer</p>
-                        <p style={{ fontWeight: '800', color: '#111827', margin: 0, fontSize: '1rem' }}>
+                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', margin: 0, fontWeight: '600', textTransform: 'uppercase' }}>Customer</p>
+                        <p style={{ fontWeight: '800', color: 'var(--text-main)', margin: 0, fontSize: '1rem' }}>
                             {order.customerName || order.customer?.name || 'Unknown'}
                         </p>
                     </div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                    <div style={{ padding: '0.5rem', background: '#FEF2F2', borderRadius: '0.5rem', flexShrink: 0 }}>
+                    <div style={{ padding: '0.5rem', background: 'var(--badge-red-bg)', borderRadius: '0.5rem', flexShrink: 0 }}>
                         <MapPin size={18} color="#EF4444" />
                     </div>
                     <div>
-                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', margin: 0, fontWeight: '600', textTransform: 'uppercase' }}>Delivery Address</p>
-                        <p style={{ fontSize: '0.9rem', color: '#374151', margin: 0, fontWeight: '500', lineHeight: '1.4' }}>
+                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', margin: 0, fontWeight: '600', textTransform: 'uppercase' }}>Delivery Address</p>
+                        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, fontWeight: '500', lineHeight: '1.4' }}>
                             {order.address || order.deliveryAddress || 'No address provided'}
                         </p>
                     </div>
                 </div>
 
-                <div style={{ background: '#F9FAFB', borderRadius: '0.75rem', padding: '1rem' }}>
-                    <div style={{ fontSize: '0.7rem', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <div style={{ background: 'var(--page-bg)', borderRadius: '0.75rem', padding: '1rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         <Package size={12} /> Items to Deliver
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                         {Array.isArray(order.items) && order.items.length > 0 ? (
                             order.items.map((item, idx) => (
                                 <span key={idx} style={{
-                                    padding: '0.35rem 0.75rem', background: 'white',
-                                    border: '1px solid #E5E7EB', borderRadius: '0.5rem',
-                                    fontSize: '0.85rem', fontWeight: '700', color: '#374151'
+                                    padding: '0.35rem 0.75rem', background: 'var(--surface-bg)',
+                                    border: '1px solid var(--border-light)', borderRadius: '0.5rem',
+                                    fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)'
                                 }}>
                                     {item.qty}x {item.product?.name || item.productName || 'Item'} ({item.payDeposit ? 'Deposit' : 'No Deposit'})
                                 </span>
                             ))
                         ) : (
-                            <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                                 {typeof order.items === 'string' ? order.items : 'No items listed'}
                             </span>
                         )}
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.25rem', borderTop: '1px solid #F3F4F6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.25rem', borderTop: '1px solid var(--surface-hover)' }}>
                     <DollarSign size={16} color="#10B981" />
-                    <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>Total Amount:</span>
-                    <span style={{ fontWeight: '800', color: '#111827', fontSize: '1rem' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total Amount:</span>
+                    <span style={{ fontWeight: '800', color: 'var(--text-main)', fontSize: '1rem' }}>
                         ₱{(order.totalAmount || 0).toLocaleString()}
                     </span>
                 </div>
@@ -239,7 +239,7 @@ const DriverDashboard = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.25rem' }}>
                     <button
                         style={{
-                            width: '100%', padding: '0.75rem', background: '#EEF2FF',
+                            width: '100%', padding: '0.75rem', background: 'var(--badge-blue-bg)',
                             color: '#4F46E5', border: '1px solid #C7D2FE', borderRadius: '0.75rem',
                             fontWeight: '700', cursor: 'pointer',
                             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
@@ -278,7 +278,7 @@ const DriverDashboard = () => {
                             </button>
                             <button
                                 style={{
-                                    width: '100%', padding: '0.75rem', background: '#FEF2F2',
+                                    width: '100%', padding: '0.75rem', background: 'var(--badge-red-bg)',
                                     color: '#DC2626', border: '1px solid #FECACA', borderRadius: '0.75rem',
                                     fontWeight: '700', cursor: 'pointer',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
@@ -290,7 +290,7 @@ const DriverDashboard = () => {
                         </>
                     )}
                     {order.status === 'Failed Attempt' && (
-                        <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginTop: '0.5rem' }}>
+                        <div style={{ background: 'var(--badge-red-bg)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginTop: '0.5rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#DC2626', fontWeight: '700', marginBottom: '0.25rem' }}>
                                 <AlertTriangle size={16} /> Failure Reported
                             </div>
@@ -304,7 +304,7 @@ const DriverDashboard = () => {
     };
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#F9FAFB' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="driver" />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -313,14 +313,14 @@ const DriverDashboard = () => {
                 <main style={{ padding: '2rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                         <div>
-                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>
+                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>
                                 My Deliveries
                             </h2>
-                            <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>
                                 {activeOrders.length} active deliveries assigned to you
                             </p>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10B981', background: '#ECFDF5', padding: '0.5rem 1rem', borderRadius: '2rem', fontSize: '0.85rem', fontWeight: '700' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10B981', background: 'var(--badge-green-bg)', padding: '0.5rem 1rem', borderRadius: '2rem', fontSize: '0.85rem', fontWeight: '700' }}>
                             <div style={{ width: '8px', height: '8px', background: '#10B981', borderRadius: '50%', animation: 'pulse 2s infinite' }}></div>
                             GPS TRANSMITTING
                         </div>
@@ -329,7 +329,7 @@ const DriverDashboard = () => {
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '4rem' }}>
                             <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #EEF2FF', borderTopColor: '#4F46E5', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
-                            <p style={{ color: '#6B7280' }}>Loading your deliveries...</p>
+                            <p style={{ color: 'var(--text-muted)' }}>Loading your deliveries...</p>
                         </div>
                     ) : (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '1.5rem' }}>
@@ -338,10 +338,10 @@ const DriverDashboard = () => {
                                     <OrderCard key={order._id} order={order} />
                                 ))
                             ) : (
-                                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem', background: 'white', borderRadius: '1.25rem', border: '1px dashed #E5E7EB' }}>
-                                    <Truck size={48} color="#D1D5DB" style={{ marginBottom: '1rem' }} />
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#111827', marginBottom: '0.5rem' }}>No Active Deliveries</h3>
-                                    <p style={{ color: '#6B7280' }}>New assignments will appear here as soon as they are assigned to you.</p>
+                                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px dashed var(--border-light)' }}>
+                                    <Truck size={48} color="var(--text-light)" style={{ marginBottom: '1rem' }} />
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.5rem' }}>No Active Deliveries</h3>
+                                    <p style={{ color: 'var(--text-muted)' }}>New assignments will appear here as soon as they are assigned to you.</p>
                                 </div>
                             )}
                         </div>
@@ -378,21 +378,21 @@ const ReportIssueModal = ({ order, onClose, onSubmit }) => {
             display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
             <div style={{
-                width: '90vw', maxWidth: '500px', background: 'white', borderRadius: '1.5rem',
+                width: '90vw', maxWidth: '500px', background: 'var(--surface-bg)', borderRadius: '1.5rem',
                 padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3 style={{ margin: 0, fontWeight: '800', fontSize: '1.25rem', color: '#111827' }}>Report Delivery Issue</h3>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} color="#9CA3AF" /></button>
+                    <h3 style={{ margin: 0, fontWeight: '800', fontSize: '1.25rem', color: 'var(--text-main)' }}>Report Delivery Issue</h3>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} color="var(--text-light)" /></button>
                 </div>
                 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>Reason for Failure</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Reason for Failure</label>
                         <select 
                             value={reason} 
                             onChange={e => setReason(e.target.value)}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #D1D5DB', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-medium)', boxSizing: 'border-box' }}
                         >
                             <option value="Customer unavailable">Customer unavailable</option>
                             <option value="Wrong address">Wrong address</option>
@@ -401,13 +401,13 @@ const ReportIssueModal = ({ order, onClose, onSubmit }) => {
                         </select>
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>Additional Notes</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Additional Notes</label>
                         <textarea 
                             value={note} 
                             onChange={e => setNote(e.target.value)}
                             rows={3}
                             placeholder="Provide any details here..."
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #D1D5DB', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-medium)', boxSizing: 'border-box' }}
                         />
                     </div>
                     <button 
@@ -470,21 +470,21 @@ const RouteMapModal = ({ order, driverPosition, onClose }) => {
         }} onClick={onClose}>
             <div style={{
                 width: '90vw', maxWidth: '900px', height: '80vh',
-                background: 'white', borderRadius: '1.5rem',
+                background: 'var(--surface-bg)', borderRadius: '1.5rem',
                 overflow: 'hidden', display: 'flex', flexDirection: 'column',
                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
             }} onClick={e => e.stopPropagation()}>
 
                 {/* Modal Header */}
                 <div style={{
-                    padding: '1.25rem 1.5rem', borderBottom: '1px solid #E5E7EB',
+                    padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-light)',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
                     <div>
-                        <h3 style={{ margin: 0, fontWeight: '800', color: '#111827', fontSize: '1.1rem' }}>
+                        <h3 style={{ margin: 0, fontWeight: '800', color: 'var(--text-main)', fontSize: '1.1rem' }}>
                             Route to {order.customerName || 'Customer'}
                         </h3>
-                        <p style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', color: '#6B7280' }}>
+                        <p style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                             {order.address || 'No address'}
                         </p>
                     </div>
@@ -494,7 +494,7 @@ const RouteMapModal = ({ order, driverPosition, onClose }) => {
                             target="_blank" rel="noopener noreferrer"
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '0.4rem',
-                                padding: '0.5rem 1rem', background: '#EEF2FF',
+                                padding: '0.5rem 1rem', background: 'var(--badge-blue-bg)',
                                 color: '#4F46E5', borderRadius: '0.75rem',
                                 fontSize: '0.8rem', fontWeight: '700',
                                 textDecoration: 'none', border: '1px solid #C7D2FE'
@@ -503,8 +503,8 @@ const RouteMapModal = ({ order, driverPosition, onClose }) => {
                             <ExternalLink size={14} /> Google Maps
                         </a>
                         <button onClick={onClose} style={{
-                            background: '#F3F4F6', border: 'none', padding: '0.5rem',
-                            borderRadius: '0.5rem', cursor: 'pointer', color: '#6B7280',
+                            background: 'var(--surface-hover)', border: 'none', padding: '0.5rem',
+                            borderRadius: '0.5rem', cursor: 'pointer', color: 'var(--text-muted)',
                             display: 'flex', alignItems: 'center'
                         }}>
                             <X size={20} />
@@ -517,7 +517,7 @@ const RouteMapModal = ({ order, driverPosition, onClose }) => {
                     {!customerPos && (
                         <div style={{
                             position: 'absolute', top: '1rem', left: '50%', transform: 'translateX(-50%)',
-                            zIndex: 1000, background: '#FEF2F2', border: '1px solid #FECACA',
+                            zIndex: 1000, background: 'var(--badge-red-bg)', border: '1px solid #FECACA',
                             color: '#EF4444', padding: '0.5rem 1rem', borderRadius: '0.5rem',
                             fontSize: '0.8rem', fontWeight: '600'
                         }}>
@@ -563,17 +563,17 @@ const RouteMapModal = ({ order, driverPosition, onClose }) => {
 
                 {/* Bottom info bar */}
                 <div style={{
-                    padding: '1rem 1.5rem', borderTop: '1px solid #E5E7EB',
+                    padding: '1rem 1.5rem', borderTop: '1px solid var(--border-light)',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    background: '#F9FAFB'
+                    background: 'var(--page-bg)'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={{ width: '10px', height: '10px', background: '#4F46E5', borderRadius: '50%' }}></div>
-                        <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>Your Location</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Your Location</span>
                         <div style={{ width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%', marginLeft: '1rem' }}></div>
-                        <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>Customer</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Customer</span>
                         <div style={{ width: '20px', height: '3px', background: '#4F46E5', borderRadius: '2px', marginLeft: '1rem', borderTop: '2px dashed #4F46E5' }}></div>
-                        <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>Route</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Route</span>
                     </div>
                     <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#4F46E5' }}>
                         Order #{order._id?.slice(-6).toUpperCase()}

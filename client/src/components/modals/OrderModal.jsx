@@ -113,17 +113,17 @@ const OrderModal = ({ isOpen, onClose, onSave, isCustomer = false }) => {
                     <X size={24} />
                 </button>
                 
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-dark)' }}>{isCustomer ? 'Request Water Delivery' : 'Create Delivery Order'}</h3>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-main)' }}>{isCustomer ? 'Request Water Delivery' : 'Create Delivery Order'}</h3>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     {!isCustomer ? (
                         <div>
-                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Select Customer</label>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Select Customer</label>
                             <select 
                                 required
                                 value={selectedCustomer}
                                 onChange={(e) => setSelectedCustomer(e.target.value)}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                             >
                                 <option value="">-- Choose Customer --</option>
                                 {customers.map(c => <option key={c._id} value={c._id}>{c.name} ({c.phone})</option>)}
@@ -131,12 +131,12 @@ const OrderModal = ({ isOpen, onClose, onSave, isCustomer = false }) => {
                         </div>
                     ) : (
                         <div>
-                             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Delivery Address</label>
+                             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Delivery Address</label>
                              <input 
                                 type="text"
                                 value={customerAddress}
                                 onChange={(e) => setCustomerAddress(e.target.value)}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                                 placeholder="Edit delivery address if needed"
                                 required
                              />
@@ -157,7 +157,7 @@ const OrderModal = ({ isOpen, onClose, onSave, isCustomer = false }) => {
                                     required
                                     value={item.product}
                                     onChange={(e) => updateItem(index, 'product', e.target.value)}
-                                    style={{ flex: 1, padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                    style={{ flex: 1, padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                                 >
                                     <option value="">Select Product</option>
                                     {products.map(p => <option key={p._id} value={p._id}>{p.name} - ₱{p.pricePerUnit}</option>)}
@@ -167,9 +167,9 @@ const OrderModal = ({ isOpen, onClose, onSave, isCustomer = false }) => {
                                     min="1"
                                     value={item.qty}
                                     onChange={(e) => updateItem(index, 'qty', parseInt(e.target.value))}
-                                    style={{ width: '60px', padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                    style={{ width: '60px', padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                                 />
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.5rem', background: '#F9FAFB', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.5rem', background: 'var(--page-bg)', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }}>
                                     <input 
                                         type="checkbox" 
                                         checked={item.payDeposit} 
@@ -185,8 +185,8 @@ const OrderModal = ({ isOpen, onClose, onSave, isCustomer = false }) => {
                         ))}
                     </div>
 
-                    <div style={{ borderTop: '2px dashed #F3F4F6', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>Total Amount</span>
+                    <div style={{ borderTop: '2px dashed var(--surface-hover)', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>Total Amount</span>
                         <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--accent-indigo)' }}>₱{totalAmount.toFixed(2)}</span>
                     </div>
 

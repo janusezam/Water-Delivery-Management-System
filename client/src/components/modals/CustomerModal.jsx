@@ -43,13 +43,13 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
                     <X size={24} />
                 </button>
                 
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-dark)' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-main)' }}>
                     {customer ? 'Edit Customer' : 'Add New Customer'}
                 </h3>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Full Name</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Full Name</label>
                         <input 
                             type="text" 
                             required
@@ -57,11 +57,11 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
                             placeholder="Juan Dela Cruz"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Phone Number</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Phone Number</label>
                         <input 
                             type="text" 
                             required
@@ -69,11 +69,11 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
                             value={formData.phone}
                             onChange={(e) => setFormData({...formData, phone: e.target.value})}
                             placeholder="09123456789"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     
-                    <div style={{ padding: '1rem', background: '#F9FAFB', borderRadius: '1rem', border: '1px solid var(--border-light)' }}>
+                    <div style={{ padding: '1rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px solid var(--border-light)' }}>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>Address Details</label>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                             <input 
@@ -85,7 +85,7 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
                                     newAddrs[0].street = e.target.value;
                                     setFormData({...formData, addresses: newAddrs});
                                 }}
-                                style={{ width: '100%', padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                style={{ width: '100%', padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                             />
                             <input 
                                 type="text" 
@@ -96,19 +96,19 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
                                     newAddrs[0].barangay = e.target.value;
                                     setFormData({...formData, addresses: newAddrs});
                                 }}
-                                style={{ width: '100%', padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                                style={{ width: '100%', padding: '0.625rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-dark)', marginBottom: '0.5rem' }}>Initial Jug Balance (Owed)</label>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Initial Jug Balance (Owed)</label>
                         <input 
                             type="number" 
                             className="input-field"
                             value={formData.jugBalance}
                             onChange={(e) => setFormData({...formData, jugBalance: parseInt(e.target.value)})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
 

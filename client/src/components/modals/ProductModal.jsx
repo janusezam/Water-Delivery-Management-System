@@ -69,7 +69,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product = null }) => {
                     <X size={24} />
                 </button>
                 
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-dark)' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-main)' }}>
                     {product ? 'Edit Product' : 'Add New Product'}
                 </h3>
 
@@ -79,7 +79,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product = null }) => {
                         <div style={{ 
                             width: '120px', 
                             height: '120px', 
-                            background: '#F9FAFB', 
+                            background: 'var(--page-bg)', 
                             borderRadius: '1rem', 
                             margin: '0 auto 1rem',
                             overflow: 'hidden',
@@ -112,7 +112,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product = null }) => {
                             placeholder="e.g. 5-Gallon Slim Refill"
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     <div>
@@ -120,7 +120,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product = null }) => {
                         <select 
                             value={formData.type}
                             onChange={(e) => setFormData({...formData, type: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         >
                             <option value="slim">Slim (5-Gallon)</option>
                             <option value="round">Round (5-Gallon)</option>
@@ -134,7 +134,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product = null }) => {
                                 type="number" required
                                 value={formData.pricePerUnit}
                                 onChange={(e) => setFormData({...formData, pricePerUnit: parseFloat(e.target.value)})}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                             />
                         </div>
                         <div>
@@ -143,7 +143,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product = null }) => {
                                 type="number" required
                                 value={formData.stockQty}
                                 onChange={(e) => setFormData({...formData, stockQty: parseInt(e.target.value)})}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                             />
                         </div>
                     </div>
@@ -153,7 +153,7 @@ const ProductModal = ({ isOpen, onClose, onSave, product = null }) => {
                             type="number"
                             value={formData.containerDeposit}
                             onChange={(e) => setFormData({...formData, containerDeposit: parseFloat(e.target.value)})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     <button type="submit" className="btn-primary" style={{ marginTop: '1rem', padding: '1rem', borderRadius: '0.75rem', background: 'var(--accent-indigo)', color: 'white', fontWeight: '700', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)' }}>

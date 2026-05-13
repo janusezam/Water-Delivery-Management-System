@@ -265,7 +265,7 @@ const CartPage = () => {
     };
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#F9FAFB' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="user" />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -275,23 +275,23 @@ const CartPage = () => {
                     <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <button 
                             onClick={() => navigate('/products')}
-                            style={{ background: 'white', border: '1px solid #E5E7EB', padding: '0.5rem', borderRadius: '0.75rem', cursor: 'pointer', color: '#6B7280' }}
+                            style={{ background: 'var(--surface-bg)', border: '1px solid var(--border-light)', padding: '0.5rem', borderRadius: '0.75rem', cursor: 'pointer', color: 'var(--text-muted)' }}
                         >
                             <ArrowLeft size={20} />
                         </button>
                         <div>
-                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Shopping Cart</h2>
-                            <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>{step === 1 ? 'Review your items before checkout' : 'Confirm delivery details'}</p>
+                            <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Shopping Cart</h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>{step === 1 ? 'Review your items before checkout' : 'Confirm delivery details'}</p>
                         </div>
                     </header>
 
                     {cart.length === 0 ? (
-                        <div style={{ background: 'white', borderRadius: '1.5rem', padding: '5rem 2rem', textAlign: 'center', border: '1px solid #E5E7EB' }}>
+                        <div style={{ background: 'var(--surface-bg)', borderRadius: '1.5rem', padding: '5rem 2rem', textAlign: 'center', border: '1px solid var(--border-light)' }}>
                             <div style={{ opacity: 0.1, color: '#4F46E5', marginBottom: '1.5rem' }}>
                                 <ShoppingCart size={80} style={{ margin: '0 auto' }} />
                             </div>
-                            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '1rem' }}>Your cart is empty</h3>
-                            <p style={{ color: '#6B7280', marginBottom: '2.5rem' }}>Looks like you haven't added anything to your cart yet.</p>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '1rem' }}>Your cart is empty</h3>
+                            <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem' }}>Looks like you haven't added anything to your cart yet.</p>
                             <button 
                                 onClick={() => navigate('/products')}
                                 className="btn-primary" 
@@ -305,9 +305,9 @@ const CartPage = () => {
                             {/* Left Column: Items or Checkout Form */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 {step === 1 ? (
-                                    <div style={{ background: 'white', borderRadius: '1.5rem', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
-                                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <h4 style={{ fontWeight: '700', margin: 0, color: '#111827' }}>Items in Cart ({cart.length})</h4>
+                                    <div style={{ background: 'var(--surface-bg)', borderRadius: '1.5rem', border: '1px solid var(--border-light)', overflow: 'hidden' }}>
+                                        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--surface-hover)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <h4 style={{ fontWeight: '700', margin: 0, color: 'var(--text-main)' }}>Items in Cart ({cart.length})</h4>
                                             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', color: '#4F46E5', fontWeight: '600' }}>
                                                 <input 
                                                     type="checkbox" 
@@ -332,7 +332,7 @@ const CartPage = () => {
                                                         justifyContent: 'space-between', 
                                                         alignItems: 'center', 
                                                         padding: '1.5rem 0', 
-                                                        borderBottom: idx === cart.length - 1 ? 'none' : '1px solid #F3F4F6',
+                                                        borderBottom: idx === cart.length - 1 ? 'none' : '1px solid var(--surface-hover)',
                                                         opacity: isSelected ? 1 : 0.6
                                                     }}>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
@@ -342,7 +342,7 @@ const CartPage = () => {
                                                                 onChange={() => toggleSelection(key)}
                                                                 style={{ cursor: 'pointer', width: '20px', height: '20px', accentColor: '#4F46E5' }}
                                                             />
-                                                            <div style={{ width: '64px', height: '64px', background: '#F9FAFB', borderRadius: '1rem', border: '1px solid #E5E7EB', display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
+                                                            <div style={{ width: '64px', height: '64px', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px solid var(--border-light)', display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
                                                                 {item.product.imageUrl ? (
                                                                     <img src={item.product.imageUrl} alt={item.product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                                 ) : (
@@ -350,12 +350,12 @@ const CartPage = () => {
                                                                 )}
                                                             </div>
                                                             <div>
-                                                                <p style={{ fontWeight: '700', color: '#111827', margin: '0 0 0.25rem 0' }}>
+                                                                <p style={{ fontWeight: '700', color: 'var(--text-main)', margin: '0 0 0.25rem 0' }}>
                                                                     {item.product.name}
-                                                                    {item.payDeposit && <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#4F46E5', marginLeft: '0.5rem', background: '#EEF2FF', padding: '0.15rem 0.4rem', borderRadius: '0.4rem', verticalAlign: 'middle' }}>+ DEPOSIT</span>}
+                                                                    {item.payDeposit && <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#4F46E5', marginLeft: '0.5rem', background: 'var(--badge-blue-bg)', padding: '0.15rem 0.4rem', borderRadius: '0.4rem', verticalAlign: 'middle' }}>+ DEPOSIT</span>}
                                                                 </p>
                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                                    <p style={{ fontSize: '0.85rem', color: '#6B7280', margin: 0 }}>₱{item.product.pricePerUnit} / unit</p>
+                                                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>₱{item.product.pricePerUnit} / unit</p>
                                                                     <span style={{ 
                                                                         fontSize: '0.7rem', 
                                                                         fontWeight: '700', 
@@ -370,13 +370,13 @@ const CartPage = () => {
                                                             </div>
                                                         </div>
                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#F3F4F6', borderRadius: '0.75rem', padding: '0.375rem' }}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-hover)', borderRadius: '0.75rem', padding: '0.375rem' }}>
                                                                 <button onClick={() => updateQty(item.product._id, -1, item.payDeposit)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4F46E5', padding: '0.25rem' }}><Minus size={16} /></button>
-                                                                <span style={{ fontWeight: '800', minWidth: '28px', textAlign: 'center', color: '#111827' }}>{item.qty}</span>
+                                                                <span style={{ fontWeight: '800', minWidth: '28px', textAlign: 'center', color: 'var(--text-main)' }}>{item.qty}</span>
                                                                 <button onClick={() => updateQty(item.product._id, 1, item.payDeposit)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4F46E5', padding: '0.25rem' }}><Plus size={16} /></button>
                                                             </div>
                                                             <div style={{ textAlign: 'right', minWidth: '100px' }}>
-                                                                <p style={{ fontWeight: '800', color: '#111827', margin: 0 }}>₱{itemTotal.toFixed(2)}</p>
+                                                                <p style={{ fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>₱{itemTotal.toFixed(2)}</p>
                                                                 <button onClick={() => removeFromCart(item.product._id, item.payDeposit)} style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer', padding: 0, marginTop: '0.25rem' }}>Remove</button>
                                                             </div>
                                                         </div>
@@ -387,18 +387,18 @@ const CartPage = () => {
                                     </div>
                                 ) : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                        <div style={{ background: 'white', borderRadius: '1.5rem', padding: '2rem', border: '1px solid #E5E7EB' }}>
-                                            <h4 style={{ fontWeight: '700', color: '#111827', display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                                        <div style={{ background: 'var(--surface-bg)', borderRadius: '1.5rem', padding: '2rem', border: '1px solid var(--border-light)' }}>
+                                            <h4 style={{ fontWeight: '700', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                                                 <MapPin size={22} color="#4F46E5" /> Delivery Information
                                             </h4>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative' }}>
-                                                <label style={{ fontSize: '1rem', fontWeight: '800', color: '#111827' }}>Delivery Address</label>
+                                                <label style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-main)' }}>Delivery Address</label>
                                                 <textarea 
                                                     value={address}
                                                     onChange={handleAddressChange}
                                                     placeholder="Search for your address or enter manually..."
                                                     style={{ 
-                                                        width: '100%', padding: '1.25rem', borderRadius: '1rem', border: '1px solid #D1D5DB',
+                                                        width: '100%', padding: '1.25rem', borderRadius: '1rem', border: '1px solid var(--border-medium)',
                                                         minHeight: '100px', resize: 'none', fontSize: '1.1rem', outline: 'none',
                                                         transition: 'border-color 0.2s',
                                                         boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)'
@@ -406,8 +406,8 @@ const CartPage = () => {
                                                 />
                                                 {suggestions.length > 0 && (
                                                     <div style={{ 
-                                                        position: 'absolute', top: '100%', left: 0, right: 0, background: 'white', 
-                                                        zIndex: 1000, borderRadius: '0.75rem', border: '1px solid #E5E7EB', 
+                                                        position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--surface-bg)', 
+                                                        zIndex: 1000, borderRadius: '0.75rem', border: '1px solid var(--border-light)', 
                                                         boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', marginTop: '0.25rem', overflow: 'hidden'
                                                     }}>
                                                         {suggestions.map((s, i) => (
@@ -418,24 +418,24 @@ const CartPage = () => {
                                                                     padding: '0.75rem 1rem', 
                                                                     cursor: 'pointer', 
                                                                     fontSize: '0.875rem', 
-                                                                    color: '#111827', // Dark text
-                                                                    background: 'white',
-                                                                    borderBottom: i === suggestions.length - 1 ? 'none' : '1px solid #F3F4F6'
+                                                                    color: 'var(--text-main)', // Dark text
+                                                                    background: 'var(--surface-bg)',
+                                                                    borderBottom: i === suggestions.length - 1 ? 'none' : '1px solid var(--surface-hover)'
                                                                 }}
                                                                 onMouseOver={(e) => e.currentTarget.style.background = '#F9FAFB'}
-                                                                onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+                                                                onMouseOut={(e) => e.currentTarget.style.background = 'var(--surface-bg)'}
                                                             >
                                                                 {s.display_name}
                                                             </div>
                                                         ))}
                                                     </div>
                                                 )}
-                                                <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>Start typing to see address suggestions.</p>
+                                                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Start typing to see address suggestions.</p>
                                             </div>
 
                                             <div style={{ marginTop: '2rem' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                                    <label style={{ fontSize: '1rem', fontWeight: '800', color: '#111827' }}>
+                                                    <label style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-main)' }}>
                                                         Pin your exact location on the map
                                                     </label>
                                                     <button 
@@ -449,7 +449,7 @@ const CartPage = () => {
                                                         Use Current Location
                                                     </button>
                                                 </div>
-                                                <div style={{ height: '450px', borderRadius: '1.5rem', overflow: 'hidden', border: '2px solid #E5E7EB', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+                                                <div style={{ height: '450px', borderRadius: '1.5rem', overflow: 'hidden', border: '2px solid var(--border-light)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
                                                     <MapContainer 
                                                         center={coordinates} 
                                                         zoom={15} 
@@ -471,11 +471,11 @@ const CartPage = () => {
 
                             {/* Right Column: Checkout Summary */}
                             <div style={{ position: 'sticky', top: '2rem' }}>
-                                <div style={{ background: 'white', borderRadius: '1.5rem', padding: '2rem', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                                    <h4 style={{ fontWeight: '800', fontSize: '1.25rem', color: '#111827', marginBottom: '1.5rem' }}>Order Total</h4>
+                                <div style={{ background: 'var(--surface-bg)', borderRadius: '1.5rem', padding: '2rem', border: '1px solid var(--border-light)', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                                    <h4 style={{ fontWeight: '800', fontSize: '1.25rem', color: 'var(--text-main)', marginBottom: '1.5rem' }}>Order Total</h4>
                                     
                                     {/* Itemized Summary */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px dashed #E5E7EB' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px dashed var(--border-light)' }}>
                                         {cart.filter(item => selectedItems.includes(getItemKey(item))).map(item => {
                                             const key = getItemKey(item);
                                             const itemSubtotal = item.product.pricePerUnit * item.qty;
@@ -483,11 +483,11 @@ const CartPage = () => {
                                             return (
                                                 <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-                                                        <span style={{ color: '#4B5563' }}>
+                                                        <span style={{ color: 'var(--text-muted)' }}>
                                                             {item.product.name} x {item.qty}
                                                             <span style={{ fontSize: '0.75rem', color: '#4F46E5', fontWeight: '700' }}> ({item.payDeposit ? 'Deposit' : 'No Deposit'})</span>
                                                         </span>
-                                                        <span style={{ fontWeight: '700', color: '#111827' }}>₱{(itemSubtotal + itemDeposit).toFixed(2)}</span>
+                                                        <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>₱{(itemSubtotal + itemDeposit).toFixed(2)}</span>
                                                     </div>
                                                     {item.payDeposit && (
                                                         <span style={{ fontSize: '0.75rem', color: '#4F46E5', fontWeight: '600' }}>
@@ -500,16 +500,16 @@ const CartPage = () => {
                                     </div>
                                     
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B7280' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
                                             <span>Subtotal</span>
                                             <span>₱{totalAmount.toFixed(2)}</span>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6B7280' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)' }}>
                                             <span>Delivery Fee</span>
                                             <span style={{ color: '#10B981', fontWeight: '600' }}>FREE</span>
                                         </div>
-                                        <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: '1rem', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontWeight: '700', color: '#111827' }}>Total Amount</span>
+                                        <div style={{ borderTop: '1px solid var(--surface-hover)', paddingTop: '1rem', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>Total Amount</span>
                                             <span style={{ fontWeight: '900', fontSize: '1.5rem', color: '#4F46E5' }}>₱{totalAmount.toFixed(2)}</span>
                                         </div>
                                     </div>
@@ -521,7 +521,7 @@ const CartPage = () => {
                                             className="btn-primary" 
                                             style={{ 
                                                 width: '100%', padding: '1.25rem', borderRadius: '1.25rem', 
-                                                background: selectedItems.length === 0 ? '#D1D5DB' : '#4F46E5',
+                                                background: selectedItems.length === 0 ? 'var(--border-medium)' : '#4F46E5',
                                                 cursor: selectedItems.length === 0 ? 'not-allowed' : 'pointer'
                                             }}
                                         >
@@ -538,14 +538,14 @@ const CartPage = () => {
                                             </button>
                                             <button 
                                                 onClick={() => setStep(1)}
-                                                style={{ background: 'none', border: 'none', color: '#6B7280', fontWeight: '700', cursor: 'pointer', padding: '0.5rem' }}
+                                                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontWeight: '700', cursor: 'pointer', padding: '0.5rem' }}
                                             >
                                                 Back to Cart
                                             </button>
                                         </div>
                                     )}
                                     
-                                    <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: '0.75rem', marginTop: '1.5rem' }}>
+                                    <p style={{ textAlign: 'center', color: 'var(--text-light)', fontSize: '0.75rem', marginTop: '1.5rem' }}>
                                         By placing an order, you agree to our Terms of Service.
                                     </p>
                                 </div>

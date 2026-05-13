@@ -56,7 +56,7 @@ const UserModal = ({ isOpen, onClose, onSave, user = null }) => {
                     <X size={24} />
                 </button>
                 
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-dark)' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-main)' }}>
                     {user ? 'Edit User' : 'Add New User'}
                 </h3>
 
@@ -68,7 +68,7 @@ const UserModal = ({ isOpen, onClose, onSave, user = null }) => {
                             placeholder="e.g. Juan Dela Cruz"
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     <div>
@@ -78,7 +78,7 @@ const UserModal = ({ isOpen, onClose, onSave, user = null }) => {
                             placeholder="juan@example.com"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     <div>
@@ -91,7 +91,7 @@ const UserModal = ({ isOpen, onClose, onSave, user = null }) => {
                             placeholder="••••••••"
                             value={formData.password}
                             onChange={(e) => setFormData({...formData, password: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>
                     <div>
@@ -99,7 +99,7 @@ const UserModal = ({ isOpen, onClose, onSave, user = null }) => {
                         <select 
                             value={formData.role}
                             onChange={(e) => setFormData({...formData, role: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-dark)', background: 'white' }}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         >
                             <option value="user">User</option>
                             <option value="staff">Staff</option>

@@ -67,37 +67,37 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
             justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)'
         }}>
             <div className="modal-content" style={{
-                background: 'white', padding: '2rem', borderRadius: '1.5rem',
+                background: 'var(--input-bg)', padding: '2rem', borderRadius: '1.5rem',
                 width: '500px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
                 maxHeight: '90vh', overflowY: 'auto'
             }}>
-                <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}>
+                <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-light)' }}>
                     <X size={24} />
                 </button>
 
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#111827', marginBottom: '0.5rem' }}>Manage Order</h3>
-                <p style={{ color: '#6B7280', fontSize: '0.875rem', marginBottom: '2rem' }}>Order ID: <span style={{ color: '#4F46E5', fontWeight: '700' }}>#{order._id.slice(-6).toUpperCase()}</span></p>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Manage Order</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '2rem' }}>Order ID: <span style={{ color: '#4F46E5', fontWeight: '700' }}>#{order._id.slice(-6).toUpperCase()}</span></p>
 
-                <div style={{ background: '#F9FAFB', padding: '1.25rem', borderRadius: '1rem', marginBottom: '2rem', border: '1px solid #F3F4F6' }}>
+                <div style={{ background: 'var(--page-bg)', padding: '1.25rem', borderRadius: '1rem', marginBottom: '2rem', border: '1px solid var(--surface-hover)' }}>
                     <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-                        <User size={18} color="#6B7280" />
+                        <User size={18} color="var(--text-muted)" />
                         <div>
-                            <p style={{ fontSize: '0.75rem', color: '#6B7280', margin: 0 }}>Customer</p>
-                            <p style={{ fontSize: '0.95rem', fontWeight: '700', color: '#111827', margin: 0 }}>{order.customerName}</p>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Customer</p>
+                            <p style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>{order.customerName}</p>
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-                        <MapPin size={18} color="#6B7280" />
+                        <MapPin size={18} color="var(--text-muted)" />
                         <div>
-                            <p style={{ fontSize: '0.75rem', color: '#6B7280', margin: 0 }}>Delivery Address</p>
-                            <p style={{ fontSize: '0.875rem', color: '#111827', margin: 0 }}>{order.address}</p>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Delivery Address</p>
+                            <p style={{ fontSize: '0.875rem', color: 'var(--text-main)', margin: 0 }}>{order.address}</p>
                         </div>
                     </div>
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        <Package size={18} color="#6B7280" />
+                        <Package size={18} color="var(--text-muted)" />
                         <div>
-                            <p style={{ fontSize: '0.75rem', color: '#6B7280', margin: 0 }}>Items</p>
-                            <p style={{ fontSize: '0.875rem', color: '#111827', margin: 0 }}>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Items</p>
+                            <p style={{ fontSize: '0.875rem', color: 'var(--text-main)', margin: 0 }}>
                                 {Array.isArray(order.items) 
                                     ? order.items.map(i => `${i.qty}x ${i.productName || 'Water'} (${i.payDeposit ? 'Deposit' : 'No Deposit'})`).join(', ')
                                     : order.items || 'No items'}
@@ -108,7 +108,7 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     {order?.status === 'Failed Attempt' && (
-                        <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginBottom: '1rem' }}>
+                        <div style={{ background: 'var(--badge-red-bg)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginBottom: '1rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#DC2626', fontWeight: '700', marginBottom: '0.25rem' }}>
                                 <AlertTriangle size={16} /> Delivery Failed
                             </div>
@@ -118,7 +118,7 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
                     )}
 
                     {order?.status === 'Cancelled' && (order.cancelReason || order.cancelMessage) && (
-                        <div style={{ background: '#FEF2F2', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginBottom: '1rem' }}>
+                        <div style={{ background: 'var(--badge-red-bg)', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #FECACA', marginBottom: '1rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#DC2626', fontWeight: '700', marginBottom: '0.25rem' }}>
                                 <AlertTriangle size={16} /> Cancellation Details
                             </div>
@@ -128,11 +128,11 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
                     )}
 
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>Order Status</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Order Status</label>
                         <select 
                             value={status}
                             onChange={(e) => handleStatusChange(e.target.value)}
-                            style={{ width: '100%', padding: '0.875rem', borderRadius: '0.75rem', border: '1px solid #D1D5DB', background: 'white', outline: 'none' }}
+                            style={{ width: '100%', padding: '0.875rem', borderRadius: '0.75rem', border: '1px solid var(--border-medium)', background: 'var(--input-bg)', outline: 'none' }}
                         >
                             {statusOptions.map(opt => {
                                 const isDriverOnlyStatus = ['Delivering', 'Completed', 'Failed Attempt', 'delivered'].includes(opt);
@@ -150,13 +150,13 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
                                 <button 
                                     type="button"
                                     onClick={() => setShowAdvanced(!showAdvanced)}
-                                    style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: '0.75rem', cursor: 'pointer', padding: 0, textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'pointer', padding: 0, textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
                                 >
                                     {showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options'}
                                 </button>
                                 
                                 {showAdvanced && (
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#EF4444', marginTop: '0.5rem', padding: '0.75rem', background: '#FEF2F2', borderRadius: '0.75rem', border: '1px dashed #FECACA' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#EF4444', marginTop: '0.5rem', padding: '0.75rem', background: 'var(--badge-red-bg)', borderRadius: '0.75rem', border: '1px dashed #FECACA' }}>
                                         <input type="checkbox" checked={overrideStatus} onChange={e => setOverrideStatus(e.target.checked)} />
                                         Override Driver Workflow (Allow direct status changes)
                                     </label>
@@ -165,19 +165,19 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
                         )}
 
                         {!assignedDriver && (
-                            <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: '#9CA3AF', fontStyle: 'italic' }}>
+                            <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: 'var(--text-light)', fontStyle: 'italic' }}>
                                 * Assign a driver to enable "Delivering" or "Completed" statuses.
                             </p>
                         )}
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>Assign Driver</label>
+                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Assign Driver</label>
                         <select 
                             value={assignedDriver}
                             onChange={(e) => setAssignedDriver(e.target.value)}
                             disabled={status === 'Cancelled' || status === 'Pending'}
-                            style={{ width: '100%', padding: '0.875rem', borderRadius: '0.75rem', border: '1px solid #D1D5DB', background: (status === 'Cancelled' || status === 'Pending') ? '#F3F4F6' : 'white', outline: 'none' }}
+                            style={{ width: '100%', padding: '0.875rem', borderRadius: '0.75rem', border: '1px solid var(--border-medium)', background: (status === 'Cancelled' || status === 'Pending') ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
                         >
                             <option value="">-- Select a Driver --</option>
                             {drivers.map(d => (

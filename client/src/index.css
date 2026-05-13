@@ -3,20 +3,55 @@
 
 
 :root {
+  /* Legacy/Core Variables */
   --bg-color: #0b0f1a;
   --card-bg: rgba(30, 41, 59, 0.7);
-  --modal-bg: #ffffff;
+  
+  /* Brand Accents */
   --accent-blue: #3b82f6;
   --accent-cyan: #06b6d4;
   --accent-indigo: #4F46E5;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-dark: #111827;
-  --text-muted: #6B7280;
-  --text-light: #ffffff;
   --glass-border: rgba(255, 255, 255, 0.1);
-  --border-light: #E5E7EB;
   --glow-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+
+  /* FLEXIBLE THEME VARIABLES (Default Light Mode) */
+  --page-bg: #F9FAFB;
+  --surface-bg: #ffffff;
+  --surface-hover: #F3F4F6;
+  --active-bg: #EEF2FF;
+  --modal-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-disabled-bg: #F3F4F6;
+  --text-primary: #f8fafc;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --text-light: #9CA3AF;
+  --border-light: #E5E7EB;
+  --border-medium: #D1D5DB;
+  --badge-blue-bg: #EEF2FF;
+  --badge-green-bg: #ECFDF5;
+  --badge-yellow-bg: #FFFBEB;
+  --badge-red-bg: #FEF2F2;
+}
+
+/* Premium Dark Mode Overrides */
+.dark-mode {
+  --page-bg: #09090b;
+  --surface-bg: #18181b;
+  --surface-hover: #27272a;
+  --active-bg: rgba(79, 70, 229, 0.15);
+  --modal-bg: #1c1c1f;
+  --input-bg: #27272a;
+  --input-disabled-bg: #1f1f23;
+  --text-main: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-light: #71717a;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.12);
+  --badge-blue-bg: rgba(79, 70, 229, 0.15);
+  --badge-green-bg: rgba(16, 185, 129, 0.15);
+  --badge-yellow-bg: rgba(245, 158, 11, 0.15);
+  --badge-red-bg: rgba(239, 68, 68, 0.15);
 }
 
 * {
@@ -25,12 +60,19 @@
   box-sizing: border-box;
 }
 
+input, select, textarea {
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-primary);
+  background-color: var(--page-bg);
+  color: var(--text-main);
   overflow-x: hidden;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1,
@@ -45,9 +87,9 @@ h3,
   background: var(--card-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border-light);
   border-radius: 1.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 /* Hide scrollbar for modals while keeping scroll functionality */
@@ -101,9 +143,9 @@ h3,
 }
 
 .input-field {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--glass-border);
-  color: white;
+  background: var(--input-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
   padding: 0.875rem 1rem;
   border-radius: 0.875rem;
   width: 100%;
@@ -115,11 +157,25 @@ h3,
 .input-field:focus {
   outline: none;
   border-color: var(--accent-blue);
-  background: rgba(15, 23, 42, 0.8);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .input-field::placeholder {
+  color: var(--text-light);
+}
+
+/* Auth pages keep the glass-style inputs */
+.auth-container .input-field {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--glass-border);
+  color: white;
+}
+
+.auth-container .input-field:focus {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.auth-container .input-field::placeholder {
   color: #64748b;
 }
 

@@ -218,22 +218,22 @@ const LiveMapPage = () => {
     };
 
     return (
-        <div className="dashboard-container" style={{ background: '#F9FAFB', display: 'flex', minHeight: '100vh', overflow: 'hidden' }}>
+        <div className="dashboard-container" style={{ background: 'var(--page-bg)', display: 'flex', minHeight: '100vh', overflow: 'hidden' }}>
             <Sidebar role="admin" />
 
             <main className="content" style={{ flex: 1, display: 'flex', height: '100vh', padding: 0 }}>
                 {/* Left Side: Driver List Sidebar */}
                 <div style={{ 
-                    width: '350px', background: 'white', borderRight: '1px solid #E5E7EB',
+                    width: '350px', background: 'var(--surface-bg)', borderRight: '1px solid var(--border-light)',
                     display: 'flex', flexDirection: 'column', zIndex: 10
                 }}>
-                    <div style={{ padding: '1.5rem', borderBottom: '1px solid #F3F4F6' }}>
-                        <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#111827', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--surface-hover)' }}>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Truck size={20} color="#4F46E5" />
                             Fleet Status
                         </h2>
                         <div style={{ position: 'relative' }}>
-                            <Search size={16} color="#9CA3AF" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }} />
+                            <Search size={16} color="var(--text-light)" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }} />
                             <input 
                                 type="text"
                                 placeholder="Search drivers..."
@@ -241,7 +241,7 @@ const LiveMapPage = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{
                                     width: '100%', padding: '0.625rem 0.75rem 0.625rem 2.5rem',
-                                    background: '#F9FAFB', border: '1px solid #E5E7EB',
+                                    background: 'var(--page-bg)', border: '1px solid var(--border-light)',
                                     borderRadius: '0.75rem', fontSize: '0.9rem', outline: 'none'
                                 }}
                             />
@@ -265,17 +265,17 @@ const LiveMapPage = () => {
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                         <div style={{ 
-                                            width: '40px', height: '40px', background: d.id === selectedDriverId ? '#4F46E5' : '#F3F4F6',
+                                            width: '40px', height: '40px', background: d.id === selectedDriverId ? '#4F46E5' : 'var(--surface-hover)',
                                             borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             color: d.id === selectedDriverId ? 'white' : '#6B7280'
                                         }}>
                                             <Navigation size={20} style={{ transform: `rotate(${d.heading}deg)` }} />
                                         </div>
                                         <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: '#111827' }}>{d.name}</div>
-                                            <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>Plate: {d.plate}</div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.95rem', color: 'var(--text-main)' }}>{d.name}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Plate: {d.plate}</div>
                                         </div>
-                                        {d.id === selectedDriverId ? <Eye size={18} color="#4F46E5" /> : <ChevronRight size={18} color="#D1D5DB" />}
+                                        {d.id === selectedDriverId ? <Eye size={18} color="#4F46E5" /> : <ChevronRight size={18} color="var(--text-light)" />}
                                     </div>
                                     <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         {(() => {
@@ -290,24 +290,24 @@ const LiveMapPage = () => {
                                                 </span>
                                             );
                                         })()}
-                                        <span style={{ fontSize: '0.7rem', color: '#9CA3AF' }}>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>
                                             {d.lastUpdate ? new Date(d.lastUpdate).toLocaleTimeString() : 'No data'}
                                         </span>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div style={{ textAlign: 'center', padding: '2rem', color: '#6B7280' }}>No drivers found.</div>
+                            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No drivers found.</div>
                         )}
                     </div>
                     
-                    <div style={{ padding: '1rem', background: '#F9FAFB', borderTop: '1px solid #E5E7EB' }}>
+                    <div style={{ padding: '1rem', background: 'var(--page-bg)', borderTop: '1px solid var(--border-light)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                            <span style={{ color: '#6B7280' }}>Total Drivers:</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Total Drivers:</span>
                             <span style={{ fontWeight: '700' }}>{Object.keys(drivers).length}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginTop: '0.4rem' }}>
-                            <span style={{ color: '#6B7280' }}>Active Deliveries:</span>
+                            <span style={{ color: 'var(--text-muted)' }}>Active Deliveries:</span>
                             <span style={{ fontWeight: '700' }}>{orders.length}</span>
                         </div>
                     </div>
@@ -318,8 +318,8 @@ const LiveMapPage = () => {
                     {selectedDriverId && (
                         <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 1000, display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
                             <div style={{ 
-                                background: 'white', padding: '0.75rem 1.25rem', borderRadius: '1rem',
-                                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #E5E7EB',
+                                background: 'var(--surface-bg)', padding: '0.75rem 1.25rem', borderRadius: '1rem',
+                                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', border: '1px solid var(--border-light)',
                                 display: 'flex', alignItems: 'center', gap: '1rem'
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#F43F5E', fontWeight: '800', fontSize: '0.85rem' }}>
@@ -329,9 +329,9 @@ const LiveMapPage = () => {
                                 <button 
                                     onClick={() => setSelectedDriverId(null)}
                                     style={{ 
-                                        background: '#F3F4F6', border: 'none', padding: '0.4rem 0.75rem', 
+                                        background: 'var(--surface-hover)', border: 'none', padding: '0.4rem 0.75rem', 
                                         borderRadius: '0.5rem', fontSize: '0.75rem', fontWeight: '700', 
-                                        cursor: 'pointer', color: '#4B5563', display: 'flex', alignItems: 'center', gap: '0.4rem'
+                                        cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem'
                                     }}
                                 >
                                     <EyeOff size={14} /> Stop
@@ -341,7 +341,7 @@ const LiveMapPage = () => {
                             {/* Warning for missing coordinates */}
                             {orders.filter(o => (o.assignedDriver?._id === selectedDriverId || o.assignedDriver === selectedDriverId) && (!o.coordinates?.lat || !o.coordinates?.lng)).length > 0 && (
                                 <div style={{ 
-                                    background: '#FEF2F2', border: '1px solid #FECACA', color: '#EF4444',
+                                    background: 'var(--badge-red-bg)', border: '1px solid #FECACA', color: '#EF4444',
                                     padding: '0.5rem 1rem', borderRadius: '0.5rem', fontSize: '0.75rem', fontWeight: '600',
                                     boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
                                 }}>
@@ -380,7 +380,7 @@ const LiveMapPage = () => {
                                 <Popup>
                                     <div style={{ padding: '0.5rem', minWidth: '200px' }}>
                                         <div style={{ fontWeight: '800', fontSize: '1rem', marginBottom: '0.5rem' }}>{d.name}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#6B7280', marginBottom: '0.25rem' }}>Vehicle: {d.plate || 'N/A'}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Vehicle: {d.plate || 'N/A'}</div>
                                         {(() => {
                                             const status = getDriverDeliveryStatus(id);
                                             const driverOrders = orders.filter(o => o.assignedDriver?._id === id || o.assignedDriver === id);
@@ -394,7 +394,7 @@ const LiveMapPage = () => {
                                                         {status.label}
                                                     </span>
                                                     {driverOrders.length > 0 && (
-                                                        <div style={{ fontSize: '0.75rem', color: '#6B7280', marginTop: '0.5rem' }}>
+                                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
                                                             {driverOrders.length} active order{driverOrders.length > 1 ? 's' : ''}
                                                         </div>
                                                     )}
@@ -428,11 +428,11 @@ const LiveMapPage = () => {
                                     <Popup>
                                         <div style={{ padding: '0.5rem', minWidth: '200px' }}>
                                             <div style={{ fontWeight: '800', fontSize: '1rem' }}>{o.customerName}</div>
-                                            <div style={{ fontSize: '0.8rem', color: '#6B7280', margin: '0.25rem 0' }}>{o.address}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.25rem 0' }}>{o.address}</div>
                                             <span style={{ 
                                                 fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
                                                 padding: '0.2rem 0.5rem', borderRadius: '1rem',
-                                                background: o.status === 'Delivering' ? '#DBEAFE' : '#FEF3C7',
+                                                background: o.status === 'Delivering' ? 'var(--badge-blue-bg)' : '#FEF3C7',
                                                 color: o.status === 'Delivering' ? '#1E40AF' : '#92400E'
                                             }}>
                                                 {o.status}

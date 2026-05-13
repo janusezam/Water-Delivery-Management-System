@@ -166,21 +166,21 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
             justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)'
         }}>
             <div style={{
-                background: 'white', borderRadius: '1.5rem', width: '90%', maxWidth: '800px',
+                background: 'var(--input-bg)', borderRadius: '1.5rem', width: '90%', maxWidth: '800px',
                 height: '80vh', display: 'flex', flexDirection: 'column', position: 'relative',
                 overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
             }}>
                 {/* Header */}
-                <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--surface-hover)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#111827' }}>
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-main)' }}>
                             {step === 1 ? 'Water Store' : step === 2 ? 'Shopping Cart' : 'Checkout Delivery'}
                         </h3>
-                        <p style={{ fontSize: '0.85rem', color: '#6B7280' }}>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                             {step === 1 ? 'Browse our products' : step === 2 ? 'Manage your selected items' : 'Confirm your delivery details'}
                         </p>
                     </div>
-                    <button onClick={onClose} style={{ color: '#9CA3AF', background: 'none', border: 'none', cursor: 'pointer' }}>
+                    <button onClick={onClose} style={{ color: 'var(--text-light)', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <X size={24} />
                     </button>
                 </div>
@@ -194,7 +194,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                 const cartItem = cart.find(item => item.product._id === product._id && item.payDeposit === isDeposit);
                                 return (
                                     <div key={product._id} className="storefront-product-card">
-                                        <div style={{ padding: '2rem', background: '#F3F4F6', borderRadius: '0.75rem', display: 'grid', placeItems: 'center' }}>
+                                        <div style={{ padding: '2rem', background: 'var(--surface-hover)', borderRadius: '0.75rem', display: 'grid', placeItems: 'center' }}>
                                             {product.imageUrl ? (
                                                 <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '0.5rem' }} />
                                             ) : (
@@ -203,7 +203,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                         </div>
                                         <div style={{ padding: '1rem' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
-                                                <h4 style={{ fontWeight: '700', fontSize: '1.1rem', color: '#111827', margin: 0 }}>{product.name}</h4>
+                                                <h4 style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--text-main)', margin: 0 }}>{product.name}</h4>
                                                 <span style={{ 
                                                     fontSize: '0.65rem', 
                                                     fontWeight: '800', 
@@ -219,7 +219,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                             <p style={{ color: '#4F46E5', fontWeight: '800', fontSize: '1.25rem', marginBottom: '0.75rem' }}>₱{product.pricePerUnit}</p>
 
                                             <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#6B7280', cursor: 'pointer' }}>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', cursor: 'pointer' }}>
                                                     <input 
                                                         type="checkbox" 
                                                         checked={isDeposit} 
@@ -233,11 +233,11 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                             {cartItem ? (
                                                 <div style={{ 
                                                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                                                    background: '#EEF2FF', borderRadius: '0.75rem', padding: '0.5rem' 
+                                                    background: 'var(--badge-blue-bg)', borderRadius: '0.75rem', padding: '0.5rem' 
                                                 }}>
                                                     <button 
                                                         onClick={() => updateQty(product._id, -1, isDeposit)}
-                                                        style={{ background: 'white', border: '1px solid #C7D2FE', borderRadius: '0.5rem', padding: '0.25rem', cursor: 'pointer', color: '#4F46E5', display: 'grid', placeItems: 'center' }}
+                                                        style={{ background: 'var(--input-bg)', border: '1px solid #C7D2FE', borderRadius: '0.5rem', padding: '0.25rem', cursor: 'pointer', color: '#4F46E5', display: 'grid', placeItems: 'center' }}
                                                     >
                                                         <Minus size={16} />
                                                     </button>
@@ -246,7 +246,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                                         onClick={() => updateQty(product._id, 1, isDeposit)}
                                                         disabled={cartItem.qty >= product.stockQty}
                                                         style={{ 
-                                                            background: 'white', border: '1px solid #C7D2FE', borderRadius: '0.5rem', padding: '0.25rem', 
+                                                            background: 'var(--input-bg)', border: '1px solid #C7D2FE', borderRadius: '0.5rem', padding: '0.25rem', 
                                                             cursor: cartItem.qty >= product.stockQty ? 'not-allowed' : 'pointer', 
                                                             color: '#4F46E5', display: 'grid', placeItems: 'center',
                                                             opacity: cartItem.qty >= product.stockQty ? 0.5 : 1
@@ -261,7 +261,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                                     disabled={product.stockQty <= 0}
                                                     style={{ 
                                                         width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: 'none',
-                                                        background: product.stockQty > 0 ? '#4F46E5' : '#F3F4F6', 
+                                                        background: product.stockQty > 0 ? '#4F46E5' : 'var(--surface-hover)', 
                                                         color: product.stockQty > 0 ? 'white' : '#9CA3AF', 
                                                         fontWeight: '700', cursor: product.stockQty > 0 ? 'pointer' : 'not-allowed',
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
@@ -278,7 +278,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                     ) : step === 2 ? (
                         <div style={{ maxWidth: '600px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                                <h4 style={{ fontWeight: '700', color: '#111827', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                                <h4 style={{ fontWeight: '700', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
                                     <ShoppingCart size={20} /> My Cart ({cart.length})
                                 </h4>
                                 {cart.length > 0 && (
@@ -297,7 +297,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                 const key = getItemKey(item);
                                 const isSelected = selectedItems.includes(key);
                                 return (
-                                    <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: '1px solid #E5E7EB', opacity: isSelected ? 1 : 0.6 }}>
+                                    <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: '1px solid var(--border-light)', opacity: isSelected ? 1 : 0.6 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <input 
                                                 type="checkbox" 
@@ -305,7 +305,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                                 onChange={() => toggleSelection(key)}
                                                 style={{ cursor: 'pointer', width: '18px', height: '18px' }}
                                             />
-                                            <div style={{ width: '50px', height: '50px', background: 'white', borderRadius: '0.5rem', border: '1px solid #E5E7EB', display: 'grid', placeItems: 'center' }}>
+                                            <div style={{ width: '50px', height: '50px', background: 'var(--input-bg)', borderRadius: '0.5rem', border: '1px solid var(--border-light)', display: 'grid', placeItems: 'center' }}>
                                                 {item.product.imageUrl ? (
                                                     <img src={item.product.imageUrl} alt={item.product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '0.5rem' }} />
                                                 ) : (
@@ -313,25 +313,25 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                                 )}
                                             </div>
                                             <div>
-                                                <p style={{ fontWeight: '700', color: '#374151', margin: 0 }}>
+                                                <p style={{ fontWeight: '700', color: 'var(--text-muted)', margin: 0 }}>
                                                     {item.product.name}
-                                                    {item.payDeposit && <span style={{ fontSize: '0.65rem', color: '#4F46E5', fontWeight: '800', marginLeft: '0.5rem', background: '#EEF2FF', padding: '0.1rem 0.3rem', borderRadius: '0.3rem' }}>+ DEPOSIT</span>}
+                                                    {item.payDeposit && <span style={{ fontSize: '0.65rem', color: '#4F46E5', fontWeight: '800', marginLeft: '0.5rem', background: 'var(--badge-blue-bg)', padding: '0.1rem 0.3rem', borderRadius: '0.3rem' }}>+ DEPOSIT</span>}
                                                 </p>
-                                                <p style={{ fontSize: '0.85rem', color: '#6B7280', margin: 0 }}>₱{item.product.pricePerUnit} / unit</p>
+                                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>₱{item.product.pricePerUnit} / unit</p>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'white', border: '1px solid #D1D5DB', borderRadius: '0.5rem', padding: '0.25rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--input-bg)', border: '1px solid var(--border-medium)', borderRadius: '0.5rem', padding: '0.25rem' }}>
                                                 <button onClick={() => updateQty(item.product._id, -1, item.payDeposit)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4F46E5' }}><Minus size={16} /></button>
                                                 <span style={{ fontWeight: '700', minWidth: '24px', textAlign: 'center' }}>{item.qty}</span>
                                                 <button onClick={() => updateQty(item.product._id, 1, item.payDeposit)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4F46E5' }}><Plus size={16} /></button>
                                             </div>
-                                            <span style={{ fontWeight: '700', color: '#111827', textAlign: 'right', minWidth: '80px' }}>₱{((item.product.pricePerUnit * item.qty) + (item.payDeposit ? (item.product.containerDeposit || 0) * item.qty : 0)).toFixed(2)}</span>
+                                            <span style={{ fontWeight: '700', color: 'var(--text-main)', textAlign: 'right', minWidth: '80px' }}>₱{((item.product.pricePerUnit * item.qty) + (item.payDeposit ? (item.product.containerDeposit || 0) * item.qty : 0)).toFixed(2)}</span>
                                         </div>
                                     </div>
                                 );
                             })}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '2px dashed #D1D5DB' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '2px dashed var(--border-medium)' }}>
                                     <span style={{ fontWeight: '800', fontSize: '1.2rem' }}>Total Amount</span>
                                     <span style={{ fontWeight: '800', fontSize: '1.4rem', color: '#4F46E5' }}>₱{totalAmount.toFixed(2)}</span>
                                 </div>
@@ -352,14 +352,14 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                 </div>
                             </div>
                                 {selectedItems.length > 0 && (
-                                    <div style={{ background: '#F9FAFB', borderRadius: '0.75rem', padding: '1rem', border: '1px solid #E5E7EB' }}>
-                                        <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Items to be ordered:</p>
+                                    <div style={{ background: 'var(--page-bg)', borderRadius: '0.75rem', padding: '1rem', border: '1px solid var(--border-light)' }}>
+                                        <p style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Items to be ordered:</p>
                                         {cart.filter(i => selectedItems.includes(getItemKey(i))).map(item => {
                                             const itemSubtotal = item.product.pricePerUnit * item.qty;
                                             const itemDeposit = item.payDeposit ? (item.product.containerDeposit || 0) * item.qty : 0;
                                             return (
                                                 <div key={getItemKey(item)} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', padding: '0.25rem 0' }}>
-                                                    <span style={{ color: '#374151' }}>
+                                                    <span style={{ color: 'var(--text-muted)' }}>
                                                         {item.product.name} x {item.qty}
                                                         <span style={{ fontSize: '0.7rem', color: '#4F46E5', fontWeight: '700' }}> ({item.payDeposit ? 'Deposit' : 'No Deposit'})</span>
                                                     </span>
@@ -370,7 +370,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                     </div>
                                 )}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                <label style={{ fontWeight: '700', color: '#374151', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <label style={{ fontWeight: '700', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                     <MapPin size={18} /> Delivery Address
                                 </label>
                                 <textarea 
@@ -379,7 +379,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                     required
                                     placeholder="Enter your complete delivery address..."
                                     style={{ 
-                                        width: '100%', padding: '1rem', borderRadius: '0.75rem', border: '1px solid #D1D5DB',
+                                        width: '100%', padding: '1rem', borderRadius: '0.75rem', border: '1px solid var(--border-medium)',
                                         minHeight: '120px', resize: 'vertical', fontSize: '0.95rem', outline: 'none'
                                     }}
                                 />
@@ -389,12 +389,12 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                 </div>
 
                 {/* Footer */}
-                <div style={{ padding: '1.5rem 2rem', borderTop: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F9FAFB' }}>
+                <div style={{ padding: '1.5rem 2rem', borderTop: '1px solid var(--surface-hover)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--page-bg)' }}>
                     {step === 1 ? (
                         <>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <div style={{ position: 'relative' }}>
-                                    <ShoppingCart size={24} color="#6B7280" />
+                                    <ShoppingCart size={24} color="var(--text-muted)" />
                                     {cart.length > 0 && (
                                         <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#EF4444', color: 'white', fontSize: '0.7rem', fontWeight: '700', width: '18px', height: '18px', borderRadius: '50%', display: 'grid', placeItems: 'center' }}>
                                             {cart.length}
@@ -402,7 +402,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                     )}
                                 </div>
                                 <div>
-                                    <p style={{ fontSize: '1.1rem', fontWeight: '800', color: '#111827', margin: 0 }}>₱{totalAmount.toFixed(2)}</p>
+                                    <p style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>₱{totalAmount.toFixed(2)}</p>
                                 </div>
                             </div>
                             <button 
@@ -410,7 +410,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                 onClick={() => setStep(2)}
                                 style={{ 
                                     padding: '0.875rem 2rem', borderRadius: '0.75rem', border: 'none',
-                                    background: cart.length === 0 ? '#D1D5DB' : '#4F46E5', color: 'white', 
+                                    background: cart.length === 0 ? 'var(--border-medium)' : '#4F46E5', color: 'white', 
                                     fontWeight: '700', cursor: cart.length === 0 ? 'not-allowed' : 'pointer'
                                 }}
                             >
@@ -430,7 +430,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                 disabled={selectedItems.length === 0}
                                 style={{ 
                                     padding: '0.875rem 2rem', borderRadius: '0.75rem', border: 'none',
-                                    background: selectedItems.length === 0 ? '#D1D5DB' : '#4F46E5', 
+                                    background: selectedItems.length === 0 ? 'var(--border-medium)' : '#4F46E5', 
                                     color: 'white', fontWeight: '700', cursor: selectedItems.length === 0 ? 'not-allowed' : 'pointer'
                                 }}
                             >
@@ -441,7 +441,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                         <>
                             <button 
                                 onClick={() => setStep(2)}
-                                style={{ background: 'none', border: 'none', color: '#6B7280', fontWeight: '700', cursor: 'pointer' }}
+                                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontWeight: '700', cursor: 'pointer' }}
                             >
                                 ← Back to Cart
                             </button>
@@ -450,7 +450,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                 disabled={!address.trim() || selectedItems.length === 0}
                                 style={{ 
                                     padding: '0.875rem 2.5rem', borderRadius: '0.75rem', border: 'none',
-                                    background: (!address.trim() || selectedItems.length === 0) ? '#D1D5DB' : '#10B981', 
+                                    background: (!address.trim() || selectedItems.length === 0) ? 'var(--border-medium)' : '#10B981', 
                                     color: 'white', fontWeight: '700', cursor: (!address.trim() || selectedItems.length === 0) ? 'not-allowed' : 'pointer',
                                     display: 'flex', alignItems: 'center', gap: '0.5rem',
                                 }}

@@ -64,16 +64,16 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
             return order.items.map((i, idx) => (
                 <div key={idx} style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '0.4rem 0.75rem', background: '#F9FAFB',
-                    border: '1px solid #E5E7EB', borderRadius: '0.5rem'
+                    padding: '0.4rem 0.75rem', background: 'var(--page-bg)',
+                    border: '1px solid var(--border-light)', borderRadius: '0.5rem'
                 }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#374151' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)' }}>
                         {i.qty}x {i.product?.name || i.productName || 'Item'}
                     </span>
                     <span style={{
                         fontSize: '0.7rem', fontWeight: '700',
                         padding: '0.15rem 0.5rem', borderRadius: '1rem',
-                        background: i.payDeposit ? '#DBEAFE' : '#F3F4F6',
+                        background: i.payDeposit ? 'var(--badge-blue-bg)' : 'var(--surface-hover)',
                         color: i.payDeposit ? '#1D4ED8' : '#6B7280'
                     }}>
                         {i.payDeposit ? '💧 Deposit' : 'No Deposit'}
@@ -94,21 +94,21 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
             justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)'
         }}>
             <div className="modal-content" style={{
-                background: 'white', borderRadius: '1.5rem', width: '700px', maxWidth: '95vw',
+                background: 'var(--input-bg)', borderRadius: '1.5rem', width: '700px', maxWidth: '95vw',
                 position: 'relative', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
                 maxHeight: '92vh', overflowY: 'auto'
             }}>
                 {/* Header */}
-                <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--surface-hover)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#111827', margin: 0 }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
                             {showMap ? 'Delivery Route' : 'Track Order'}
                         </h3>
                         <p style={{ color: '#4F46E5', fontWeight: '700', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
                             #{order._id.slice(-6).toUpperCase()}
                         </p>
                     </div>
-                    <button onClick={() => showMap ? setShowMap(false) : onClose()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF' }}>
+                    <button onClick={() => showMap ? setShowMap(false) : onClose()} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-light)' }}>
                         <X size={24} />
                     </button>
                 </div>
@@ -121,7 +121,7 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                     <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         {/* Status Progress Tracker */}
                         {isCancelled ? (
-                            <div style={{ background: '#FEF2F2', borderRadius: '1rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid #FECACA' }}>
+                            <div style={{ background: 'var(--badge-red-bg)', borderRadius: '1rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid #FECACA' }}>
                                 <XCircle size={24} color="#EF4444" />
                                 <div>
                                     <p style={{ fontWeight: '800', color: '#DC2626', margin: 0 }}>Order Cancelled</p>
@@ -130,7 +130,7 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                                 </div>
                             </div>
                         ) : order.status === 'Failed Attempt' ? (
-                            <div style={{ background: '#FEF2F2', borderRadius: '1rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid #FECACA' }}>
+                            <div style={{ background: 'var(--badge-red-bg)', borderRadius: '1rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid #FECACA' }}>
                                 <AlertTriangle size={24} color="#EF4444" />
                                 <div>
                                     <p style={{ fontWeight: '800', color: '#DC2626', margin: 0 }}>Delivery Failed</p>
@@ -139,13 +139,13 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                                 </div>
                             </div>
                         ) : (
-                            <div style={{ background: '#F9FAFB', borderRadius: '1rem', padding: '1.5rem', border: '1px solid #F3F4F6' }}>
-                                <p style={{ fontSize: '0.75rem', fontWeight: '700', color: '#9CA3AF', textTransform: 'uppercase', marginBottom: '1.25rem' }}>Delivery Status</p>
+                            <div style={{ background: 'var(--page-bg)', borderRadius: '1rem', padding: '1.5rem', border: '1px solid var(--surface-hover)' }}>
+                                <p style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: '1.25rem' }}>Delivery Status</p>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
                                     {/* Connector line */}
                                     <div style={{
                                         position: 'absolute', top: '20px', left: '20px', right: '20px',
-                                        height: '2px', background: '#E5E7EB', zIndex: 0
+                                        height: '2px', background: 'var(--border-light)', zIndex: 0
                                     }} />
                                     <div style={{
                                         position: 'absolute', top: '20px', left: '20px',
@@ -164,8 +164,8 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                                                 <div style={{
                                                     width: '40px', height: '40px', borderRadius: '50%',
                                                     display: 'grid', placeItems: 'center',
-                                                    background: isCompleted ? '#4F46E5' : 'white',
-                                                    border: `2px solid ${isCompleted ? '#4F46E5' : '#E5E7EB'}`,
+                                                    background: isCompleted ? '#4F46E5' : 'var(--surface-bg)',
+                                                    border: `2px solid ${isCompleted ? '#4F46E5' : 'var(--border-light)'}`,
                                                     boxShadow: isCurrent ? '0 0 0 4px rgba(79,70,229,0.15)' : 'none',
                                                     transition: 'all 0.3s'
                                                 }}>
@@ -187,12 +187,12 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
 
                         {/* Delivery Address */}
                         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                            <div style={{ padding: '0.5rem', background: '#FEF2F2', borderRadius: '0.5rem', flexShrink: 0 }}>
+                            <div style={{ padding: '0.5rem', background: 'var(--badge-red-bg)', borderRadius: '0.5rem', flexShrink: 0 }}>
                                 <MapPin size={18} color="#EF4444" />
                             </div>
                             <div style={{ flex: 1 }}>
-                                <p style={{ fontSize: '0.75rem', color: '#9CA3AF', fontWeight: '600', textTransform: 'uppercase', margin: 0 }}>Delivery Address</p>
-                                <p style={{ color: '#374151', fontWeight: '500', margin: '0.25rem 0 0', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600', textTransform: 'uppercase', margin: 0 }}>Delivery Address</p>
+                                <p style={{ color: 'var(--text-muted)', fontWeight: '500', margin: '0.25rem 0 0', fontSize: '0.9rem', lineHeight: '1.4' }}>
                                     {order.address || order.deliveryAddress || 'Not specified'}
                                 </p>
                                 {/* View Route button */}
@@ -201,7 +201,7 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                                         onClick={() => setShowMap(true)}
                                         style={{
                                             marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem',
-                                            padding: '0.35rem 0.75rem', background: '#EEF2FF', color: '#4F46E5',
+                                            padding: '0.35rem 0.75rem', background: 'var(--badge-blue-bg)', color: '#4F46E5',
                                             border: '1px solid #C7D2FE', borderRadius: '0.5rem',
                                             fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer'
                                         }}
@@ -214,11 +214,11 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
 
                         {/* Items with deposit */}
                         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                            <div style={{ padding: '0.5rem', background: '#EEF2FF', borderRadius: '0.5rem', flexShrink: 0 }}>
+                            <div style={{ padding: '0.5rem', background: 'var(--badge-blue-bg)', borderRadius: '0.5rem', flexShrink: 0 }}>
                                 <Package size={18} color="#4F46E5" />
                             </div>
                             <div style={{ flex: 1 }}>
-                                <p style={{ fontSize: '0.75rem', color: '#9CA3AF', fontWeight: '600', textTransform: 'uppercase', margin: '0 0 0.5rem' }}>Items Ordered</p>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600', textTransform: 'uppercase', margin: '0 0 0.5rem' }}>Items Ordered</p>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                                     {renderItems()}
                                 </div>
@@ -228,12 +228,12 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                         {/* Driver */}
                         {order.assignedDriver && (
                             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                                <div style={{ padding: '0.5rem', background: '#ECFDF5', borderRadius: '0.5rem', flexShrink: 0 }}>
+                                <div style={{ padding: '0.5rem', background: 'var(--badge-green-bg)', borderRadius: '0.5rem', flexShrink: 0 }}>
                                     <Truck size={18} color="#10B981" />
                                 </div>
                                 <div>
-                                    <p style={{ fontSize: '0.75rem', color: '#9CA3AF', fontWeight: '600', textTransform: 'uppercase', margin: 0 }}>Your Driver</p>
-                                    <p style={{ color: '#111827', fontWeight: '700', margin: '0.125rem 0 0' }}>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600', textTransform: 'uppercase', margin: 0 }}>Your Driver</p>
+                                    <p style={{ color: 'var(--text-main)', fontWeight: '700', margin: '0.125rem 0 0' }}>
                                         {order.assignedDriver?.name || 'Assigned'}
                                     </p>
                                 </div>
@@ -241,12 +241,12 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                         )}
 
                         {/* Total */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: '#F9FAFB', borderRadius: '0.75rem', border: '1px solid #F3F4F6' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6B7280', fontWeight: '600' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: 'var(--page-bg)', borderRadius: '0.75rem', border: '1px solid var(--surface-hover)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontWeight: '600' }}>
                                 <DollarSign size={16} color="#10B981" />
                                 Total Amount
                             </div>
-                            <span style={{ fontWeight: '900', fontSize: '1.25rem', color: '#111827' }}>
+                            <span style={{ fontWeight: '900', fontSize: '1.25rem', color: 'var(--text-main)' }}>
                                 ₱{(order.totalAmount || 0).toLocaleString()}
                             </span>
                         </div>
@@ -304,13 +304,13 @@ const RouteMapInline = ({ order, customerPos, onBack }) => {
             {/* Route info bar */}
             {distanceKm && (
                 <div style={{
-                    padding: '0.75rem 2rem', background: '#F9FAFB', borderBottom: '1px solid #E5E7EB',
+                    padding: '0.75rem 2rem', background: 'var(--page-bg)', borderBottom: '1px solid var(--border-light)',
                     display: 'flex', gap: '0.75rem', alignItems: 'center'
                 }}>
-                    <span style={{ padding: '0.3rem 0.6rem', background: '#EEF2FF', color: '#4F46E5', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: '700' }}>
+                    <span style={{ padding: '0.3rem 0.6rem', background: 'var(--badge-blue-bg)', color: '#4F46E5', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: '700' }}>
                         📏 {distanceKm} km
                     </span>
-                    <span style={{ padding: '0.3rem 0.6rem', background: '#ECFDF5', color: '#059669', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: '700' }}>
+                    <span style={{ padding: '0.3rem 0.6rem', background: 'var(--badge-green-bg)', color: '#059669', borderRadius: '0.5rem', fontSize: '0.8rem', fontWeight: '700' }}>
                         ⏱ {durationMin} min
                     </span>
                     <div style={{ flex: 1 }}></div>
@@ -320,7 +320,7 @@ const RouteMapInline = ({ order, customerPos, onBack }) => {
                             target="_blank" rel="noopener noreferrer"
                             style={{
                                 display: 'flex', alignItems: 'center', gap: '0.3rem',
-                                padding: '0.3rem 0.6rem', background: '#EEF2FF', color: '#4F46E5',
+                                padding: '0.3rem 0.6rem', background: 'var(--badge-blue-bg)', color: '#4F46E5',
                                 borderRadius: '0.5rem', fontSize: '0.75rem', fontWeight: '700',
                                 textDecoration: 'none', border: '1px solid #C7D2FE'
                             }}
@@ -358,14 +358,14 @@ const RouteMapInline = ({ order, customerPos, onBack }) => {
 
             {/* Bottom legend */}
             <div style={{
-                padding: '0.75rem 2rem', borderTop: '1px solid #E5E7EB',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F9FAFB'
+                padding: '0.75rem 2rem', borderTop: '1px solid var(--border-light)',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--page-bg)'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ width: '10px', height: '10px', background: '#10B981', borderRadius: '50%' }}></div>
-                    <span style={{ fontSize: '0.8rem', color: '#6B7280' }}>Origin</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Origin</span>
                     <div style={{ width: '10px', height: '10px', background: '#EF4444', borderRadius: '50%', marginLeft: '1rem' }}></div>
-                    <span style={{ fontSize: '0.8rem', color: '#6B7280' }}>Customer</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Customer</span>
                 </div>
                 <button
                     onClick={onBack}

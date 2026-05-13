@@ -28,7 +28,7 @@ const DriverRoutePage = () => {
     }, []);
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#F9FAFB' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="driver" />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -40,7 +40,7 @@ const DriverRoutePage = () => {
                         width: '100%', 
                         borderRadius: '1.25rem', 
                         overflow: 'hidden', 
-                        border: '1px solid #E5E7EB',
+                        border: '1px solid var(--border-light)',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
                     }}>
                         <MapContainer center={[14.5995, 120.9842]} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -62,19 +62,19 @@ const DriverRoutePage = () => {
                         bottom: '2.5rem', 
                         left: '2.5rem', 
                         right: '2.5rem', 
-                        background: 'white', 
+                        background: 'var(--surface-bg)', 
                         padding: '1.25rem', 
                         borderRadius: '1rem', 
                         boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
                         zIndex: 1000,
-                        border: '1px solid #E5E7EB',
+                        border: '1px solid var(--border-light)',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center'
                     }}>
                         <div>
-                            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Next Stop</div>
-                            <div style={{ fontSize: '1rem', fontWeight: '800', color: '#111827' }}>{orders[0]?.customer?.name || 'No more stops'}</div>
+                            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Next Stop</div>
+                            <div style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-main)' }}>{orders[0]?.customer?.name || 'No more stops'}</div>
                         </div>
                         <button 
                             onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(orders[0]?.deliveryAddress)}`)}

@@ -89,23 +89,23 @@ const DriversPage = () => {
     );
 
     return (
-        <div className="dashboard-container" style={{ background: '#F9FAFB' }}>
+        <div className="dashboard-container" style={{ background: 'var(--page-bg)' }}>
             <Sidebar role="admin" />
 
             <main className="content" style={{ padding: '2rem 3rem' }}>
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
                     <div>
-                        <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Drivers</h2>
-                        <p style={{ color: '#6B7280', fontSize: '0.925rem', marginBottom: '1.25rem' }}>Manage your delivery personnel and vehicles.</p>
+                        <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Drivers</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', marginBottom: '1.25rem' }}>Manage your delivery personnel and vehicles.</p>
                         
                         <div style={{ position: 'relative', width: '320px' }}>
-                            <Search style={{ position: 'absolute', top: '10px', left: '12px', color: '#9CA3AF' }} size={18} />
+                            <Search style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-light)' }} size={18} />
                             <input 
                                 type="text" 
                                 placeholder="Search by name, plate, or license..." 
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem', background: 'white' }}
+                                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem', background: 'var(--surface-bg)' }}
                             />
                         </div>
                     </div>
@@ -123,21 +123,21 @@ const DriversPage = () => {
                     {loading ? (
                         <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center' }}>
                             <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #EEF2FF', borderTopColor: '#4F46E5', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
-                            <p style={{ color: '#6B7280' }}>Loading drivers...</p>
+                            <p style={{ color: 'var(--text-muted)' }}>Loading drivers...</p>
                         </div>
                     ) : filteredDrivers.length > 0 ? filteredDrivers.map((driver) => {
                         const status = getDriverDeliveryStatus(driver._id);
                         
                         return (
-                            <div key={driver._id} style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                            <div key={driver._id} style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <div style={{ width: '48px', height: '48px', background: '#EEF2FF', borderRadius: '1rem', display: 'grid', placeItems: 'center', color: '#4F46E5' }}>
+                                        <div style={{ width: '48px', height: '48px', background: 'var(--badge-blue-bg)', borderRadius: '1rem', display: 'grid', placeItems: 'center', color: '#4F46E5' }}>
                                             <User size={24} />
                                         </div>
                                         <div>
-                                            <h4 style={{ fontSize: '1rem', fontWeight: '700', color: '#111827' }}>{driver.user?.name || 'Unknown'}</h4>
-                                            <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>ID: {driver._id.slice(-6).toUpperCase()}</p>
+                                            <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>{driver.user?.name || 'Unknown'}</h4>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>ID: {driver._id.slice(-6).toUpperCase()}</p>
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
@@ -160,42 +160,42 @@ const DriversPage = () => {
                                     </div>
                                 </div>
 
-                                <div style={{ background: '#F9FAFB', borderRadius: '1rem', padding: '1rem', marginBottom: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div style={{ background: 'var(--page-bg)', borderRadius: '1rem', padding: '1rem', marginBottom: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <div>
-                                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', marginBottom: '0.25rem', fontWeight: '600' }}>VEHICLE</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#374151' }}>{driver.vehicleType || 'N/A'}</p>
+                                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '0.25rem', fontWeight: '600' }}>VEHICLE</p>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)' }}>{driver.vehicleType || 'N/A'}</p>
                                     </div>
                                     <div>
-                                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', marginBottom: '0.25rem', fontWeight: '600' }}>PLATE NO</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#374151' }}>{driver.plateNo || 'N/A'}</p>
+                                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '0.25rem', fontWeight: '600' }}>PLATE NO</p>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)' }}>{driver.plateNo || 'N/A'}</p>
                                     </div>
                                     <div style={{ gridColumn: '1 / -1' }}>
-                                        <p style={{ fontSize: '0.7rem', color: '#9CA3AF', marginBottom: '0.25rem', fontWeight: '600' }}>LICENSE NO</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#374151', fontFamily: 'monospace' }}>{driver.licenseNo || 'Not provided'}</p>
+                                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '0.25rem', fontWeight: '600' }}>LICENSE NO</p>
+                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{driver.licenseNo || 'Not provided'}</p>
                                     </div>
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                                     <a 
                                         href={`mailto:${driver.user?.email || ''}`}
-                                        style={{ flex: 1, padding: '0.625rem', background: 'white', border: '1px solid #E5E7EB', borderRadius: '0.75rem', fontSize: '0.85rem', fontWeight: '600', color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textDecoration: 'none' }}
+                                        style={{ flex: 1, padding: '0.625rem', background: 'var(--surface-bg)', border: '1px solid var(--border-light)', borderRadius: '0.75rem', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textDecoration: 'none' }}
                                     >
                                         <Mail size={16} />
                                         Email
                                     </a>
                                     <button 
                                         onClick={() => openEditModal(driver)}
-                                        style={{ padding: '0.625rem', background: 'white', border: '1px solid #E5E7EB', borderRadius: '0.75rem', cursor: 'pointer', title: 'Edit Driver' }}
+                                        style={{ padding: '0.625rem', background: 'var(--surface-bg)', border: '1px solid var(--border-light)', borderRadius: '0.75rem', cursor: 'pointer', title: 'Edit Driver' }}
                                     >
-                                        <Info size={18} color="#6B7280" />
+                                        <Info size={18} color="var(--text-muted)" />
                                     </button>
                                 </div>
                             </div>
                         );
                     }) : (
-                        <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: '#9CA3AF', background: 'white', borderRadius: '1.25rem', border: '1px dashed #E5E7EB' }}>
-                            <Truck size={48} color="#D1D5DB" style={{ margin: '0 auto 1rem' }} />
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#374151', marginBottom: '0.5rem' }}>No drivers found</h3>
+                        <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: 'var(--text-light)', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px dashed var(--border-light)' }}>
+                            <Truck size={48} color="var(--text-light)" style={{ margin: '0 auto 1rem' }} />
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>No drivers found</h3>
                             <p style={{ fontSize: '0.9rem' }}>{searchQuery ? 'Try adjusting your search terms.' : 'Add your first driver to get started.'}</p>
                         </div>
                     )}

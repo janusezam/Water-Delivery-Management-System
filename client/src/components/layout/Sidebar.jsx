@@ -86,8 +86,8 @@ const Sidebar = ({ role }) => {
     return (
         <aside className="sidebar" style={{
             width: isCollapsed ? '88px' : '280px',
-            background: 'white',
-            borderRight: '1px solid #F3F4F6',
+            background: 'var(--surface-bg)',
+            borderRight: '1px solid var(--border-light)',
             display: 'flex',
             flexDirection: 'column',
             height: '100vh',
@@ -154,8 +154,8 @@ const Sidebar = ({ role }) => {
                     top: '85px',
                     width: '28px',
                     height: '28px',
-                    background: 'white',
-                    border: '1px solid #E5E7EB',
+                    background: 'var(--surface-bg)',
+                    border: '1px solid var(--border-light)',
                     borderRadius: '50%',
                     display: 'grid',
                     placeItems: 'center',
@@ -204,8 +204,8 @@ const Sidebar = ({ role }) => {
                             fontSize: '0.95rem',
                             fontWeight: isActive ? '700' : '500',
                             transition: 'all 0.2s ease',
-                            color: isActive ? '#4F46E5' : '#6B7280',
-                            background: isActive ? '#EEF2FF' : 'transparent',
+                            color: isActive ? '#4F46E5' : 'var(--text-muted)',
+                            background: isActive ? 'var(--active-bg)' : 'transparent',
                             minHeight: '52px',
                             width: '100%',
                             boxShadow: isActive ? '0 2px 4px rgba(79, 70, 229, 0.05)' : 'none'
@@ -238,11 +238,11 @@ const Sidebar = ({ role }) => {
                     cursor: 'pointer',
                     fontSize: '0.95rem',
                     fontWeight: '700',
-                    borderTop: '1px solid #F3F4F6',
+                    borderTop: '1px solid var(--border-light)',
                     overflow: 'hidden',
                     transition: 'all 0.2s ease'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.background = '#FEF2F2'}
+                onMouseOver={(e) => e.currentTarget.style.background = 'var(--active-bg)'}
                 onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
             >
                 <LogOut size={22} style={{ flexShrink: 0 }} />

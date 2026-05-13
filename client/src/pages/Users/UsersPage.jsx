@@ -88,14 +88,14 @@ const UsersPage = () => {
     );
 
     return (
-        <div className="dashboard-container" style={{ background: '#F9FAFB' }}>
+        <div className="dashboard-container" style={{ background: 'var(--page-bg)' }}>
             <Sidebar role="admin" />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Header breadcrumbs={['Users']} />
                 
                 {loading ? (
-                    <div style={{ flex: 1, display: 'grid', placeItems: 'center', color: '#6B7280', minHeight: '100vh' }}>
+                    <div style={{ flex: 1, display: 'grid', placeItems: 'center', color: 'var(--text-muted)', minHeight: '100vh' }}>
                         <div style={{ textAlign: 'center' }}>
                             <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #EEF2FF', borderTopColor: '#4F46E5', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
                             <p style={{ fontSize: '0.9rem', fontWeight: '500' }}>Loading Users...</p>
@@ -105,12 +105,12 @@ const UsersPage = () => {
                     <main className="content" style={{ padding: '2rem 3rem', animation: 'fadeIn 0.5s ease-out' }}>
                         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                             <div>
-                                <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Users</h2>
-                                <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>Manage system roles and access levels.</p>
+                                <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Users</h2>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>Manage system roles and access levels.</p>
                             </div>
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                 <div style={{ position: 'relative' }}>
-                                    <Search style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} size={18} />
+                                    <Search style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} size={18} />
                                     <input 
                                         type="text"
                                         placeholder="Search users..."
@@ -119,7 +119,7 @@ const UsersPage = () => {
                                         style={{ 
                                             padding: '0.75rem 1rem 0.75rem 3rem',
                                             borderRadius: '0.75rem',
-                                            border: '1px solid #E5E7EB',
+                                            border: '1px solid var(--border-light)',
                                             width: '250px',
                                             outline: 'none',
                                             fontSize: '0.9rem'
@@ -148,27 +148,27 @@ const UsersPage = () => {
                             </div>
                         </header>
 
-                        <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                        <div style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead style={{ background: '#F9FAFB', borderBottom: '1px solid #F3F4F6' }}>
+                                <thead style={{ background: 'var(--page-bg)', borderBottom: '1px solid var(--surface-hover)' }}>
                                     <tr>
-                                        <th style={{ textAlign: 'left', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>User</th>
-                                        <th style={{ textAlign: 'left', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Role</th>
-                                        <th style={{ textAlign: 'left', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Joined Date</th>
-                                        <th style={{ textAlign: 'right', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Actions</th>
+                                        <th style={{ textAlign: 'left', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>User</th>
+                                        <th style={{ textAlign: 'left', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Role</th>
+                                        <th style={{ textAlign: 'left', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Joined Date</th>
+                                        <th style={{ textAlign: 'right', padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredUsers.map(user => (
-                                        <tr key={user._id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                                        <tr key={user._id} style={{ borderBottom: '1px solid var(--surface-hover)' }}>
                                             <td style={{ padding: '1rem 1.5rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                    <div style={{ width: '36px', height: '36px', background: '#F3F4F6', color: '#4F46E5', borderRadius: '50%', display: 'grid', placeItems: 'center', fontWeight: '700' }}>
+                                                    <div style={{ width: '36px', height: '36px', background: 'var(--surface-hover)', color: '#4F46E5', borderRadius: '50%', display: 'grid', placeItems: 'center', fontWeight: '700' }}>
                                                         {user.name[0]}
                                                     </div>
                                                     <div>
-                                                        <div style={{ fontWeight: '600', color: '#111827' }}>{user.name}</div>
-                                                        <div style={{ fontSize: '0.8rem', color: '#6B7280' }}>{user.email}</div>
+                                                        <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{user.name}</div>
+                                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{user.email}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -185,7 +185,7 @@ const UsersPage = () => {
                                                     {user.role}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '1rem 1.5rem', color: '#6B7280', fontSize: '0.85rem' }}>
+                                            <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                                                 {new Date(user.createdAt).toLocaleDateString()}
                                             </td>
                                             <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>

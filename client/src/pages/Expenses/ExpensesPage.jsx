@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { CreditCard, Plus, Receipt, Calendar, User, Search } from 'lucide-react';
-import { getExpenses, createExpense } from '../../services';
+import { CreditCard, Plus, Calendar, Search, Edit, Trash2, CheckCircle, AlertTriangle, Download, X } from 'lucide-react';
+import { getExpenses, createExpense, updateExpense, deleteExpense, getExpenseSummary, exportExpenses } from '../../services';
 import ExpenseModal from '../../components/modals/ExpenseModal';
 import Toast from '../../components/common/Toast';
 
 const ExpensesPage = () => {
     const [expenses, setExpenses] = useState([]);
+    const [summary, setSummary] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingExpense, setEditingExpense] = useState(null);
+    const [lightboxImage, setLightboxImage] = useState(null);
     
-    // Get user from local storage
+    // Filters
+    const [searchQuery, setSearchQuery] = useState('');
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
+
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const isDriver = user.role === 'driver';
+    const isAdmin = user.role === 'admin';
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
     const showToast = (message, type = 'success') => {
@@ -21,35 +29,120 @@ const ExpensesPage = () => {
         setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 4000);
     };
 
-    const fetchExpenses = async () => {
+    const fetchData = async () => {
+        setLoading(true);
         try {
-            const { data } = await getExpenses();
-            // If driver, only show their own expenses
+            const params = {};
+            if (dateFrom) params.from = dateFrom;
+            if (dateTo) params.to = dateTo;
+
+            const [expensesRes, summaryRes] = await Promise.all([
+                getExpenses(params),
+                isAdmin ? getExpenseSummary(params) : Promise.resolve({ data: null })
+            ]);
+
             if (isDriver) {
-                setExpenses(data.filter(e => e.driver?.user?._id === user._id));
+                setExpenses(expensesRes.data.filter(e => e.driver?.user?._id === user._id));
             } else {
-                setExpenses(data);
+                setExpenses(expensesRes.data);
             }
-            setLoading(false);
+
+            if (isAdmin) {
+                setSummary(summaryRes.data);
+            }
         } catch (error) {
             console.error('Error fetching expenses', error);
+            showToast('Failed to load data', 'error');
+        } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchExpenses();
-    }, []);
+        fetchData();
+    }, [dateFrom, dateTo]);
 
     const handleSaveExpense = async (formData) => {
         try {
-            await createExpense(formData);
-            showToast('Expense logged successfully');
+            if (editingExpense) {
+                await updateExpense(editingExpense._id, formData);
+                showToast('Expense updated successfully');
+            } else {
+                await createExpense(formData);
+                showToast('Expense logged successfully');
+            }
             setIsModalOpen(false);
-            fetchExpenses();
+            setEditingExpense(null);
+            fetchData();
         } catch (error) {
-            showToast('Failed to log expense', 'error');
+            showToast(editingExpense ? 'Failed to update expense' : 'Failed to log expense', 'error');
         }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this expense?')) {
+            try {
+                await deleteExpense(id);
+                showToast('Expense deleted');
+                fetchData();
+            } catch (error) {
+                showToast('Failed to delete expense', 'error');
+            }
+        }
+    };
+
+    const handleToggleReviewed = async (expense) => {
+        try {
+            await updateExpense(expense._id, { is_reviewed: !expense.is_reviewed });
+            showToast(`Expense marked as ${!expense.is_reviewed ? 'reviewed' : 'unreviewed'}`);
+            fetchData();
+        } catch (error) {
+            showToast('Failed to update review status', 'error');
+        }
+    };
+
+    const handleExport = async () => {
+        try {
+            const params = {};
+            if (dateFrom) params.from = dateFrom;
+            if (dateTo) params.to = dateTo;
+
+            const response = await exportExpenses(params);
+            
+            // Create a blob from the response and trigger download
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'gas_expenses.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            showToast('Failed to export CSV', 'error');
+        }
+    };
+
+    const openEditModal = (expense) => {
+        setEditingExpense(expense);
+        setIsModalOpen(true);
+    };
+
+    // Client-side search filtering
+    const filteredExpenses = expenses.filter(expense => 
+        !searchQuery || 
+        expense.driver?.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        expense.fuel_station?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Efficiency highlighting
+    const getRowStyle = (expense) => {
+        if (!isAdmin || !summary?.avg_km_per_liter || !expense.km_per_liter) return { borderBottom: '1px solid #F3F4F6' };
+        
+        const threshold = summary.avg_km_per_liter * 0.7; // < 70% of average
+        if (expense.km_per_liter < threshold) {
+            return { borderBottom: '1px solid #F3F4F6', background: '#FEF3C7' }; // Amber warning
+        }
+        return { borderBottom: '1px solid #F3F4F6' };
     };
 
     return (
@@ -59,98 +152,258 @@ const ExpensesPage = () => {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Header breadcrumbs={['Gas Expenses']} />
 
-                <main className="content" style={{ padding: '2rem 3rem', animation: 'fadeIn 0.5s ease-out' }}>
+                <main className="content" style={{ padding: '2rem 3rem', animation: 'fadeIn 0.5s ease-out', maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
                     <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                         <div>
                             <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', letterSpacing: '-0.025em' }}>Gas Expenses</h2>
                             <p style={{ color: '#6B7280', fontSize: '0.925rem' }}>
-                                {isDriver ? 'Track your fuel costs and maintenance records.' : 'Monitor fuel costs across all active vehicles.'}
+                                {isDriver ? 'Track your fuel costs and maintenance records.' : 'Monitor fuel costs and efficiency across the fleet.'}
                             </p>
                         </div>
-                        <button 
-                            onClick={() => setIsModalOpen(true)}
-                            style={{ 
-                                background: '#4F46E5', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', 
-                                border: 'none', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem', 
-                                cursor: 'pointer', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)'
-                            }}
-                        >
-                            <Plus size={20} />
-                            <span>Log Expense</span>
-                        </button>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            {isAdmin && (
+                                <button 
+                                    onClick={handleExport}
+                                    style={{ 
+                                        background: 'white', color: '#374151', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', 
+                                        border: '1px solid #E5E7EB', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem', 
+                                        cursor: 'pointer', boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                                    }}
+                                >
+                                    <Download size={18} />
+                                    <span>Export CSV</span>
+                                </button>
+                            )}
+                            <button 
+                                onClick={() => { setEditingExpense(null); setIsModalOpen(true); }}
+                                style={{ 
+                                    background: '#4F46E5', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '0.75rem', 
+                                    border: 'none', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem', 
+                                    cursor: 'pointer', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.2)'
+                                }}
+                            >
+                                <Plus size={20} />
+                                <span>Log Expense</span>
+                            </button>
+                        </div>
                     </header>
 
+                    {isAdmin && summary && (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Spend</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>₱{(summary.total_spend || 0).toLocaleString()}</p>
+                            </div>
+                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Liters</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>{(summary.total_liters || 0).toLocaleString()}L</p>
+                            </div>
+                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Avg Efficiency</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>{summary.avg_km_per_liter ? `${summary.avg_km_per_liter} KM/L` : 'N/A'}</p>
+                            </div>
+                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Fill-ups</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>{summary.number_of_fillups || 0}</p>
+                            </div>
+                            <div className="glass" style={{ background: 'white', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <p style={{ fontSize: '0.875rem', color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Cost per Gallon</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827' }}>
+                                    {summary.fuel_cost_per_gallon_delivered ? `₱${summary.fuel_cost_per_gallon_delivered}` : <span style={{ fontSize: '1.2rem', color: '#9CA3AF' }}>N/A (No deliveries)</span>}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+
                     <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #F3F4F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ position: 'relative', width: '320px' }}>
+                        <div style={{ padding: '1.5rem', borderBottom: '1px solid #F3F4F6', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ position: 'relative', width: '320px', flex: '1 1 auto', maxWidth: '400px' }}>
                                 <Search style={{ position: 'absolute', top: '10px', left: '12px', color: '#9CA3AF' }} size={18} />
                                 <input 
                                     type="text" 
-                                    placeholder="Search by date or cost..." 
+                                    placeholder="Search driver or station..." 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
                                 />
                             </div>
+                            
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: '0.85rem', color: '#6B7280', fontWeight: '600' }}>Filter Date:</span>
+                                <input 
+                                    type="date" 
+                                    value={dateFrom}
+                                    onChange={(e) => setDateFrom(e.target.value)}
+                                    style={{ padding: '0.625rem 1rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
+                                />
+                                <span style={{ color: '#9CA3AF' }}>to</span>
+                                <input 
+                                    type="date" 
+                                    value={dateTo}
+                                    onChange={(e) => setDateTo(e.target.value)}
+                                    style={{ padding: '0.625rem 1rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', outline: 'none', fontSize: '0.9rem' }}
+                                />
+                                {(dateFrom || dateTo) && (
+                                    <button onClick={() => { setDateFrom(''); setDateTo(''); }} style={{ background: 'none', border: 'none', color: '#EF4444', fontSize: '0.85rem', cursor: 'pointer', fontWeight: '600' }}>
+                                        Clear
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ background: '#F9FAFB', borderBottom: '1px solid #F3F4F6' }}>
-                                <tr>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Date</th>
-                                    {!isDriver && <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Driver</th>}
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Liters</th>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Price/L</th>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Total Cost</th>
-                                    <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', textAlign: 'right' }}>Receipt</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {expenses.length > 0 ? expenses.map((expense) => (
-                                    <tr key={expense._id} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                                        <td style={{ padding: '1.25rem 1.5rem' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#374151', fontSize: '0.9rem', fontWeight: '600' }}>
-                                                <Calendar size={16} color="#9CA3AF" />
-                                                {new Date(expense.date).toLocaleDateString()}
-                                            </div>
-                                        </td>
-                                        {!isDriver && (
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1000px' }}>
+                                <thead style={{ background: '#F9FAFB', borderBottom: '1px solid #F3F4F6' }}>
+                                    <tr>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Date</th>
+                                        {!isDriver && <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Driver</th>}
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Station</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Volume & Price</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Efficiency</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Cost</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase' }}>Status</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', textAlign: 'center' }}>Receipt</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredExpenses.length > 0 ? filteredExpenses.map((expense) => (
+                                        <tr key={expense._id} style={getRowStyle(expense)}>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                    <div style={{ width: '28px', height: '28px', background: '#F3F4F6', borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5' }}>
-                                                        {expense.driver?.user?.name[0]}
-                                                    </div>
-                                                    <span style={{ fontWeight: '600', color: '#111827' }}>{expense.driver?.user?.name}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#374151', fontSize: '0.9rem', fontWeight: '600' }}>
+                                                    <Calendar size={16} color="#9CA3AF" />
+                                                    {new Date(expense.date).toLocaleDateString()}
                                                 </div>
                                             </td>
-                                        )}
-                                        <td style={{ padding: '1.25rem 1.5rem', color: '#4B5563', fontSize: '0.9rem' }}>{expense.liters}L</td>
-                                        <td style={{ padding: '1.25rem 1.5rem', color: '#4B5563', fontSize: '0.9rem' }}>₱{expense.pricePerLiter.toFixed(2)}</td>
-                                        <td style={{ padding: '1.25rem 1.5rem', fontWeight: '800', color: '#EF4444' }}>₱{expense.totalCost.toFixed(2)}</td>
-                                        <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
-                                            {expense.receiptPhoto ? (
-                                                <a href={expense.receiptPhoto} target="_blank" rel="noreferrer" style={{ color: '#4F46E5', fontSize: '0.85rem', fontWeight: '700', textDecoration: 'none' }}>
-                                                    View Receipt
-                                                </a>
-                                            ) : <span style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>No Photo</span>}
-                                        </td>
-                                    </tr>
-                                )) : (
-                                    <tr>
-                                        <td colSpan="6" style={{ padding: '4rem', textAlign: 'center', color: '#9CA3AF' }}>
-                                            {loading ? 'Fetching records...' : 'No expenses logged yet.'}
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                            {!isDriver && (
+                                                <td style={{ padding: '1.25rem 1.5rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <div style={{ width: '28px', height: '28px', background: '#EEF2FF', borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5' }}>
+                                                            {expense.driver?.user?.name?.[0] || '?'}
+                                                        </div>
+                                                        <span style={{ fontWeight: '600', color: '#111827' }}>{expense.driver?.user?.name || 'Unknown'}</span>
+                                                    </div>
+                                                </td>
+                                            )}
+                                            <td style={{ padding: '1.25rem 1.5rem', color: '#4B5563', fontSize: '0.9rem' }}>
+                                                {expense.fuel_station || <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>Not specified</span>}
+                                            </td>
+                                            <td style={{ padding: '1.25rem 1.5rem' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span style={{ fontWeight: '600', color: '#374151' }}>{expense.liters}L</span>
+                                                    <span style={{ fontSize: '0.8rem', color: '#6B7280' }}>@ ₱{expense.pricePerLiter.toFixed(2)}/L</span>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '1.25rem 1.5rem' }}>
+                                                {expense.km_per_liter ? (
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                        <span style={{ fontWeight: '600', color: '#374151' }}>{expense.km_per_liter} KM/L</span>
+                                                        {isAdmin && summary?.avg_km_per_liter && expense.km_per_liter < (summary.avg_km_per_liter * 0.7) && (
+                                                            <AlertTriangle size={14} color="#D97706" title={`Low efficiency! Fleet average is ${summary.avg_km_per_liter} KM/L`} />
+                                                        )}
+                                                    </div>
+                                                ) : <span style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>N/A</span>}
+                                            </td>
+                                            <td style={{ padding: '1.25rem 1.5rem', fontWeight: '800', color: '#EF4444' }}>₱{expense.totalCost.toFixed(2)}</td>
+                                            <td style={{ padding: '1.25rem 1.5rem' }}>
+                                                {expense.createdBy?.role === 'admin' ? (
+                                                    <span style={{ background: '#E0E7FF', color: '#3730A3', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                        <CheckCircle size={12} /> Logged by Admin
+                                                    </span>
+                                                ) : expense.is_reviewed ? (
+                                                    <span style={{ background: '#D1FAE5', color: '#065F46', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                        <CheckCircle size={12} /> Reviewed
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ background: '#F3F4F6', color: '#4B5563', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600' }}>
+                                                        Pending
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center' }}>
+                                                {expense.receiptPhoto ? (
+                                                    <img 
+                                                        src={expense.receiptPhoto} 
+                                                        alt="Receipt" 
+                                                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '0.5rem', cursor: 'pointer', border: '1px solid #E5E7EB' }}
+                                                        onClick={() => setLightboxImage(expense.receiptPhoto)}
+                                                    />
+                                                ) : <span style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>—</span>}
+                                            </td>
+                                            <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                                                    {isAdmin && expense.createdBy?.role !== 'admin' && (
+                                                        <button 
+                                                            onClick={() => handleToggleReviewed(expense)}
+                                                            title={expense.is_reviewed ? "Mark as Unreviewed" : "Mark as Reviewed"}
+                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: expense.is_reviewed ? '#10B981' : '#9CA3AF', padding: '0.25rem' }}
+                                                        >
+                                                            <CheckCircle size={18} />
+                                                        </button>
+                                                    )}
+                                                    {(!expense.is_reviewed || isAdmin) && (
+                                                        <button 
+                                                            onClick={() => openEditModal(expense)}
+                                                            title="Edit"
+                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4F46E5', padding: '0.25rem' }}
+                                                        >
+                                                            <Edit size={18} />
+                                                        </button>
+                                                    )}
+                                                    {isAdmin && (
+                                                        <button 
+                                                            onClick={() => handleDelete(expense._id)}
+                                                            title="Delete"
+                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: '0.25rem' }}
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan={isDriver ? "8" : "9"} style={{ padding: '4rem', textAlign: 'center', color: '#9CA3AF' }}>
+                                                {loading ? 'Fetching records...' : 'No expenses found.'}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </main>
             </div>
 
             <ExpenseModal 
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); setEditingExpense(null); }}
                 onSave={handleSaveExpense}
+                expense={editingExpense}
             />
+
+            {/* Lightbox for receipt viewing */}
+            {lightboxImage && (
+                <div 
+                    onClick={() => setLightboxImage(null)}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}
+                >
+                    <button 
+                        onClick={() => setLightboxImage(null)}
+                        style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+                    >
+                        <X size={32} />
+                    </button>
+                    <img 
+                        src={lightboxImage} 
+                        alt="Receipt Full View" 
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '0.5rem' }}
+                        onClick={(e) => e.stopPropagation()} // Prevent click from closing when clicking image
+                    />
+                </div>
+            )}
 
             <Toast 
                 {...toast} 

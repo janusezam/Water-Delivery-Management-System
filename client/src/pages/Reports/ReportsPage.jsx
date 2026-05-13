@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
-import { BarChart3, TrendingUp, TrendingDown, Package, CreditCard, ShoppingBag, Truck } from 'lucide-react';
-import { getReportSummary } from '../../services';
+import { BarChart3, TrendingUp, TrendingDown, Package, CreditCard, ShoppingBag, Truck, Droplets } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { getReportSummary, getExpenseSummary } from '../../services';
 
 const ReportsPage = () => {
     const [summary, setSummary] = useState(null);
+    const [expenseSummary, setExpenseSummary] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchSummary = async () => {
             try {
-                const { data } = await getReportSummary();
-                setSummary(data);
+                const [reportRes, expenseRes] = await Promise.all([
+                    getReportSummary(),
+                    getExpenseSummary()
+                ]);
+                setSummary(reportRes.data);
+                setExpenseSummary(expenseRes.data);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching report', error);
@@ -102,7 +108,7 @@ const ReportsPage = () => {
                     </div>
 
                     <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', padding: '2rem' }}>
-                        <h4 style={{ fontSize: '1.125rem', fontWeight: '700', marginBottom: '1.5rem' }}>Profit Summary</h4>
+                        <h4 style={{ fontSize: '1.125rem', fontWeight: '700', marginBottom: '1.5rem', color: 'var(--text-dark)' }}>Profit Summary</h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '1rem', borderBottom: '1px solid #F3F4F6' }}>
                                 <span style={{ color: '#6B7280', fontSize: '0.9rem' }}>Gross Revenue</span>
@@ -119,6 +125,49 @@ const ReportsPage = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Gas Expense Analytics Section */}
+                {expenseSummary?.driver_analytics?.length > 0 && (
+                    <div style={{ marginTop: '2.5rem' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#111827', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Droplets size={24} color="#3B82F6" />
+                            Gas Expense & Driver Analytics
+                        </h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                            
+                            <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <h4 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1.5rem', color: '#374151' }}>Total Spend per Driver (₱)</h4>
+                                <div style={{ height: '300px', width: '100%' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={expenseSummary.driver_analytics} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} tickFormatter={(value) => `₱${value}`} />
+                                            <Tooltip cursor={{fill: '#F3F4F6'}} contentStyle={{ borderRadius: '0.5rem', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} formatter={(value) => [`₱${value.toLocaleString()}`, 'Total Spend']} />
+                                            <Bar dataKey="total_spend" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            <div style={{ background: 'white', borderRadius: '1.25rem', border: '1px solid #E5E7EB', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                                <h4 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1.5rem', color: '#374151' }}>Driver Fuel Efficiency (KM/L)</h4>
+                                <div style={{ height: '300px', width: '100%' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={expenseSummary.driver_analytics} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} />
+                                            <Tooltip cursor={{fill: '#F3F4F6'}} contentStyle={{ borderRadius: '0.5rem', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} formatter={(value) => [`${value} KM/L`, 'Avg Efficiency']} />
+                                            <Bar dataKey="avg_km_per_liter" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                )}
                     </main>
                 )}
             </div>

@@ -44,6 +44,7 @@ const createOrder = async (req, res) => {
         let resolvedCustomerName = customerName;
         let resolvedAddress = address || deliveryAddress;
         let resolvedUserId = null;
+        let resolvedCustomerId = customerId || null;
 
         // If a customerId is provided (admin creating order for a customer),
         // look up the customer name from the Customer model
@@ -63,6 +64,16 @@ const createOrder = async (req, res) => {
         if (req.user?.role === 'user') {
             resolvedUserId = req.user._id;
             resolvedCustomerName = resolvedCustomerName || req.user.name;
+            // Try to find a matching Customer record for this user
+            if (!resolvedCustomerId) {
+                const custByUser = await Customer.findOne({ user: req.user._id });
+                if (custByUser) resolvedCustomerId = custByUser._id;
+                else {
+                    // Fallback: match by name
+                    const custByName = await Customer.findOne({ name: resolvedCustomerName });
+                    if (custByName) resolvedCustomerId = custByName._id;
+                }
+            }
         }
 
         if (!resolvedCustomerName) {
@@ -75,6 +86,7 @@ const createOrder = async (req, res) => {
         const order = new Order({
             customerName: resolvedCustomerName,
             user: resolvedUserId,
+            customer: resolvedCustomerId,
             address: resolvedAddress,
             items: items || [],
             totalAmount: totalAmount || 0,
@@ -160,6 +172,7 @@ const updateOrder = async (req, res) => {
         if (req.body.failedNote !== undefined) updateData.failedNote = req.body.failedNote;
         if (req.body.cancelReason !== undefined) updateData.cancelReason = req.body.cancelReason;
         if (req.body.cancelMessage !== undefined) updateData.cancelMessage = req.body.cancelMessage;
+        if (req.body.jugsReturned !== undefined) updateData.jugsReturned = req.body.jugsReturned;
 
         // Inventory Logic: Deduct stock when status moves to 'delivered' or 'Completed'
         const completionStatuses = ['delivered', 'Completed'];
@@ -192,6 +205,65 @@ const updateOrder = async (req, res) => {
             }
         }
 
+        // ── Jug Balance Logic ──
+        // When delivery is completed: update Customer.jugBalance
+        // jugsOut = total qty of non-deposit items (station containers going out)
+        // jugsIn  = jugsReturned (empties the driver collected)
+        // Balance delta = jugsOut - jugsIn
+        if (isNowCompleted && !wasAlreadyCompleted) {
+            // Find the linked customer
+            let customerDoc = null;
+            if (currentOrder.customer) {
+                customerDoc = await Customer.findById(currentOrder.customer);
+            }
+            if (!customerDoc) {
+                // Fallback: try to find by name
+                customerDoc = await Customer.findOne({ name: currentOrder.customerName });
+            }
+
+            if (customerDoc) {
+                const jugsOut = (currentOrder.items || []).reduce((sum, item) => {
+                    // Only count non-deposit items (refills using station containers)
+                    if (!item.payDeposit && item.qty > 0) return sum + item.qty;
+                    return sum;
+                }, 0);
+                const jugsIn = req.body.jugsReturned || currentOrder.jugsReturned || 0;
+                const balanceDelta = jugsOut - jugsIn;
+
+                if (balanceDelta !== 0) {
+                    await Customer.findByIdAndUpdate(customerDoc._id, {
+                        $inc: { jugBalance: balanceDelta }
+                    });
+                }
+            }
+        }
+
+        // If reversing a completed order, reverse the jug balance too
+        if (!isNowCompleted && wasAlreadyCompleted) {
+            let customerDoc = null;
+            if (currentOrder.customer) {
+                customerDoc = await Customer.findById(currentOrder.customer);
+            }
+            if (!customerDoc) {
+                customerDoc = await Customer.findOne({ name: currentOrder.customerName });
+            }
+
+            if (customerDoc) {
+                const jugsOut = (currentOrder.items || []).reduce((sum, item) => {
+                    if (!item.payDeposit && item.qty > 0) return sum + item.qty;
+                    return sum;
+                }, 0);
+                const jugsIn = currentOrder.jugsReturned || 0;
+                const balanceDelta = jugsOut - jugsIn;
+
+                if (balanceDelta !== 0) {
+                    await Customer.findByIdAndUpdate(customerDoc._id, {
+                        $inc: { jugBalance: -balanceDelta }
+                    });
+                }
+            }
+        }
+
         const updatedOrder = await Order.findByIdAndUpdate(
             orderId,
             { $set: updateData },
@@ -212,10 +284,20 @@ const updateOrder = async (req, res) => {
 // @route   DELETE /api/orders/:id
 const deleteOrder = async (req, res) => {
     try {
-        const order = await Order.findByIdAndDelete(req.params.id);
+        const order = await Order.findById(req.params.id);
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
+
+        // Prevent deletion of active or completed orders
+        const protectedStatuses = ['Dispatched', 'dispatched', 'Delivering', 'Completed', 'delivered'];
+        if (protectedStatuses.includes(order.status)) {
+            return res.status(400).json({ 
+                message: `Cannot delete an order with status: ${order.status}. Please cancel it first.` 
+            });
+        }
+
+        await Order.findByIdAndDelete(req.params.id);
         res.json({ message: 'Order deleted successfully' });
     } catch (error) {
         console.error('Error deleting order:', error);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { Truck, Search, Filter, Plus, Clock, CheckCircle, XCircle, LayoutGrid, ClipboardList } from 'lucide-react';
+import { Truck, Search, Filter, Plus, Clock, CheckCircle, XCircle, LayoutGrid, ClipboardList, Eye, Settings, Trash2, Ban, Package } from 'lucide-react';
 import { getOrders, createOrder, deleteOrder } from '../../services';
 import OrderModal from '../../components/modals/OrderModal';
 import StorefrontModal from '../../components/modals/StorefrontModal';
@@ -43,7 +43,8 @@ const OrdersPage = () => {
             fetchOrders();
         } catch (error) {
             console.error('Delete order error:', error);
-            alert('Failed to delete order');
+            const errMsg = error.response?.data?.message || 'Failed to delete order';
+            alert(errMsg);
         }
     };
 
@@ -70,18 +71,23 @@ const OrdersPage = () => {
 
     const getStatusStyle = (status) => {
         switch (status) {
+            case 'Pending': 
+                return { bg: 'var(--badge-yellow-bg)', color: '#D97706', icon: <Clock size={16} /> };
             case 'Dispatched':
-            case 'dispatched': return { bg: '#EEF2FF', color: '#4F46E5', icon: <Truck size={16} /> };
+            case 'dispatched': 
+                return { bg: 'var(--badge-blue-bg)', color: '#4F46E5', icon: <Package size={16} /> };
+            case 'Delivering': 
+                return { bg: '#E0F2FE', color: '#0369A1', icon: <Truck size={16} style={{ animation: 'pulse 2s infinite' }} /> };
             case 'Completed':
-            case 'delivered': return { bg: '#ECFDF5', color: '#10B981', icon: <CheckCircle size={16} /> };
+            case 'delivered': 
+                return { bg: 'var(--badge-green-bg)', color: '#10B981', icon: <CheckCircle size={16} /> };
             case 'Cancelled':
-            case 'cancelled': return { bg: '#FEF2F2', color: '#EF4444', icon: <XCircle size={16} /> };
-            case 'Delivering': return { 
-                bg: '#E0F2FE', 
-                color: '#0369A1', 
-                icon: <Truck size={16} style={{ animation: 'pulse 2s infinite' }} /> 
-            };
-            default: return { bg: 'var(--surface-hover)', color: 'var(--text-muted)', icon: null };
+            case 'cancelled': 
+                return { bg: 'var(--badge-red-bg)', color: '#EF4444', icon: <Ban size={16} /> };
+            case 'Failed Attempt':
+                return { bg: '#FFF1F2', color: '#E11D48', icon: <XCircle size={16} /> };
+            default: 
+                return { bg: 'var(--surface-hover)', color: 'var(--text-muted)', icon: <Clock size={16} /> };
         }
     };
 
@@ -245,16 +251,18 @@ const OrdersPage = () => {
                                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                             <button
                                                                 onClick={() => { setSelectedOrder(order); setIsTrackOpen(true); }}
-                                                                style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: 'var(--badge-blue-bg)', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
+                                                                title="View Details"
+                                                                style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: 'var(--badge-blue-bg)', color: '#4F46E5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
                                                             >
-                                                                🔍 Details
+                                                                <Eye size={16} />
                                                             </button>
                                                             {order.status === 'Pending' && (
                                                                 <button
                                                                     onClick={() => { setSelectedOrder(order); setIsCancelOpen(true); }}
-                                                                    style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #FEE2E2', background: 'var(--badge-red-bg)', fontSize: '0.75rem', fontWeight: '700', color: '#EF4444', cursor: 'pointer' }}
+                                                                    title="Cancel Order"
+                                                                    style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #FEE2E2', background: 'var(--badge-red-bg)', color: '#EF4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
                                                                 >
-                                                                    Cancel
+                                                                    <Ban size={16} />
                                                                 </button>
                                                             )}
                                                         </div>
@@ -262,25 +270,43 @@ const OrdersPage = () => {
                                                         activeTab === 'completed' ? (
                                                             <button
                                                                 onClick={() => { setSelectedOrder(order); setIsTrackOpen(true); }}
-                                                                style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: 'var(--badge-blue-bg)', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
+                                                                title="View Details"
+                                                                style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: 'var(--badge-blue-bg)', color: '#4F46E5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
                                                             >
-                                                                🔍 Details
+                                                                <Eye size={16} />
                                                             </button>
                                                         ) : (
                                                             <>
                                                                 <button
                                                                     onClick={() => { setSelectedOrder(order); setIsManageOpen(true); }}
-                                                                    style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: 'var(--surface-bg)', fontSize: '0.75rem', fontWeight: '700', color: '#4F46E5', cursor: 'pointer' }}
+                                                                    title="Manage Order"
+                                                                    style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: 'var(--surface-bg)', color: '#4F46E5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
                                                                 >
-                                                                    Manage
+                                                                    <Settings size={16} />
                                                                 </button>
                                                                 {userProfile.role === 'admin' && (
-                                                                    <button
-                                                                        onClick={() => handleDeleteOrder(order._id, order._id.slice(-6).toUpperCase())}
-                                                                        style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid #FEE2E2', background: 'var(--badge-red-bg)', fontSize: '0.75rem', fontWeight: '700', color: '#EF4444', cursor: 'pointer' }}
-                                                                    >
-                                                                        Delete
-                                                                    </button>
+                                                                    (() => {
+                                                                        const protectedStatuses = ['Dispatched', 'dispatched', 'Delivering', 'Completed', 'delivered'];
+                                                                        const isProtected = protectedStatuses.includes(order.status);
+                                                                        return (
+                                                                            <button
+                                                                                onClick={() => !isProtected && handleDeleteOrder(order._id, order._id.slice(-6).toUpperCase())}
+                                                                                disabled={isProtected}
+                                                                                title={isProtected ? "Cannot delete active or completed orders" : "Delete Order"}
+                                                                                style={{ 
+                                                                                    padding: '0.5rem', borderRadius: '0.5rem', 
+                                                                                    border: isProtected ? '1px solid var(--border-medium)' : '1px solid #FEE2E2', 
+                                                                                    background: isProtected ? 'var(--surface-hover)' : 'var(--badge-red-bg)', 
+                                                                                    color: isProtected ? 'var(--text-light)' : '#EF4444', 
+                                                                                    cursor: isProtected ? 'not-allowed' : 'pointer',
+                                                                                    opacity: isProtected ? 0.6 : 1,
+                                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
+                                                                                }}
+                                                                            >
+                                                                                <Trash2 size={16} />
+                                                                            </button>
+                                                                        );
+                                                                    })()
                                                                 )}
                                                             </>
                                                         )

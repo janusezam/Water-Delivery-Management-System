@@ -52,6 +52,19 @@ const FitBounds = ({ points }) => {
     return null;
 };
 
+// Distance Calculation (Haversine)
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    return R * c; 
+};
+
 const DriverDashboard = () => {
     const [activeOrders, setActiveOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -110,12 +123,18 @@ const DriverDashboard = () => {
         return () => navigator.geolocation.clearWatch(watchId);
     }, [socket, driverId]);
 
+    const [deliveryConfirm, setDeliveryConfirm] = useState(null); // { orderId, jugsReturned }
+
     const handleUpdateStatus = async (orderId, newStatus) => {
+        // For delivery completion, show jug collection modal instead of simple confirm
+        if (newStatus === 'delivered') {
+            setDeliveryConfirm({ orderId, jugsReturned: 0 });
+            return;
+        }
+
         const messages = {
             'Delivering': 'Start this delivery? This will mark it as Delivering.',
-            'delivered': 'Mark this order as delivered and complete?'
         };
-        const currentOrder = activeOrders.find(o => o._id === orderId);
         const confirmMsg = messages[newStatus] || 'Update status?';
         if (!window.confirm(confirmMsg)) return;
         try {
@@ -128,6 +147,22 @@ const DriverDashboard = () => {
         } catch (error) {
             console.error('Error updating order status:', error);
             alert('Failed to update order status');
+        }
+    };
+
+    const handleConfirmDelivery = async () => {
+        if (!deliveryConfirm) return;
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:5000/api/orders/${deliveryConfirm.orderId}`,
+                { status: 'delivered', jugsReturned: deliveryConfirm.jugsReturned },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setDeliveryConfirm(null);
+            fetchOrders();
+        } catch (error) {
+            console.error('Error completing delivery:', error);
+            alert('Failed to complete delivery');
         }
     };
 
@@ -158,6 +193,15 @@ const DriverDashboard = () => {
 
     const OrderCard = ({ order }) => {
         const badge = getStatusBadge(order.status);
+        
+        let distanceText = null;
+        if (driverPosition && order.coordinates?.lat && order.coordinates?.lng) {
+            const distance = calculateDistance(
+                driverPosition.lat, driverPosition.lng, 
+                order.coordinates.lat, order.coordinates.lng
+            ).toFixed(1);
+            distanceText = `🚗 ${distance} km away`;
+        }
         return (
             <div style={{
                 background: 'var(--surface-bg)', borderRadius: '1.25rem',
@@ -198,7 +242,14 @@ const DriverDashboard = () => {
                         <MapPin size={18} color="#EF4444" />
                     </div>
                     <div>
-                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', margin: 0, fontWeight: '600', textTransform: 'uppercase' }}>Delivery Address</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
+                            <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', margin: 0, fontWeight: '600', textTransform: 'uppercase' }}>Delivery Address</p>
+                            {distanceText && (
+                                <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#10B981', background: 'var(--badge-green-bg)', padding: '0.2rem 0.5rem', borderRadius: '1rem' }}>
+                                    {distanceText}
+                                </span>
+                            )}
+                        </div>
                         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, fontWeight: '500', lineHeight: '1.4' }}>
                             {order.address || order.deliveryAddress || 'No address provided'}
                         </p>
@@ -354,6 +405,82 @@ const DriverDashboard = () => {
 
             {/* Report Issue Modal */}
             {reportOrder && <ReportIssueModal order={reportOrder} onClose={() => setReportOrder(null)} onSubmit={handleReportIssueSubmit} />}
+
+            {/* Delivery Confirmation Modal — Jug Collection */}
+            {deliveryConfirm && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 9999,
+                    background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                    <div style={{
+                        width: '90vw', maxWidth: '420px', background: 'var(--surface-bg)', borderRadius: '1.5rem',
+                        padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                        display: 'flex', flexDirection: 'column', gap: '1.5rem'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ margin: 0, fontWeight: '800', fontSize: '1.25rem', color: 'var(--text-main)' }}>Complete Delivery</h3>
+                            <button onClick={() => setDeliveryConfirm(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                                <X size={20} color="var(--text-light)" />
+                            </button>
+                        </div>
+
+                        <div style={{ background: '#F0FDF4', borderRadius: '1rem', padding: '1.25rem', border: '1px solid #BBF7D0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#166534', fontWeight: '700', marginBottom: '0.75rem' }}>
+                                <CheckCircle size={18} /> Delivery Completed
+                            </div>
+                            <p style={{ margin: 0, fontSize: '0.85rem', color: '#15803D' }}>
+                                Before confirming, please record how many <strong>empty jugs/containers</strong> you collected from the customer.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                                Empty Jugs Collected
+                            </label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <button
+                                    onClick={() => setDeliveryConfirm(prev => ({ ...prev, jugsReturned: Math.max(0, prev.jugsReturned - 1) }))}
+                                    style={{
+                                        width: '44px', height: '44px', borderRadius: '0.75rem', border: '1px solid var(--border-medium)',
+                                        background: 'var(--page-bg)', cursor: 'pointer', fontSize: '1.25rem', fontWeight: '700',
+                                        color: '#4F46E5', display: 'grid', placeItems: 'center'
+                                    }}
+                                >−</button>
+                                <span style={{
+                                    fontSize: '2rem', fontWeight: '900', color: 'var(--text-main)',
+                                    minWidth: '60px', textAlign: 'center'
+                                }}>
+                                    {deliveryConfirm.jugsReturned}
+                                </span>
+                                <button
+                                    onClick={() => setDeliveryConfirm(prev => ({ ...prev, jugsReturned: prev.jugsReturned + 1 }))}
+                                    style={{
+                                        width: '44px', height: '44px', borderRadius: '0.75rem', border: '1px solid var(--border-medium)',
+                                        background: 'var(--page-bg)', cursor: 'pointer', fontSize: '1.25rem', fontWeight: '700',
+                                        color: '#4F46E5', display: 'grid', placeItems: 'center'
+                                    }}
+                                >+</button>
+                            </div>
+                            <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: 'var(--text-light)', fontStyle: 'italic' }}>
+                                Enter 0 if no empty containers were returned by the customer.
+                            </p>
+                        </div>
+
+                        <button
+                            onClick={handleConfirmDelivery}
+                            style={{
+                                width: '100%', padding: '1rem', borderRadius: '0.75rem', border: 'none',
+                                background: '#10B981', color: 'white', fontWeight: '700', fontSize: '0.95rem',
+                                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                            }}
+                        >
+                            <CheckCircle size={20} /> Confirm Delivery
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

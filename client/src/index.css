@@ -288,3 +288,13 @@ h3,
   color: var(--accent-indigo);
   border-bottom: 2px solid var(--accent-indigo);
 }
+
+/* Fix reCAPTCHA badge z-index layering */
+.grecaptcha-badge {
+  z-index: 9999 !important;
+}
+
+/* Hide Leaflet Routing Machine container (prevents blank white box on map) */
+.leaflet-routing-container {
+  display: none !important;
+}

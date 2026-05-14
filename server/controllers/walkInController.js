@@ -49,10 +49,22 @@ const processSale = async (req, res) => {
             });
         }
 
-        if (customer && jugsReturned > 0) {
-            await Customer.findByIdAndUpdate(customer, {
-                $inc: { jugBalance: -jugsReturned }
-            });
+        // Jug Balance Logic for Walk-In Sales
+        if (customer) {
+            // Calculate jugs going out (non-deposit items = using station containers)
+            const jugsOut = items.reduce((sum, item) => {
+                // Items without deposit are refills using station containers
+                if (!item.payDeposit && item.qty > 0) return sum + item.qty;
+                return sum;
+            }, 0);
+            const jugsIn = jugsReturned || 0;
+            const balanceDelta = jugsOut - jugsIn;
+
+            if (balanceDelta !== 0) {
+                await Customer.findByIdAndUpdate(customer, {
+                    $inc: { jugBalance: balanceDelta }
+                });
+            }
         }
 
         res.status(201).json(sale);

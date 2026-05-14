@@ -37,6 +37,7 @@ const FitBounds = ({ points }) => {
 
 const STATUS_STEPS = [
     { key: 'Pending',     label: 'Order Placed',    icon: Clock },
+    { key: 'Dispatched',  label: 'Dispatched',      icon: Package },
     { key: 'Delivering',  label: 'Delivering',       icon: Truck },
     { key: 'delivered',   label: 'Delivered',        icon: CheckCircle },
 ];
@@ -53,7 +54,7 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
     const currentStepIndex = isCancelled
         ? -1
         : STATUS_STEPS.findIndex(s =>
-            s.key === order.status ||
+            s.key.toLowerCase() === order.status.toLowerCase() ||
             (order.status === 'Completed' && s.key === 'delivered')
           );
 
@@ -150,7 +151,7 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                                     <div style={{
                                         position: 'absolute', top: '20px', left: '20px',
                                         height: '2px', zIndex: 1,
-                                        width: currentStepIndex <= 0 ? '0%' : currentStepIndex === 1 ? '50%' : '100%',
+                                        width: `calc((100% - 40px) * ${Math.max(0, currentStepIndex) / (STATUS_STEPS.length - 1)})`,
                                         background: '#4F46E5',
                                         transition: 'width 0.5s ease'
                                     }} />

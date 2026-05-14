@@ -134,14 +134,8 @@ const ExpensesPage = () => {
         expense.fuel_station?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Efficiency highlighting
+    // Highlight style
     const getRowStyle = (expense) => {
-        if (!isAdmin || !summary?.avg_km_per_liter || !expense.km_per_liter) return { borderBottom: '1px solid var(--surface-hover)' };
-        
-        const threshold = summary.avg_km_per_liter * 0.7; // < 70% of average
-        if (expense.km_per_liter < threshold) {
-            return { borderBottom: '1px solid var(--surface-hover)', background: '#FEF3C7' }; // Amber warning
-        }
         return { borderBottom: '1px solid var(--surface-hover)' };
     };
 
@@ -199,8 +193,8 @@ const ExpensesPage = () => {
                                 <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{(summary.total_liters || 0).toLocaleString()}L</p>
                             </div>
                             <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Avg Efficiency</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.avg_km_per_liter ? `${summary.avg_km_per_liter} KM/L` : 'N/A'}</p>
+                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Avg Price / Liter</p>
+                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.avg_price_per_liter ? `₱${summary.avg_price_per_liter}` : 'N/A'}</p>
                             </div>
                             <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                                 <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Fill-ups</p>
@@ -260,7 +254,7 @@ const ExpensesPage = () => {
                                         {!isDriver && <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Driver</th>}
                                         <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Station</th>
                                         <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Volume & Price</th>
-                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Efficiency</th>
+                                        <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Odometer</th>
                                         <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Cost</th>
                                         <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</th>
                                         <th style={{ padding: '1rem 1.5rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'center' }}>Receipt</th>
@@ -296,13 +290,8 @@ const ExpensesPage = () => {
                                                 </div>
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
-                                                {expense.km_per_liter ? (
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                        <span style={{ fontWeight: '600', color: 'var(--text-muted)' }}>{expense.km_per_liter} KM/L</span>
-                                                        {isAdmin && summary?.avg_km_per_liter && expense.km_per_liter < (summary.avg_km_per_liter * 0.7) && (
-                                                            <AlertTriangle size={14} color="#D97706" title={`Low efficiency! Fleet average is ${summary.avg_km_per_liter} KM/L`} />
-                                                        )}
-                                                    </div>
+                                                {expense.odometer ? (
+                                                    <span style={{ fontWeight: '600', color: 'var(--text-muted)' }}>{expense.odometer.toLocaleString()} km</span>
                                                 ) : <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>N/A</span>}
                                             </td>
                                             <td style={{ padding: '1.25rem 1.5rem', fontWeight: '800', color: '#EF4444' }}>₱{expense.totalCost.toFixed(2)}</td>

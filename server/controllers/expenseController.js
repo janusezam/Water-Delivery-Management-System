@@ -5,14 +5,9 @@ const Driver = require('../models/Driver');
 // @desc    Log a gas expense
 // @route   POST /api/expenses
 const logExpense = async (req, res) => {
-    const { driver, trip, pricePerLiter, notes, km_driven, km_per_liter, fuel_station, date } = req.body;
+    const { driver, trip, pricePerLiter, notes, liters, fuel_station, date, odometer } = req.body;
     try {
-        // Calculate computed fields server-side
-        let liters = 0;
-        if (km_driven > 0 && km_per_liter > 0) {
-            liters = parseFloat((parseFloat(km_driven) / parseFloat(km_per_liter)).toFixed(2));
-        }
-        const totalCost = parseFloat((liters * parseFloat(pricePerLiter)).toFixed(2));
+        const totalCost = parseFloat((parseFloat(liters) * parseFloat(pricePerLiter)).toFixed(2));
 
         // Handle Cloudinary receipt upload via multer
         const receiptPhoto = req.file ? req.file.path : null;
@@ -21,13 +16,12 @@ const logExpense = async (req, res) => {
             driver,
             trip: trip || undefined,
             date: date || Date.now(),
-            liters,
+            liters: parseFloat(liters),
             pricePerLiter: parseFloat(pricePerLiter),
             totalCost,
             receiptPhoto,
             notes,
-            km_driven: parseFloat(km_driven),
-            km_per_liter: parseFloat(km_per_liter),
+            odometer: odometer ? parseFloat(odometer) : undefined,
             fuel_station,
             createdBy: req.user._id,
             is_reviewed: req.user.role === 'admin' ? true : false // Auto-review if admin creates
@@ -108,15 +102,15 @@ const updateExpense = async (req, res) => {
         }
 
         // Update fields
-        const { pricePerLiter, notes, km_driven, km_per_liter, fuel_station, trip, is_reviewed, date } = req.body;
+        const { pricePerLiter, notes, odometer, liters, fuel_station, trip, is_reviewed, date } = req.body;
 
         if (pricePerLiter !== undefined) expense.pricePerLiter = parseFloat(pricePerLiter);
         if (notes !== undefined) expense.notes = notes;
         if (fuel_station !== undefined) expense.fuel_station = fuel_station;
         if (trip !== undefined) expense.trip = trip || undefined;
         if (date !== undefined) expense.date = date;
-        if (km_driven !== undefined) expense.km_driven = parseFloat(km_driven);
-        if (km_per_liter !== undefined) expense.km_per_liter = parseFloat(km_per_liter);
+        if (odometer !== undefined) expense.odometer = parseFloat(odometer);
+        if (liters !== undefined) expense.liters = parseFloat(liters);
 
         // Admin can toggle reviewed status
         if (isAdmin && is_reviewed !== undefined) {
@@ -124,12 +118,9 @@ const updateExpense = async (req, res) => {
         }
 
         // Recompute derived fields
-        if (expense.km_driven > 0 && expense.km_per_liter > 0) {
-            expense.liters = parseFloat((expense.km_driven / expense.km_per_liter).toFixed(2));
-        } else {
-            expense.liters = 0;
+        if (expense.liters && expense.pricePerLiter) {
+            expense.totalCost = parseFloat((expense.liters * expense.pricePerLiter).toFixed(2));
         }
-        expense.totalCost = parseFloat((expense.liters * expense.pricePerLiter).toFixed(2));
 
         // Handle receipt photo upload
         if (req.file) {
@@ -199,13 +190,7 @@ const getExpenseSummary = async (req, res) => {
 
         const total_spend = expenses.reduce((sum, e) => sum + (e.totalCost || 0), 0);
         const total_liters = expenses.reduce((sum, e) => sum + (e.liters || 0), 0);
-        const total_km = expenses.reduce((sum, e) => sum + (e.km_driven || 0), 0);
         const number_of_fillups = expenses.length;
-
-        const expensesWithKmpl = expenses.filter(e => e.km_per_liter != null);
-        const avg_km_per_liter = expensesWithKmpl.length > 0
-            ? parseFloat((expensesWithKmpl.reduce((sum, e) => sum + e.km_per_liter, 0) / expensesWithKmpl.length).toFixed(2))
-            : null;
 
         const avg_price_per_liter = number_of_fillups > 0
             ? parseFloat((expenses.reduce((sum, e) => sum + (e.pricePerLiter || 0), 0) / number_of_fillups).toFixed(2))
@@ -247,27 +232,21 @@ const getExpenseSummary = async (req, res) => {
                     name: e.driver?.user?.name || 'Unknown',
                     total_spend: 0,
                     total_liters: 0,
-                    total_distance: 0,
                     fillups: 0
                 };
             }
             driver_analytics[driverId].total_spend += (e.totalCost || 0);
             driver_analytics[driverId].total_liters += (e.liters || 0);
-            driver_analytics[driverId].total_distance += (e.km_driven || 0);
             driver_analytics[driverId].fillups += 1;
         });
 
-        // Format to array and calculate averages
-        const driver_analytics_array = Object.values(driver_analytics).map(d => ({
-            ...d,
-            avg_km_per_liter: d.total_liters > 0 ? parseFloat((d.total_distance / d.total_liters).toFixed(2)) : 0
-        })).sort((a, b) => b.total_spend - a.total_spend);
+        // Format to array
+        const driver_analytics_array = Object.values(driver_analytics)
+            .sort((a, b) => b.total_spend - a.total_spend);
 
         res.json({
             total_spend: parseFloat(total_spend.toFixed(2)),
             total_liters: parseFloat(total_liters.toFixed(2)),
-            total_km: parseFloat(total_km.toFixed(2)),
-            avg_km_per_liter,
             avg_price_per_liter,
             number_of_fillups,
             fuel_cost_per_gallon_delivered,

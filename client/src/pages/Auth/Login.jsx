@@ -69,14 +69,14 @@ const Login = () => {
                 }
                 .login-right-pane {
                     flex: 1;
-                    background: #f8fafc;
+                    background: var(--page-bg);
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     padding: 2rem;
                 }
                 .login-card {
-                    background: var(--input-bg);
+                    background: var(--surface-bg);
                     padding: 3rem;
                     border-radius: 1.5rem;
                     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -87,11 +87,11 @@ const Login = () => {
                     width: 100%;
                     padding: 0.875rem 1rem 0.875rem 3rem;
                     border-radius: 0.75rem;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid var(--border-medium);
                     outline: none;
                     font-size: 1rem;
-                    color: #1e293b;
-                    background: #f8fafc;
+                    color: var(--text-main);
+                    background: var(--input-bg);
                     transition: all 0.2s;
                 }
                 .login-input:focus {
@@ -160,12 +160,12 @@ const Login = () => {
             {/* Right Side */}
             <div className="login-right-pane">
                 <div className="login-card">
-                    <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem', fontFamily: "'Outfit', sans-serif" }}>Sign in to System</h2>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '2rem' }}>Enter your credentials to continue</p>
+                    <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.5rem', fontFamily: "'Outfit', sans-serif" }}>Sign in to System</h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '2rem' }}>Enter your credentials to continue</p>
 
                     {message && (
                         <div style={{ 
-                            background: '#fef2f2', 
+                            background: 'var(--badge-red-bg)', 
                             border: '1px solid #fecaca',
                             color: '#ef4444', 
                             padding: '0.75rem',
@@ -180,9 +180,9 @@ const Login = () => {
 
                     <form onSubmit={handleLogin}>
                         <div style={{ marginBottom: '1.25rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Email</label>
+                            <label style={{ display: 'block', fontSize: '0.875rem', color: 'var(--text-main)', fontWeight: '600', marginBottom: '0.5rem' }}>Email</label>
                             <div style={{ position: 'relative' }}>
-                                <Mail style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
+                                <Mail style={{ position: 'absolute', top: '14px', left: '14px', color: 'var(--text-light)' }} size={20} />
                                 <input
                                     type="email"
                                     className="login-input"
@@ -195,9 +195,9 @@ const Login = () => {
                         </div>
 
                         <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Password</label>
+                            <label style={{ display: 'block', fontSize: '0.875rem', color: 'var(--text-main)', fontWeight: '600', marginBottom: '0.5rem' }}>Password</label>
                             <div style={{ position: 'relative' }}>
-                                <Lock style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
+                                <Lock style={{ position: 'absolute', top: '14px', left: '14px', color: 'var(--text-light)' }} size={20} />
                                 <input
                                     type="password"
                                     className="login-input"
@@ -220,9 +220,9 @@ const Login = () => {
                     </form>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '2rem 0' }}>
-                        <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-                        <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600' }}>OR CONTINUE WITH</span>
-                        <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
+                        <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600' }}>OR CONTINUE WITH</span>
+                        <div style={{ flex: 1, height: '1px', background: 'var(--border-light)' }}></div>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -236,18 +236,18 @@ const Login = () => {
                         />
                     </div>
 
-                    <div style={{ marginTop: '2rem', textAlign: 'center', color: '#64748b', fontSize: '0.95rem' }}>
+                    <div style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
                         Don't have an account? <Link to="/register" style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: '700', marginLeft: '0.5rem' }}>Register now</Link>
                     </div>
 
                     <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
                         <Link to="/admin/login" style={{ 
-                            color: '#94a3b8', 
+                            color: 'var(--text-light)', 
                             fontSize: '0.85rem', 
                             textDecoration: 'none',
                             transition: 'color 0.2s ease',
                             fontWeight: '500'
-                        }} onMouseOver={(e) => e.target.style.color = '#475569'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
+                        }} onMouseOver={(e) => e.target.style.color = 'var(--text-muted)'} onMouseOut={(e) => e.target.style.color = 'var(--text-light)'}>
                             Admin Portal
                         </Link>
                     </div>

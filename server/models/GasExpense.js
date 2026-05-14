@@ -34,11 +34,14 @@ const gasExpenseSchema = new mongoose.Schema({
     },
     km_driven: {
         type: Number,
-        required: true
+        required: false // Not used anymore
     },
     km_per_liter: {
         type: Number,
-        required: true
+        required: false // Not used anymore
+    },
+    odometer: {
+        type: Number // Replaces the old estimator model
     },
     fuel_station: {
         type: String
@@ -55,14 +58,14 @@ const gasExpenseSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Pre-save hook to auto-compute liters and totalCost
+// Pre-save hook to auto-compute liters and totalCost (Legacy hook, left for older edits if necessary)
 gasExpenseSchema.pre('save', async function () {
-    // Compute liters based on distance and efficiency
-    if (this.km_driven && this.km_per_liter) {
+    // If the frontend didn't supply liters directly, compute from legacy fields
+    if (!this.liters && this.km_driven && this.km_per_liter) {
         this.liters = parseFloat((this.km_driven / this.km_per_liter).toFixed(2));
     }
 
-    // Compute totalCost
+    // Always compute totalCost
     if (this.liters && this.pricePerLiter) {
         this.totalCost = parseFloat((this.liters * this.pricePerLiter).toFixed(2));
     }

@@ -9,6 +9,10 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    customer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customer'
+    },
     address: {
         type: String,
         required: true
@@ -59,6 +63,10 @@ const orderSchema = new mongoose.Schema({
         }
     }],
     totalAmount: {
+        type: Number,
+        default: 0
+    },
+    jugsReturned: {
         type: Number,
         default: 0
     }

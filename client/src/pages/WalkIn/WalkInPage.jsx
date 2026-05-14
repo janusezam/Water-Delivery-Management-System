@@ -283,6 +283,33 @@ const WalkInPage = () => {
                                 </div>
                             </div>
 
+                            {/* Jugs Returned — only show for registered customers */}
+                            {selectedCustomer && (
+                                <div style={{ marginBottom: '1rem', padding: '0.875rem', background: 'var(--surface-bg)', borderRadius: '0.75rem', border: '1px solid var(--border-light)' }}>
+                                    <label style={{ fontSize: '0.65rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem', textTransform: 'uppercase' }}>
+                                        Empty Jugs Returned by Customer
+                                    </label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setJugsReturned(prev => Math.max(0, prev - 1))}
+                                            style={{ width: '36px', height: '36px', borderRadius: '0.5rem', border: '1px solid var(--border-medium)', background: 'var(--page-bg)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '700', color: '#4F46E5', display: 'grid', placeItems: 'center' }}
+                                        >−</button>
+                                        <span style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--text-main)', minWidth: '40px', textAlign: 'center' }}>
+                                            {jugsReturned}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setJugsReturned(prev => prev + 1)}
+                                            style={{ width: '36px', height: '36px', borderRadius: '0.5rem', border: '1px solid var(--border-medium)', background: 'var(--page-bg)', cursor: 'pointer', fontSize: '1.1rem', fontWeight: '700', color: '#4F46E5', display: 'grid', placeItems: 'center' }}
+                                        >+</button>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--text-light)', fontStyle: 'italic', marginLeft: '0.25rem' }}>
+                                            {selectedCustomer.jugBalance > 0 ? `(Owes ${selectedCustomer.jugBalance} jugs)` : '(Balance clear)'}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
                             <button onClick={handleCheckout} disabled={cart.length === 0}
                                 style={{ width: '100%', padding: '0.875rem', background: cart.length === 0 ? 'var(--border-medium)' : '#4F46E5', color: 'white', border: 'none', borderRadius: '1rem', fontWeight: '800', fontSize: '0.95rem', cursor: cart.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', boxShadow: cart.length === 0 ? 'none' : '0 4px 14px rgba(79,70,229,0.35)', transition: 'all 0.2s' }}>
                                 <CreditCard size={18} /> Pay & Print Receipt

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
+import Header from '../../components/layout/Header';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,8 +11,14 @@ import { Truck, Navigation, Package, User, MapPin, Clock, Eye, EyeOff, Search, C
 // Custom Driver Icon (Indigo)
 const createDriverIcon = (heading, isSelected) => L.divIcon({
     className: 'custom-driver-icon',
-    html: `<div style="transform: rotate(${heading || 0}deg); background: ${isSelected ? '#F43F5E' : '#4F46E5'}; color: white; padding: 8px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 12px ${isSelected ? 'rgba(244, 63, 94, 0.5)' : 'rgba(79, 70, 229, 0.4)'}; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5-5 18-2-9-9-2Z"/></svg>
+    html: `<div style="background: ${isSelected ? '#F43F5E' : '#4F46E5'}; color: white; padding: 8px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 12px ${isSelected ? 'rgba(244, 63, 94, 0.5)' : 'rgba(79, 70, 229, 0.4)'}; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 17h4V5H2v12h3"/>
+                <path d="M20 17h2v-9h-5V5H14v12h3"/>
+                <path d="M14 8h5l3 3v5h-3"/>
+                <circle cx="6.5" cy="17.5" r="2.5"/>
+                <circle cx="17.5" cy="17.5" r="2.5"/>
+            </svg>
             ${isSelected ? '<div style="position: absolute; top: -10px; right: -10px; background: #F43F5E; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; animation: pulse 1.5s infinite;"></div>' : ''}
            </div>`,
     iconSize: [38, 38],
@@ -24,7 +31,10 @@ const createOrderIcon = (status) => {
     return L.divIcon({
         className: 'custom-order-icon',
         html: `<div style="background: ${color}; color: white; padding: 8px; border-radius: 50%; border: 2px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
                </div>`,
         iconSize: [34, 34],
         iconAnchor: [17, 17]
@@ -221,12 +231,21 @@ const LiveMapPage = () => {
         <div className="dashboard-container" style={{ background: 'var(--page-bg)', display: 'flex', minHeight: '100vh', overflow: 'hidden' }}>
             <Sidebar role="admin" />
 
-            <main className="content" style={{ flex: 1, display: 'flex', height: '100vh', padding: 0 }}>
-                {/* Left Side: Driver List Sidebar */}
-                <div style={{ 
-                    width: '350px', background: 'var(--surface-bg)', borderRight: '1px solid var(--border-light)',
-                    display: 'flex', flexDirection: 'column', zIndex: 10
-                }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+                <Header breadcrumbs={['Live Fleet Map']} />
+
+                <main className="content" style={{ flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'row-reverse', gap: '1.5rem', overflow: 'hidden' }}>
+                    {/* Right Side: Driver List Sidebar */}
+                    <div style={{ 
+                        width: '350px', 
+                        background: 'var(--surface-bg)', 
+                        borderRadius: '1rem', 
+                        border: '1px solid var(--border-light)',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        zIndex: 10
+                    }}>
                     <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--surface-hover)' }}>
                         <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Truck size={20} color="#4F46E5" />
@@ -257,10 +276,10 @@ const LiveMapPage = () => {
                                     key={d.id}
                                     onClick={() => setSelectedDriverId(d.id === selectedDriverId ? null : d.id)}
                                     style={{
-                                        padding: '1rem', borderRadius: '1rem', marginBottom: '0.5rem',
+                                        padding: '1rem', borderRadius: '0.75rem', marginBottom: '0.75rem',
                                         cursor: 'pointer', transition: 'all 0.2s ease',
-                                        background: d.id === selectedDriverId ? '#EEF2FF' : 'transparent',
-                                        border: `1px solid ${d.id === selectedDriverId ? '#C7D2FE' : 'transparent'}`,
+                                        background: d.id === selectedDriverId ? 'rgba(79, 70, 229, 0.05)' : 'var(--page-bg)',
+                                        border: d.id === selectedDriverId ? '2px solid #4F46E5' : '1px solid var(--border-light)',
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -294,6 +313,30 @@ const LiveMapPage = () => {
                                             {d.lastUpdate ? new Date(d.lastUpdate).toLocaleTimeString() : 'No data'}
                                         </span>
                                     </div>
+                                    
+                                    {/* Show Assigned Orders */}
+                                    {(() => {
+                                        const driverOrders = orders.filter(o => o.assignedDriver?._id === d.id || o.assignedDriver === d.id);
+                                        if (driverOrders.length > 0) {
+                                            return (
+                                                <div style={{ marginTop: '0.75rem', borderTop: '1px solid var(--border-light)', paddingTop: '0.75rem' }}>
+                                                    <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                                                        Assigned Deliveries ({driverOrders.length})
+                                                    </div>
+                                                    {driverOrders.map(o => (
+                                                        <div key={o._id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', fontSize: '0.8rem' }}>
+                                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: o.status === 'Delivering' ? '#10B981' : '#F59E0B' }}></div>
+                                                            <span style={{ color: 'var(--text-main)', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '140px' }}>
+                                                                {o.customerName || o.customer?.name || 'Unknown'}
+                                                            </span>
+                                                            <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>- {o.status}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    })()}
                                 </div>
                             ))
                         ) : (
@@ -313,8 +356,15 @@ const LiveMapPage = () => {
                     </div>
                 </div>
 
-                {/* Right Side: Map */}
-                <div style={{ flex: 1, position: 'relative' }}>
+                {/* Left Side: Map Area */}
+                <div style={{ 
+                    flex: 1, 
+                    borderRadius: '1rem', 
+                    overflow: 'hidden', 
+                    border: '1px solid var(--border-light)',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    position: 'relative' 
+                }}>
                     {selectedDriverId && (
                         <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 1000, display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
                             <div style={{ 
@@ -462,7 +512,8 @@ const LiveMapPage = () => {
                         )}
                     </MapContainer>
                 </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 };

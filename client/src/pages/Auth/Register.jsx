@@ -1,42 +1,66 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, User as UserIcon, Briefcase, Truck } from 'lucide-react';
+import { Mail, Lock, ArrowRight, User as UserIcon, Phone } from 'lucide-react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { register } from '../../services';
 import logo from '../../assets/WATERLOGO.png';
 
 const Register = () => {
-    const [name, setName] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
+    const [mobileNumber, setMobileNumber] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('user');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const { executeRecaptcha } = useGoogleReCaptcha();
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (password !== confirmPassword) {
+            setMessage('Passwords do not match');
+            return;
+        }
         
         if (!executeRecaptcha) {
             setMessage('ReCAPTCHA not initialized');
             return;
         }
 
+        setLoading(true);
         try {
             const token = await executeRecaptcha('register');
-            await register({ name, email, password, role, recaptchaToken: token });
-            setMessage('Registration successful! Redirecting to login...');
-            setTimeout(() => navigate('/login'), 2000);
+            const response = await register({ 
+                firstName, 
+                lastName, 
+                email, 
+                mobileNumber, 
+                password, 
+                recaptchaToken: token 
+            });
+            
+            setMessage(response.data.message || 'Registration successful!');
+            
+            if (response.data.requiresActivation || response.status === 201) {
+                // Save email to localStorage for the verification page
+                localStorage.setItem('verify_email', email);
+                setTimeout(() => navigate('/verify-activation'), 2000);
+            }
         } catch (error) {
-            setMessage(error.response?.data?.message || 'Registration failed');
+            if (error.response?.data?.requiresActivation) {
+                localStorage.setItem('verify_email', email);
+                setMessage(error.response.data.message);
+                setTimeout(() => navigate('/verify-activation'), 2000);
+            } else {
+                setMessage(error.response?.data?.message || 'Registration failed');
+            }
+        } finally {
+            setLoading(false);
         }
     };
-
-    const roles = [
-        { id: 'user', icon: <UserIcon size={18} />, label: 'Customer' },
-        { id: 'staff', icon: <Briefcase size={18} />, label: 'Staff' },
-        { id: 'driver', icon: <Truck size={18} />, label: 'Driver' }
-    ];
 
     return (
         <div className="login-split-container" style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
@@ -64,11 +88,11 @@ const Register = () => {
                 }
                 .login-card {
                     background: var(--input-bg);
-                    padding: 3rem;
+                    padding: 2.5rem;
                     border-radius: 1.5rem;
                     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
                     width: 100%;
-                    max-width: 450px;
+                    max-width: 500px;
                 }
                 .login-input {
                     width: 100%;
@@ -102,10 +126,15 @@ const Register = () => {
                     align-items: center;
                     gap: 0.5rem;
                     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+                    margin-top: 1rem;
                 }
-                .login-btn:hover {
+                .login-btn:hover:not(:disabled) {
                     transform: translateY(-2px);
                     box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+                }
+                .login-btn:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
                 }
                 .brand-logo {
                     width: 200px;
@@ -119,25 +148,33 @@ const Register = () => {
                     transform: scale(1.1) translateY(-10px);
                     filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
                 }
+                .grid-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1rem;
+                    margin-bottom: 1.25rem;
+                }
                 @media (max-width: 768px) {
                     .login-split-container {
                         flex-direction: column;
                     }
                     .login-left-pane {
-                        padding: 4rem 2rem;
+                        padding: 3rem 2rem;
                         flex: none;
                     }
                     .login-right-pane {
-                        padding: 2rem 1rem;
+                        padding: 1.5rem 1rem;
                         align-items: flex-start;
                     }
                     .login-card {
                         padding: 2rem;
                     }
+                    .grid-row {
+                        grid-template-columns: 1fr;
+                    }
                 }
             `}} />
 
-            {/* Left Side */}
             <div className="login-left-pane">
                 <img src={logo} alt="Logo" className="brand-logo" />
                 <h1 style={{ fontSize: '3rem', fontWeight: '800', margin: 0, fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em', textShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>AquaDeliver</h1>
@@ -147,14 +184,14 @@ const Register = () => {
             {/* Right Side */}
             <div className="login-right-pane">
                 <div className="login-card">
-                    <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem', fontFamily: "'Outfit', sans-serif" }}>Create Account</h2>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '2rem' }}>Join the AquaDeliver network today</p>
+                    <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem', fontFamily: "'Outfit', sans-serif" }}>Create Account</h2>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Start your journey with us today</p>
 
                     {message && (
                         <div style={{ 
-                            background: message.includes('successful') ? '#ecfdf5' : '#fef2f2', 
-                            border: `1px solid ${message.includes('successful') ? '#a7f3d0' : '#fecaca'}`,
-                            color: message.includes('successful') ? '#059669' : '#ef4444', 
+                            background: message.toLowerCase().includes('successful') ? '#ecfdf5' : '#fef2f2', 
+                            border: `1px solid ${message.toLowerCase().includes('successful') ? '#a7f3d0' : '#fecaca'}`,
+                            color: message.toLowerCase().includes('successful') ? '#059669' : '#ef4444', 
                             padding: '0.75rem',
                             borderRadius: '0.75rem',
                             textAlign: 'center', 
@@ -166,18 +203,34 @@ const Register = () => {
                     )}
 
                     <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: '1.25rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Full Name</label>
-                            <div style={{ position: 'relative' }}>
-                                <UserIcon style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
-                                <input 
-                                    type="text" 
-                                    className="login-input" 
-                                    placeholder="Full Name" 
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    required
-                                />
+                        <div className="grid-row">
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>First Name</label>
+                                <div style={{ position: 'relative' }}>
+                                    <UserIcon style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
+                                    <input 
+                                        type="text" 
+                                        className="login-input" 
+                                        placeholder="First Name" 
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Last Name</label>
+                                <div style={{ position: 'relative' }}>
+                                    <UserIcon style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
+                                    <input 
+                                        type="text" 
+                                        className="login-input" 
+                                        placeholder="Last Name" 
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        required
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -196,60 +249,58 @@ const Register = () => {
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Password</label>
+                        <div style={{ marginBottom: '1.25rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Mobile Number</label>
                             <div style={{ position: 'relative' }}>
-                                <Lock style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
+                                <Phone style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
                                 <input 
-                                    type="password" 
+                                    type="tel" 
                                     className="login-input" 
-                                    placeholder="••••••••" 
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="09XXXXXXXXX" 
+                                    value={mobileNumber}
+                                    onChange={(e) => setMobileNumber(e.target.value)}
                                     required
                                 />
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: '2rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.75rem', color: '#334155', fontSize: '0.85rem', fontWeight: '600' }}>
-                                Account Type
-                            </label>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
-                                {roles.map((r) => (
-                                    <div 
-                                        key={r.id}
-                                        onClick={() => setRole(r.id)}
-                                        style={{
-                                            padding: '0.75rem 0.5rem',
-                                            textAlign: 'center',
-                                            borderRadius: '0.75rem',
-                                            cursor: 'pointer',
-                                            border: `1px solid ${role === r.id ? 'var(--accent-blue)' : '#e2e8f0'}`,
-                                            background: role === r.id ? '#eff6ff' : '#f8fafc',
-                                            transition: 'all 0.2s',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            color: role === r.id ? 'var(--accent-blue)' : '#64748b'
-                                        }}
-                                    >
-                                        <div style={{ color: role === r.id ? 'var(--accent-blue)' : '#94a3b8' }}>
-                                            {r.icon}
-                                        </div>
-                                        <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>{r.label}</span>
-                                    </div>
-                                ))}
+                        <div className="grid-row">
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <Lock style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
+                                    <input 
+                                        type="password" 
+                                        className="login-input" 
+                                        placeholder="••••••••" 
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.875rem', color: '#334155', fontWeight: '600', marginBottom: '0.5rem' }}>Confirm Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <Lock style={{ position: 'absolute', top: '14px', left: '14px', color: '#94a3b8' }} size={20} />
+                                    <input 
+                                        type="password" 
+                                        className="login-input" 
+                                        placeholder="••••••••" 
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <button type="submit" className="login-btn">
-                            Register Now <ArrowRight size={20} />
+                        <button type="submit" className="login-btn" disabled={loading}>
+                            {loading ? 'Creating Account...' : 'Register Now'} {!loading && <ArrowRight size={20} />}
                         </button>
                     </form>
 
-                    <div style={{ marginTop: '2rem', textAlign: 'center', color: '#64748b', fontSize: '0.95rem' }}>
+                    <div style={{ marginTop: '1.5rem', textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>
                         Already have an account? <Link to="/login" style={{ color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: '700', marginLeft: '0.5rem' }}>Sign In</Link>
                     </div>
                 </div>

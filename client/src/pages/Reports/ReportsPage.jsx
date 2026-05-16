@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
+import Header from '../../components/layout/Header';
 import { 
     TrendingUp, TrendingDown, Package, Droplets, CreditCard, 
     Calendar, CheckCircle, XCircle, Clock, Truck, Activity, DollarSign
@@ -69,10 +70,11 @@ const ReportsPage = () => {
     }
 
     return (
-        <div className="dashboard-container" style={{ background: 'var(--page-bg)' }}>
+        <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="admin" />
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', height: '100vh' }}>
+                <Header breadcrumbs={['Reports']} />
                 <main className="content" style={{ padding: '2rem 3rem', animation: 'fadeIn 0.5s ease-out' }}>
                     
                     {/* 1. Header + Date Filter Bar */}

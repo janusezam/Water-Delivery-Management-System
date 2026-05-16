@@ -72,6 +72,28 @@ const SpectatorHandler = ({ selectedDriver, drivers, orders, isInitialLoad, setI
     return null;
 };
 
+// Map Resizer to handle sidebar collapse/expand
+const MapResizer = () => {
+    const map = useMap();
+    
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver(() => {
+            map.invalidateSize();
+        });
+        
+        const container = map.getContainer();
+        if (container) {
+            resizeObserver.observe(container);
+        }
+        
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, [map]);
+    
+    return null;
+};
+
 // OSRM Routing Component — uses fetch() to avoid axios auth header CORS issues
 const RoutedLine = ({ driverPos, orderPos }) => {
     const [route, setRoute] = useState(null);
@@ -418,6 +440,7 @@ const LiveMapPage = () => {
                             isInitialLoad={isInitialLoad}
                             setInitialLoad={setInitialLoad}
                         />
+                        <MapResizer />
 
                         {/* Driver Markers */}
                         {Object.entries(drivers).map(([id, d]) => (

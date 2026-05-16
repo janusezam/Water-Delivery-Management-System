@@ -58,6 +58,7 @@ const Sidebar = ({ role }) => {
         { path: '/orders', icon: <Truck size={22} />, label: 'Orders' },
         { path: '/customers', icon: <Users size={22} />, label: 'Customers' },
         { path: '/products', icon: <Package size={22} />, label: 'Products' },
+        { path: '/live-map', icon: <MapIcon size={22} />, label: 'Live Map' },
     ];
 
     const driverLinks = [

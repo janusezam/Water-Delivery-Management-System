@@ -4,6 +4,7 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgotPass from './pages/Auth/ForgotPass';
 import ResetPass from './pages/Auth/ResetPass';
+import VerifyOTP from './pages/Auth/VerifyOTP';
 import AdminLogin from './pages/Auth/AdminLogin';
 import AdminDashboard from './pages/Dashboards/AdminDashboard';
 import StaffDashboard from './pages/Dashboards/StaffDashboard';
@@ -34,6 +35,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPass />} />
         <Route path="/reset-password" element={<ResetPass />} />
+        <Route path="/verify-activation" element={<VerifyOTP />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         
         {/* Dashboards */}
@@ -74,7 +76,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/drivers" element={
-          <ProtectedRoute allowedRoles={['admin', 'staff']}>
+          <ProtectedRoute allowedRoles={['admin']}>
             <DriversPage />
           </ProtectedRoute>
         } />
@@ -84,17 +86,17 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/trips" element={
-          <ProtectedRoute allowedRoles={['admin', 'staff', 'driver']}>
+          <ProtectedRoute allowedRoles={['admin']}>
             <TripsPage />
           </ProtectedRoute>
         } />
         <Route path="/expenses" element={
-          <ProtectedRoute allowedRoles={['admin', 'staff', 'driver']}>
+          <ProtectedRoute allowedRoles={['admin', 'driver']}>
             <ExpensesPage />
           </ProtectedRoute>
         } />
         <Route path="/reports" element={
-          <ProtectedRoute allowedRoles={['admin', 'staff']}>
+          <ProtectedRoute allowedRoles={['admin']}>
             <ReportsPage />
           </ProtectedRoute>
         } />

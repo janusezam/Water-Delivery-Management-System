@@ -32,7 +32,13 @@ const Login = () => {
             else if (data.role === 'admin') navigate('/dashboard/admin');
             else navigate('/dashboard/user');
         } catch (error) {
-            setMessage(error.response?.data?.message || 'Login failed');
+            if (error.response?.status === 403 && error.response?.data?.requiresActivation) {
+                localStorage.setItem('verify_email', error.response.data.email);
+                setMessage('Account not activated. Redirecting to verification...');
+                setTimeout(() => navigate('/verify-activation'), 1500);
+            } else {
+                setMessage(error.response?.data?.message || 'Login failed');
+            }
         }
     };
 

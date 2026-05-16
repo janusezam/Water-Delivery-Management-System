@@ -23,3 +23,7 @@ export const updateTripStatus = (id, status) => {
 export const deleteTrip = (id) => {
   return axiosClient.delete(`/api/trips/${id}`);
 };
+
+export const completeTrip = (id, data) => {
+  return axiosClient.put(`/api/trips/${id}/complete`, data);
+};

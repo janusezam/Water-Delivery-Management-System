@@ -27,44 +27,218 @@ const verifyRecaptcha = async (token) => {
     }
 };
 
+const sendEmail = async ({ to, subject, text, html }) => {
+    const transporter = nodemailer.createTransport({
+        service: process.env.EMAIL_SERVICE,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+
+    const mailOptions = {
+        from: `AquaDeliver <${process.env.EMAIL_USER}>`,
+        to,
+        subject,
+        text,
+        html
+    };
+
+    return transporter.sendMail(mailOptions);
+};
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password, role, recaptchaToken } = req.body;
+    try {
+        const { firstName, lastName, email, mobileNumber, password, recaptchaToken } = req.body;
 
-    const isHuman = await verifyRecaptcha(recaptchaToken);
-    if (!isHuman) {
-        return res.status(400).json({ message: 'reCAPTCHA verification failed' });
-    }
+        if (!firstName || !lastName || !email || !mobileNumber || !password) {
+            return res.status(400).json({ message: 'Please provide all required fields' });
+        }
 
-    if (role === 'admin') {
-        return res.status(400).json({ message: 'Admin registration is not allowed here.' });
-    }
+        const isHuman = await verifyRecaptcha(recaptchaToken);
+        if (!isHuman) {
+            return res.status(400).json({ message: 'reCAPTCHA verification failed' });
+        }
 
-    const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ email });
 
-    if (userExists) {
-        return res.status(400).json({ message: 'User already exists' });
-    }
+        if (userExists) {
+            if (!userExists.isActivated) {
+                // If account exists but not activated, update credentials and send a new OTP
+                userExists.firstName = firstName;
+                userExists.lastName = lastName;
+                userExists.mobileNumber = mobileNumber;
+                userExists.password = password; // Pre-save hook will hash this
+                
+                const otp = Math.floor(100000 + Math.random() * 900000).toString();
+                userExists.activationOTP = otp;
+                userExists.activationOTPExpires = Date.now() + 1 * 60 * 1000; // 1 minute
+                await userExists.save();
 
-    const user = await User.create({
-        name,
-        email,
-        password,
-        role: role || 'user'
-    });
+                try {
+                    await sendEmail({
+                        to: userExists.email,
+                        subject: 'AquaDeliver Account Activation OTP',
+                        text: `Your new activation OTP is: ${otp}. It will expire in 1 minute.`,
+                        html: `
+                            <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                                <h2 style="color: #3b82f6;">Activate Your Account</h2>
+                                <p>Your registration details have been updated. Please use the following code to activate your account:</p>
+                                <div style="font-size: 24px; font-weight: bold; color: #3b82f6; letter-spacing: 5px; margin: 20px 0;">
+                                    ${otp}
+                                </div>
+                                <p>This code will expire in 1 minute.</p>
+                            </div>
+                        `
+                    });
+                    return res.status(200).json({ 
+                        message: 'Account details updated. A new OTP has been sent to your email.',
+                        requiresActivation: true,
+                        email: userExists.email
+                    });
+                } catch (emailError) {
+                    return res.status(200).json({ 
+                        message: 'Account details updated but failed to send OTP. Please try logging in to trigger a new code.',
+                        requiresActivation: true,
+                        email: userExists.email
+                    });
+                }
+            }
+            return res.status(400).json({ message: 'User already exists' });
+        }
 
-    if (user) {
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            token: generateToken(user._id),
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = Date.now() + 1 * 60 * 1000; // 1 minute
+
+        const user = await User.create({
+            firstName,
+            lastName,
+            email,
+            mobileNumber,
+            password,
+            role: 'user', // Default role
+            activationOTP: otp,
+            activationOTPExpires: otpExpires,
+            isActivated: false
         });
-    } else {
-        res.status(400).json({ message: 'Invalid user data' });
+
+        if (user) {
+            try {
+                await sendEmail({
+                    to: user.email,
+                    subject: 'AquaDeliver Account Activation OTP',
+                    text: `Your activation OTP is: ${otp}. It will expire in 1 minute.`,
+                    html: `
+                        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                            <h2 style="color: #3b82f6;">Welcome to AquaDeliver!</h2>
+                            <p>Thank you for registering. Please use the following code to activate your account:</p>
+                            <div style="font-size: 24px; font-weight: bold; color: #3b82f6; letter-spacing: 5px; margin: 20px 0;">
+                                ${otp}
+                            </div>
+                            <p>This code will expire in 1 minute.</p>
+                        </div>
+                    `
+                });
+
+                res.status(201).json({
+                    message: 'Registration successful! Please check your email for the activation OTP.',
+                    email: user.email
+                });
+            } catch (emailError) {
+                console.error('Error sending activation email:', emailError);
+                res.status(201).json({
+                    message: 'User registered but failed to send activation email. Please contact support.',
+                    email: user.email
+                });
+            }
+        } else {
+            res.status(400).json({ message: 'Invalid user data' });
+        }
+    } catch (error) {
+        console.error('Registration Error:', error);
+        res.status(500).json({ message: error.message || 'Server error during registration' });
+    }
+};
+
+// @desc    Verify activation OTP
+// @route   POST /api/auth/verify-activation
+// @access  Public
+const verifyActivation = async (req, res) => {
+    const { email, otp } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.isActivated) {
+        return res.status(400).json({ message: 'Account is already activated' });
+    }
+
+    if (user.activationOTP !== otp || user.activationOTPExpires < Date.now()) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    user.isActivated = true;
+    user.activationOTP = undefined;
+    user.activationOTPExpires = undefined;
+    await user.save();
+
+    res.json({
+        message: 'Account activated successfully! You can now log in.',
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token: generateToken(user._id)
+    });
+};
+
+// @desc    Resend activation OTP
+// @route   POST /api/auth/resend-otp
+// @access  Public
+const resendOTP = async (req, res) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.isActivated) {
+        return res.status(400).json({ message: 'Account is already activated' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.activationOTP = otp;
+    user.activationOTPExpires = Date.now() + 1 * 60 * 1000; // 1 minute
+    await user.save();
+
+    try {
+        await sendEmail({
+            to: user.email,
+            subject: 'AquaDeliver Account Activation OTP',
+            text: `Your new activation OTP is: ${otp}. It will expire in 1 minute.`,
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                    <h2 style="color: #3b82f6;">AquaDeliver Activation Code</h2>
+                    <p>You requested a new activation code. Please use the following code to activate your account:</p>
+                    <div style="font-size: 24px; font-weight: bold; color: #3b82f6; letter-spacing: 5px; margin: 20px 0;">
+                        ${otp}
+                    </div>
+                    <p>This code will expire in 1 minute.</p>
+                </div>
+            `
+        });
+        res.json({ message: 'New OTP sent to email' });
+    } catch (error) {
+        console.error('Error resending OTP:', error);
+        res.status(500).json({ message: 'Error sending email' });
     }
 };
 
@@ -82,6 +256,14 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
+        if (!user.isActivated) {
+            return res.status(403).json({ 
+                message: 'Account not activated. Please verify your email.',
+                requiresActivation: true,
+                email: user.email
+            });
+        }
+
         res.json({
             _id: user._id,
             name: user.name,
@@ -155,28 +337,29 @@ const forgotPassword = async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetPasswordOTP = otp;
-    user.resetPasswordExpires = Date.now() + 600000; // 10 minutes
+    user.resetPasswordExpires = Date.now() + 1 * 60 * 1000; // 1 minute
     await user.save();
 
-    const transporter = nodemailer.createTransport({
-        service: process.env.EMAIL_SERVICE,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: 'AquaDeliver Password Reset OTP',
-        text: `Your OTP for password reset is: ${otp}. It will expire in 10 minutes.`,
-    };
-
     try {
-        await transporter.sendMail(mailOptions);
+        await sendEmail({
+            to: user.email,
+            subject: 'AquaDeliver Password Reset Code',
+            text: `Your password reset code is: ${otp}. It will expire in 1 minute.`,
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                    <h2 style="color: #3b82f6;">Password Reset Request</h2>
+                    <p>You requested a password reset. Please use the following code to proceed:</p>
+                    <div style="font-size: 24px; font-weight: bold; color: #3b82f6; letter-spacing: 5px; margin: 20px 0;">
+                        ${otp}
+                    </div>
+                    <p>This code will expire in 1 minute.</p>
+                    <p>If you did not request this, please ignore this email.</p>
+                </div>
+            `
+        });
         res.json({ message: 'OTP sent to email' });
     } catch (error) {
+        console.error('Error sending reset email:', error);
         res.status(500).json({ message: 'Error sending email' });
     }
 };
@@ -236,6 +419,12 @@ const loginAdmin = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && user.role === 'admin' && (await user.matchPassword(password))) {
+        if (!user.isActivated) {
+            return res.status(403).json({ 
+                message: 'Admin account not activated. Please contact system administrator.',
+            });
+        }
+
         res.json({
             _id: user._id,
             name: user.name,
@@ -250,6 +439,8 @@ const loginAdmin = async (req, res) => {
 
 module.exports = {
     registerUser,
+    verifyActivation,
+    resendOTP,
     loginUser,
     googleLogin,
     forgotPassword,

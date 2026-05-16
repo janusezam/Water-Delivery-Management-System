@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
+import Header from '../../components/layout/Header';
 import { Truck, Plus, User, Info, MoreVertical, Smartphone, Search, Mail, Package } from 'lucide-react';
 import { getDrivers, createDriver, updateDriver, getOrders } from '../../services';
 import DriverModal from '../../components/modals/DriverModal';
@@ -89,10 +90,12 @@ const DriversPage = () => {
     );
 
     return (
-        <div className="dashboard-container" style={{ background: 'var(--page-bg)' }}>
+        <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="admin" />
 
-            <main className="content" style={{ padding: '2rem 3rem' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+                <Header breadcrumbs={['Drivers']} />
+                <main className="content" style={{ padding: '2rem 3rem' }}>
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
                     <div>
                         <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Drivers</h2>
@@ -201,6 +204,7 @@ const DriversPage = () => {
                     )}
                 </div>
             </main>
+        </div>
 
             <DriverModal 
                 isOpen={isModalOpen}

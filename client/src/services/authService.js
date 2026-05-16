@@ -12,6 +12,14 @@ export const register = (userData) => {
   return axiosClient.post('/api/auth/register', userData);
 };
 
+export const verifyActivation = (email, otp) => {
+  return axiosClient.post('/api/auth/verify-activation', { email, otp });
+};
+
+export const resendOTP = (email) => {
+  return axiosClient.post('/api/auth/resend-otp', { email });
+};
+
 export const googleLogin = (tokenId, role) => {
   return axiosClient.post('/api/auth/google', { tokenId, role });
 };

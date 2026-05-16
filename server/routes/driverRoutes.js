@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const { getDrivers, createDriver, updateDriverStatus, updateDriver } = require('../controllers/driverController');
+const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.route('/')
-    .get(getDrivers)
-    .post(createDriver);
+    .get(protect, authorize('admin', 'staff'), getDrivers)
+    .post(protect, authorize('admin'), createDriver);
 
 router.route('/:id')
-    .put(updateDriver);
+    .put(protect, authorize('admin'), updateDriver);
 
-router.put('/:id/status', updateDriverStatus);
+router.put('/:id/status', protect, authorize('admin', 'driver'), updateDriverStatus);
 
 module.exports = router;

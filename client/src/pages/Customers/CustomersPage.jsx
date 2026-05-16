@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
+import Header from '../../components/layout/Header';
 import { Users, Plus, Search, Phone, MapPin, ChevronRight, Trash2 } from 'lucide-react';
 import { getCustomers, deleteCustomer, createCustomer, updateCustomer } from '../../services';
 import CustomerModal from '../../components/modals/CustomerModal';
@@ -62,10 +63,12 @@ const CustomersPage = () => {
     };
 
     return (
-        <div className="dashboard-container" style={{ background: 'var(--page-bg)' }}>
+        <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="admin" />
 
-            <main className="content" style={{ padding: '2rem 3rem' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
+                <Header breadcrumbs={['Customers']} />
+                <main className="content" style={{ padding: '2rem 3rem' }}>
                 <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
                     <div>
                         <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Customers</h2>
@@ -149,6 +152,7 @@ const CustomersPage = () => {
                     </div>
                 </div>
             </main>
+        </div>
 
             <CustomerModal 
                 isOpen={isModalOpen}

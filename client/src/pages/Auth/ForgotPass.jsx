@@ -9,7 +9,26 @@ const ForgotPass = () => {
     const [otp, setOtp] = useState('');
     const [step, setStep] = useState(1); // 1: Email, 2: OTP
     const [message, setMessage] = useState('');
+    const [resendTimer, setResendTimer] = useState(0);
+    const [otpExpiry, setOtpExpiry] = useState(60); // 1 minute
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        let interval;
+        if (step === 2) {
+            interval = setInterval(() => {
+                if (resendTimer > 0) setResendTimer((prev) => prev - 1);
+                if (otpExpiry > 0) setOtpExpiry((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [step, resendTimer, otpExpiry]);
+
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
 
     const handleSendOTP = async (e) => {
         e.preventDefault();
@@ -17,6 +36,8 @@ const ForgotPass = () => {
             await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/forgot-password`, { email });
             setStep(2);
             setMessage('OTP sent to your email.');
+            setResendTimer(60);
+            setOtpExpiry(60);
         } catch (error) {
             setMessage('Error sending OTP. Please try again.');
         }
@@ -114,10 +135,11 @@ const ForgotPass = () => {
                     filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
                 }
                 .otp-input {
-                    letter-spacing: 0.5rem;
+                    letter-spacing: 0.8rem;
                     text-align: center;
                     font-weight: 800;
                     font-size: 1.25rem;
+                    padding-left: 3rem !important;
                 }
                 @media (max-width: 768px) {
                     .login-split-container {
@@ -164,15 +186,34 @@ const ForgotPass = () => {
                     <h2 style={{ fontSize: '1.875rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem', fontFamily: "'Outfit', sans-serif" }}>
                         {step === 1 ? 'Forgot Password' : 'Verify OTP'}
                     </h2>
+                    
+                    {step === 2 && (
+                        <div style={{ 
+                            display: 'inline-block',
+                            padding: '0.25rem 0.75rem',
+                            background: '#fef2f2',
+                            color: '#ef4444',
+                            borderRadius: '2rem',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            marginBottom: '1.5rem',
+                            textAlign: 'center',
+                            width: 'fit-content',
+                            margin: '0 auto 1.5rem'
+                        }}>
+                            {otpExpiry > 0 ? `Expires in: ${formatTime(otpExpiry)}` : 'Code Expired'}
+                        </div>
+                    )}
+
                     <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '2rem' }}>
                         {step === 1 ? 'Enter your email to receive a reset code' : 'Enter the 6-digit code sent to your email'}
                     </p>
 
                     {message && (
                         <div style={{ 
-                            background: step === 2 && message.includes('sent') ? '#ecfdf5' : '#fef2f2', 
-                            border: `1px solid ${step === 2 && message.includes('sent') ? '#a7f3d0' : '#fecaca'}`,
-                            color: step === 2 && message.includes('sent') ? '#059669' : '#ef4444', 
+                            background: message.toLowerCase().includes('sent') ? '#ecfdf5' : '#fef2f2', 
+                            border: `1px solid ${message.toLowerCase().includes('sent') ? '#a7f3d0' : '#fecaca'}`,
+                            color: message.toLowerCase().includes('sent') ? '#059669' : '#ef4444', 
                             padding: '0.75rem',
                             borderRadius: '0.75rem',
                             textAlign: 'center', 
@@ -212,24 +253,26 @@ const ForgotPass = () => {
                                     <input 
                                         type="text" 
                                         className="login-input otp-input" 
-                                        placeholder="0 0 0 0 0 0" 
+                                        placeholder="000000" 
                                         value={otp}
                                         onChange={(e) => setOtp(e.target.value)}
                                         maxLength={6}
+                                        disabled={otpExpiry === 0}
                                         required
                                     />
                                 </div>
                             </div>
-                            <button type="submit" className="login-btn">
+                            <button type="submit" className="login-btn" disabled={otpExpiry === 0}>
                                 Verify Code <ArrowRight size={20} />
                             </button>
                             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
                                 <button 
                                     type="button" 
-                                    onClick={() => setStep(1)}
-                                    style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}
+                                    onClick={handleSendOTP}
+                                    disabled={resendTimer > 0}
+                                    style={{ background: 'none', border: 'none', color: resendTimer > 0 ? '#94a3b8' : 'var(--accent-blue)', cursor: resendTimer > 0 ? 'not-allowed' : 'pointer', fontSize: '0.85rem', fontWeight: '600' }}
                                 >
-                                    Resend Code
+                                    {resendTimer > 0 ? `Resend in ${resendTimer}s` : 'Resend Code'}
                                 </button>
                             </div>
                         </form>

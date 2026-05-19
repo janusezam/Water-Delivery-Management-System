@@ -7,6 +7,7 @@ import CustomerModal from '../../components/modals/CustomerModal';
 
 const CustomersPage = () => {
     const [customers, setCustomers] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState(null);
@@ -62,6 +63,11 @@ const CustomersPage = () => {
         setIsModalOpen(true);
     };
 
+    const filteredCustomers = customers.filter(c => 
+        (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.phone || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className="dashboard-container" style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
             <Sidebar role="admin" />
@@ -91,17 +97,19 @@ const CustomersPage = () => {
                             <input 
                                 type="text" 
                                 placeholder="Search by name or phone..." 
-                                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem' }}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem', background: 'var(--input-bg)' }}
                             />
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.5rem', padding: '1.5rem' }}>
-                        {customers.length > 0 ? customers.map((customer) => (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem', padding: '1.5rem' }}>
+                        {filteredCustomers.length > 0 ? filteredCustomers.map((customer) => (
                             <div key={customer._id} 
                                 onClick={() => openEditModal(customer)}
-                                className="customer-card" 
-                                style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1rem', border: '1px solid var(--border-light)', transition: 'all 0.3s ease', cursor: 'pointer' }}
+                                className="customer-card storefront-product-card" 
+                                style={{ padding: '1.5rem', cursor: 'pointer' }}
                             >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                                     <div style={{ width: '48px', height: '48px', background: 'var(--surface-hover)', borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '1.2rem', fontWeight: '700', color: '#4F46E5' }}>
@@ -136,7 +144,9 @@ const CustomersPage = () => {
                                         <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>{customer.totalOrders} total orders</span>
                                         <button 
                                             onClick={(e) => { e.stopPropagation(); handleDelete(customer._id); }}
-                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', display: 'flex', alignItems: 'center' }}
+                                            style={{ background: 'var(--badge-red-bg)', border: 'none', cursor: 'pointer', color: '#EF4444', display: 'flex', alignItems: 'center', padding: '0.5rem', borderRadius: '0.5rem', transition: 'all 0.2s' }}
+                                            onMouseOver={(e) => e.currentTarget.style.filter = 'brightness(0.9)'}
+                                            onMouseOut={(e) => e.currentTarget.style.filter = 'none'}
                                         >
                                             <Trash2 size={16} />
                                         </button>

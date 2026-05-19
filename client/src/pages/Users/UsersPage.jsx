@@ -189,22 +189,26 @@ const UsersPage = () => {
                                                 {new Date(user.createdAt).toLocaleDateString()}
                                             </td>
                                             <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                                                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                    <button 
-                                                        onClick={() => handleEditClick(user)}
-                                                        style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}
-                                                        title="Edit User"
-                                                    >
-                                                        <Edit2 size={18} />
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => handleDelete(user._id)}
-                                                        style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}
-                                                        title="Delete User"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </div>
+                                                {user.email !== 'admin@wrs.com' ? (
+                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                        <button 
+                                                            onClick={() => handleEditClick(user)}
+                                                            style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}
+                                                            title="Edit User"
+                                                        >
+                                                            <Edit2 size={18} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleDelete(user._id)}
+                                                            style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}
+                                                            title="Delete User"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontStyle: 'italic' }}>Protected</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

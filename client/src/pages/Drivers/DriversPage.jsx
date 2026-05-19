@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { Truck, Plus, User, Info, MoreVertical, Smartphone, Search, Mail, Package } from 'lucide-react';
-import { getDrivers, createDriver, updateDriver, getOrders } from '../../services';
+import { Truck, Plus, User, Info, MoreVertical, Smartphone, Search, Mail, Package, Trash2 } from 'lucide-react';
+import { getDrivers, createDriver, updateDriver, getOrders, deleteDriver } from '../../services';
 import DriverModal from '../../components/modals/DriverModal';
 
 const DriversPage = () => {
@@ -44,6 +44,17 @@ const DriversPage = () => {
             fetchData();
         } catch (error) {
             alert('Failed to save driver');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this driver?')) {
+            try {
+                await deleteDriver(id);
+                fetchData();
+            } catch (error) {
+                alert('Failed to delete driver');
+            }
         }
     };
 
@@ -132,7 +143,7 @@ const DriversPage = () => {
                         const status = getDriverDeliveryStatus(driver._id);
                         
                         return (
-                            <div key={driver._id} style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                            <div key={driver._id} className="storefront-product-card" style={{ padding: '1.5rem', background: 'var(--surface-bg)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                         <div style={{ width: '48px', height: '48px', background: 'var(--badge-blue-bg)', borderRadius: '1rem', display: 'grid', placeItems: 'center', color: '#4F46E5' }}>
@@ -191,6 +202,14 @@ const DriversPage = () => {
                                         style={{ padding: '0.625rem', background: 'var(--surface-bg)', border: '1px solid var(--border-light)', borderRadius: '0.75rem', cursor: 'pointer', title: 'Edit Driver' }}
                                     >
                                         <Info size={18} color="var(--text-muted)" />
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDelete(driver._id)}
+                                        style={{ padding: '0.625rem', background: 'var(--badge-red-bg)', border: 'none', borderRadius: '0.75rem', cursor: 'pointer', title: 'Delete Driver', transition: 'all 0.2s' }}
+                                        onMouseOver={(e) => e.currentTarget.style.filter = 'brightness(0.9)'}
+                                        onMouseOut={(e) => e.currentTarget.style.filter = 'none'}
+                                    >
+                                        <Trash2 size={18} color="#EF4444" />
                                     </button>
                                 </div>
                             </div>

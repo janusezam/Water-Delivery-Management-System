@@ -280,20 +280,33 @@ const loginUser = async (req, res) => {
 // @route   POST /api/auth/google
 // @access  Public
 const googleLogin = async (req, res) => {
-    const { tokenId, role } = req.body;
-    console.log('Received Google Token:', tokenId ? 'Token present' : 'Token MISSING');
+    const { tokenId, accessToken, role } = req.body;
+    console.log('Received Google Login Request:', tokenId ? 'ID Token' : accessToken ? 'Access Token' : 'NO TOKEN');
 
     try {
-        console.log('Audience being verified:', process.env.GOOGLE_CLIENT_ID);
-        const ticket = await client.verifyIdToken({
-            idToken: tokenId,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
+        let name, email, googleId;
 
-        console.log('Google Token Verified successfully');
-
-
-        const { name, email, sub: googleId } = ticket.getPayload();
+        if (tokenId) {
+            // Standard <GoogleLogin /> path (ID Token)
+            const ticket = await client.verifyIdToken({
+                idToken: tokenId,
+                audience: process.env.GOOGLE_CLIENT_ID,
+            });
+            const payload = ticket.getPayload();
+            name = payload.name;
+            email = payload.email;
+            googleId = payload.sub;
+            console.log('Google ID Token Verified successfully');
+        } else if (accessToken) {
+            // Custom button path (Access Token)
+            const response = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+            name = response.data.name;
+            email = response.data.email;
+            googleId = response.data.sub;
+            console.log('Google Access Token Verified successfully');
+        } else {
+            return res.status(400).json({ message: 'No token provided' });
+        }
 
         let user = await User.findOne({ email });
 

@@ -20,6 +20,10 @@ const updateUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (user) {
+            if (user.email === 'admin@wrs.com' && req.body.role && req.body.role !== 'admin') {
+                return res.status(400).json({ message: 'Cannot downgrade the primary system admin account role' });
+            }
+
             user.name = req.body.name || user.name;
             user.email = req.body.email || user.email;
             user.role = req.body.role || user.role;
@@ -49,6 +53,9 @@ const deleteUser = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (user) {
+            if (user.email === 'admin@wrs.com') {
+                return res.status(400).json({ message: 'Cannot delete the primary system admin account' });
+            }
             await User.deleteOne({ _id: user._id });
             res.json({ message: 'User removed' });
         } else {

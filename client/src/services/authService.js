@@ -20,8 +20,8 @@ export const resendOTP = (email) => {
   return axiosClient.post('/api/auth/resend-otp', { email });
 };
 
-export const googleLogin = (tokenId, role) => {
-  return axiosClient.post('/api/auth/google', { tokenId, role });
+export const googleLogin = (tokenId, accessToken, role) => {
+  return axiosClient.post('/api/auth/google', { tokenId, accessToken, role });
 };
 
 export const forgotPassword = (email) => {

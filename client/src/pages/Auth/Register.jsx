@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, User as UserIcon, Phone } from 'lucide-react';
+import { Mail, Lock, ArrowRight, User as UserIcon, Phone, Droplet, Truck, MapPin } from 'lucide-react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { register } from '../../services';
 import logo from '../../assets/WATERLOGO.png';
@@ -68,8 +68,14 @@ const Register = () => {
                 .login-split-container {
                     flex-direction: row;
                 }
+                @keyframes cardSlideIn {
+                    from { opacity: 0; transform: translateX(40px); }
+                    to { opacity: 1; transform: translateX(0); }
+                }
                 .login-left-pane {
                     flex: 1;
+                    position: relative;
+                    overflow: hidden;
                     background: linear-gradient(135deg, var(--accent-blue), #0047a5);
                     display: flex;
                     flex-direction: column;
@@ -77,32 +83,42 @@ const Register = () => {
                     align-items: center;
                     color: white;
                     padding: 2rem;
+                    z-index: 1;
+                }
+                .login-left-pane::before {
+                    content: '';
+                    position: absolute;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background: radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.4) 0%, transparent 40%),
+                                radial-gradient(circle at 80% 60%, rgba(37, 99, 235, 0.4) 0%, transparent 50%);
+                    z-index: -1;
                 }
                 .login-right-pane {
                     flex: 1;
-                    background: #f8fafc;
+                    background: var(--page-bg);
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     padding: 2rem;
                 }
                 .login-card {
-                    background: var(--input-bg);
+                    background: var(--surface-bg);
                     padding: 2.5rem;
                     border-radius: 1.5rem;
-                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
                     width: 100%;
                     max-width: 500px;
+                    animation: cardSlideIn 0.4s ease-out forwards;
                 }
                 .login-input {
                     width: 100%;
                     padding: 0.875rem 1rem 0.875rem 3rem;
                     border-radius: 0.75rem;
-                    border: 1px solid #e2e8f0;
+                    border: 1px solid var(--border-medium);
                     outline: none;
                     font-size: 1rem;
-                    color: #1e293b;
-                    background: #f8fafc;
+                    color: var(--text-main);
+                    background: var(--input-bg);
                     transition: all 0.2s;
                 }
                 .login-input:focus {
@@ -140,13 +156,73 @@ const Register = () => {
                     width: 200px;
                     height: 200px;
                     object-fit: contain;
-                    margin-bottom: 2rem;
+                    margin-bottom: 1.5rem;
                     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-                    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+                    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
                 }
                 .brand-logo:hover {
                     transform: scale(1.1) translateY(-10px);
-                    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+                    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.4));
+                }
+                .icon-grid {
+                    display: flex;
+                    gap: 3rem;
+                    margin-top: 3rem;
+                }
+                .icon-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 0.75rem;
+                    text-align: center;
+                }
+                .icon-wrapper {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: rgba(255, 255, 255, 0.05);
+                    transition: all 0.3s ease;
+                }
+                .icon-item:hover .icon-wrapper {
+                    background: rgba(255, 255, 255, 0.15);
+                    transform: translateY(-3px);
+                }
+                .icon-title {
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    letter-spacing: 0.02em;
+                    color: rgba(255, 255, 255, 0.9);
+                }
+                .divider {
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    width: 60%;
+                    margin: 2rem 0;
+                    opacity: 0.5;
+                }
+                .divider-line {
+                    height: 1px;
+                    flex: 1;
+                    background: linear-gradient(90deg, transparent, white, transparent);
+                }
+                .divider-dot {
+                    width: 6px;
+                    height: 6px;
+                    background: white;
+                    border-radius: 50%;
+                }
+                .wave-bottom {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 15vh;
+                    z-index: -1;
                 }
                 .grid-row {
                     display: grid;
@@ -162,6 +238,9 @@ const Register = () => {
                         padding: 3rem 2rem;
                         flex: none;
                     }
+                    .icon-grid {
+                        gap: 1.5rem;
+                    }
                     .login-right-pane {
                         padding: 1.5rem 1rem;
                         align-items: flex-start;
@@ -176,9 +255,45 @@ const Register = () => {
             `}} />
 
             <div className="login-left-pane">
+                {/* Decorative waves */}
+                <svg className="wave-bottom" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path fill="#0047a5" fillOpacity="0.6" d="M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,213,720,208C840,203,960,171,1080,165.3C1200,160,1320,181,1380,192L1440,203L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+                    <path fill="#000000" fillOpacity="0.1" d="M0,96L80,117.3C160,139,320,181,480,186.7C640,192,800,160,960,149.3C1120,139,1280,149,1360,154.7L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+                </svg>
+
                 <img src={logo} alt="Logo" className="brand-logo" />
-                <h1 style={{ fontSize: '3rem', fontWeight: '800', margin: 0, fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em', textShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>AquaDeliver</h1>
-                <p style={{ fontSize: '1.25rem', opacity: 0.9, marginTop: '0.75rem', fontWeight: '500', letterSpacing: '0.05em' }}>A Water Refilling Station Delivery Management System</p>
+                
+                <h1 style={{ fontSize: '3.5rem', fontWeight: '800', margin: 0, fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em', textShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>AquaDeliver</h1>
+                <p style={{ fontSize: '1.25rem', opacity: 0.9, marginTop: '1rem', fontWeight: '400', letterSpacing: '0.02em', textAlign: 'center', maxWidth: '80%' }}>
+                    A Water Refilling Station Delivery Management System
+                </p>
+
+                <div className="divider">
+                    <div className="divider-line"></div>
+                    <div className="divider-dot"></div>
+                    <div className="divider-line"></div>
+                </div>
+
+                <div className="icon-grid">
+                    <div className="icon-item">
+                        <div className="icon-wrapper">
+                            <Droplet size={24} color="white" />
+                        </div>
+                        <span className="icon-title">Quality Water</span>
+                    </div>
+                    <div className="icon-item">
+                        <div className="icon-wrapper">
+                            <Truck size={24} color="white" />
+                        </div>
+                        <span className="icon-title">Fast Delivery</span>
+                    </div>
+                    <div className="icon-item">
+                        <div className="icon-wrapper">
+                            <MapPin size={24} color="white" />
+                        </div>
+                        <span className="icon-title">Order Tracking</span>
+                    </div>
+                </div>
             </div>
 
             {/* Right Side */}

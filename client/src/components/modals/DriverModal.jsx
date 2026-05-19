@@ -1,14 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
-    const [formData, setFormData] = useState(driver || {
+    const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
         vehicleType: 'tricycle',
         plateNo: ''
     });
+
+    useEffect(() => {
+        if (driver) {
+            setFormData({
+                name: driver.user?.name || driver.name || '',
+                email: driver.user?.email || driver.email || '',
+                vehicleType: driver.vehicleType || 'tricycle',
+                plateNo: driver.plateNo || ''
+            });
+        } else {
+            setFormData({
+                name: '',
+                email: '',
+                password: '',
+                vehicleType: 'tricycle',
+                plateNo: ''
+            });
+        }
+    }, [driver, isOpen]);
 
     if (!isOpen) return null;
 

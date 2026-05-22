@@ -16,7 +16,6 @@ import CustomersPage from './pages/Customers/CustomersPage';
 import WalkInPage from './pages/WalkIn/WalkInPage';
 import DriversPage from './pages/Drivers/DriversPage';
 import OrdersPage from './pages/Orders/OrdersPage';
-import TripsPage from './pages/Trips/TripsPage';
 import ExpensesPage from './pages/Expenses/ExpensesPage';
 import ReportsPage from './pages/Reports/ReportsPage';
 import UsersPage from './pages/Users/UsersPage';
@@ -85,11 +84,7 @@ function App() {
             <OrdersPage />
           </ProtectedRoute>
         } />
-        <Route path="/trips" element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <TripsPage />
-          </ProtectedRoute>
-        } />
+
         <Route path="/expenses" element={
           <ProtectedRoute allowedRoles={['admin', 'driver']}>
             <ExpensesPage />

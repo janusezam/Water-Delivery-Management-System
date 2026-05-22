@@ -211,7 +211,7 @@ const ProductsPage = () => {
                                             <div>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                                                     <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>{product.name}</h3>
-                                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', background: '#F1F5F9', padding: '0.25rem 0.5rem', borderRadius: '0.5rem' }}>{product.type}</span>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', background: 'var(--surface-hover)', padding: '0.25rem 0.5rem', borderRadius: '0.5rem' }}>{product.type}</span>
                                                 </div>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                     <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: product.stockQty > 0 ? '#10B981' : '#EF4444' }}></div>
@@ -227,7 +227,7 @@ const ProductsPage = () => {
                                                 <p style={{ fontSize: '1.5rem', fontWeight: '900', color: '#4F46E5', margin: 0 }}>₱{product.pricePerUnit}</p>
                                             </div>
 
-                                            <div style={{ display: 'flex', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid #F1F5F9' }}>
+                                            <div style={{ display: 'flex', gap: '0.75rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
                                                 <button 
                                                     onClick={() => openSelection(product, 'cart')}
                                                     disabled={product.stockQty <= 0}
@@ -317,7 +317,7 @@ const ProductsPage = () => {
                                                     borderRadius: '1rem', 
                                                     fontSize: '0.75rem', 
                                                     fontWeight: '700',
-                                                    background: product.stockQty < 10 ? '#FEF2F2' : '#ECFDF5',
+                                                    background: product.stockQty < 10 ? 'var(--badge-red-bg)' : 'var(--badge-green-bg)',
                                                     color: product.stockQty < 10 ? '#EF4444' : '#10B981'
                                                 }}>
                                                     {product.stockQty} Units

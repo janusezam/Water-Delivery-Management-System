@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Camera, Lock, Loader2 } from 'lucide-react';
-import { getDrivers, getTrips } from '../../services';
+import { getDrivers } from '../../services';
 
 const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
     const [drivers, setDrivers] = useState([]);
-    const [trips, setTrips] = useState([]);
     const [formData, setFormData] = useState({
         date: new Date().toISOString().slice(0, 10),
         driver: '',
         odometer: '',
         liters: '',
         price_per_liter: '',
-        trip_id: '',
         fuel_station: '',
         notes: '',
         receiptPhoto: null
@@ -30,14 +28,10 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
         if (isOpen) {
             const fetchData = async () => {
                 try {
-                    const [driversRes, tripsRes] = await Promise.all([
-                        getDrivers(),
-                        getTrips()
+                    const [driversRes] = await Promise.all([
+                        getDrivers()
                     ]);
                     setDrivers(driversRes.data);
-                    
-                    const activeTrips = tripsRes.data.filter(t => t.status !== 'completed');
-                    setTrips(activeTrips);
                     
                     if (expense) {
                         setFormData({
@@ -46,7 +40,6 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                             odometer: expense.odometer || '',
                             liters: expense.liters || '',
                             price_per_liter: expense.price_per_liter || expense.pricePerLiter || '',
-                            trip_id: expense.trip_id || expense.trip?._id || expense.trip || '',
                             fuel_station: expense.fuel_station || '',
                             notes: expense.notes || '',
                             receiptPhoto: null
@@ -59,7 +52,6 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                             odometer: '',
                             liters: '',
                             price_per_liter: '',
-                            trip_id: '',
                             fuel_station: '',
                             notes: '',
                             receiptPhoto: null
@@ -118,7 +110,6 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
             liters: litersNum,
             pricePerLiter: priceNum,
             totalCost: parseFloat(computedTotalCost),
-            trip: formData.trip_id || null,
             fuel_station: formData.fuel_station || '',
             notes: formData.notes || '',
             receiptPhoto: formData.receiptPhoto
@@ -269,23 +260,7 @@ const ExpenseModal = ({ isOpen, onClose, onSave, expense }) => {
                         <span style={{ fontWeight: '800', color: '#1E40AF', fontSize: '1.25rem' }}>₱{computedTotalCost}</span>
                     </div>
 
-                    {/* Optional Fields */}
-                    <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Link to Trip (Optional)</label>
-                        <select 
-                            value={formData.trip_id}
-                            disabled={isLocked}
-                            onChange={(e) => setFormData({...formData, trip_id: e.target.value})}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: isLocked ? 'var(--input-disabled-bg)' : 'var(--input-bg)', outline: 'none' }}
-                        >
-                            <option value="">-- No Trip Linked --</option>
-                            {trips.map(t => (
-                                <option key={t._id} value={t._id}>
-                                    {new Date(t.createdAt).toLocaleDateString()} - {t.driver?.user?.name || 'Trip'} ({t.status})
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+
 
                     <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Fuel Station (Optional)</label>

@@ -120,7 +120,7 @@ const CustomersPage = () => {
                                         borderRadius: '1rem', 
                                         fontSize: '0.7rem', 
                                         fontWeight: '700',
-                                        background: customer.jugBalance > 0 ? '#FEF2F2' : '#ECFDF5',
+                                        background: customer.jugBalance > 0 ? 'var(--badge-red-bg)' : 'var(--badge-green-bg)',
                                         color: customer.jugBalance > 0 ? '#EF4444' : '#10B981'
                                     }}>
                                         {customer.jugBalance > 0 ? `Owes ${customer.jugBalance} Jugs` : 'Clear Balance'}

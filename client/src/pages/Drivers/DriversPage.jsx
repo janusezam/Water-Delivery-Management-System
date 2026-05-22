@@ -72,26 +72,26 @@ const DriversPage = () => {
         const driverOrders = orders.filter(o => o.assignedDriver?._id === driverId || o.assignedDriver === driverId);
         
         if (driverOrders.length === 0) {
-            return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669', count: 0 };
+            return { label: 'AVAILABLE', bg: 'var(--badge-green-bg)', color: '#10B981', count: 0 };
         }
         
         const activeOrders = driverOrders.filter(o => !['delivered', 'Completed', 'Cancelled', 'cancelled'].includes(o.status));
         
         if (activeOrders.length === 0) {
-            return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669', count: 0 };
+            return { label: 'AVAILABLE', bg: 'var(--badge-green-bg)', color: '#10B981', count: 0 };
         }
         
         const hasInProgress = activeOrders.some(o => o.status === 'Delivering');
         if (hasInProgress) {
-            return { label: 'ON DELIVERY', bg: '#DBEAFE', color: '#1D4ED8', count: activeOrders.length };
+            return { label: 'ON DELIVERY', bg: 'var(--badge-blue-bg)', color: '#3b82f6', count: activeOrders.length };
         }
         
         const hasPending = activeOrders.some(o => ['Pending', 'dispatched', 'Dispatched'].includes(o.status));
         if (hasPending) {
-            return { label: 'PENDING DELIVERY', bg: '#FEF3C7', color: '#D97706', count: activeOrders.length };
+            return { label: 'PENDING DELIVERY', bg: 'var(--badge-yellow-bg)', color: '#f59e0b', count: activeOrders.length };
         }
         
-        return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669', count: 0 };
+        return { label: 'AVAILABLE', bg: 'var(--badge-green-bg)', color: '#10B981', count: 0 };
     };
 
     const filteredDrivers = drivers.filter(d => 

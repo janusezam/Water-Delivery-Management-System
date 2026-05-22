@@ -208,7 +208,7 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
                                                     fontSize: '0.65rem', 
                                                     fontWeight: '800', 
                                                     color: product.stockQty > 0 ? '#10B981' : '#EF4444',
-                                                    background: product.stockQty > 0 ? '#ECFDF5' : '#FEF2F2',
+                                                    background: product.stockQty > 0 ? 'var(--badge-green-bg)' : 'var(--badge-red-bg)',
                                                     padding: '0.2rem 0.5rem',
                                                     borderRadius: '0.5rem',
                                                     textTransform: 'uppercase'

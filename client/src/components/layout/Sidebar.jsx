@@ -46,7 +46,6 @@ const Sidebar = ({ role }) => {
         { path: '/customers', icon: <Users size={22} />, label: 'Customers' },
         { path: '/products', icon: <Package size={22} />, label: 'Products' },
         { path: '/drivers', icon: <Users size={22} />, label: 'Drivers' },
-        { path: '/trips', icon: <Navigation size={22} />, label: 'Trips' },
         { path: '/live-map', icon: <MapIcon size={22} />, label: 'Live Map' },
         { path: '/expenses', icon: <CreditCard size={22} />, label: 'Gas Expenses' },
         { path: '/reports', icon: <BarChart3 size={22} />, label: 'Reports' },

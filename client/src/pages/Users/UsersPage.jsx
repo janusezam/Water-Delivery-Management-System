@@ -179,7 +179,7 @@ const UsersPage = () => {
                                                     fontSize: '0.75rem',
                                                     fontWeight: '700',
                                                     textTransform: 'uppercase',
-                                                    background: user.role === 'admin' ? '#FEE2E2' : user.role === 'staff' ? '#E0E7FF' : '#DCFCE7',
+                                                    background: user.role === 'admin' ? 'var(--badge-red-bg)' : user.role === 'staff' ? 'var(--badge-blue-bg)' : 'var(--badge-green-bg)',
                                                     color: user.role === 'admin' ? '#EF4444' : user.role === 'staff' ? '#4F46E5' : '#10B981',
                                                 }}>
                                                     {user.role}

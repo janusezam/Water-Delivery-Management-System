@@ -271,7 +271,7 @@ const CartPage = () => {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Header breadcrumbs={['Shopping Cart']} />
 
-                <main style={{ padding: '2rem 3rem', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+                <main style={{ padding: '2rem 3rem' }}>
                     <header style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <button 
                             onClick={() => navigate('/products')}

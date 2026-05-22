@@ -297,11 +297,11 @@ const ExpensesPage = () => {
                                             <td style={{ padding: '1.25rem 1.5rem', fontWeight: '800', color: '#EF4444' }}>₱{expense.totalCost.toFixed(2)}</td>
                                             <td style={{ padding: '1.25rem 1.5rem' }}>
                                                 {expense.createdBy?.role === 'admin' ? (
-                                                    <span style={{ background: '#E0E7FF', color: '#3730A3', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                    <span style={{ background: 'var(--badge-blue-bg)', color: '#3b82f6', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
                                                         <CheckCircle size={12} /> Logged by Admin
                                                     </span>
                                                 ) : expense.is_reviewed ? (
-                                                    <span style={{ background: '#D1FAE5', color: '#065F46', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                    <span style={{ background: 'var(--badge-green-bg)', color: '#10B981', padding: '0.25rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
                                                         <CheckCircle size={12} /> Reviewed
                                                     </span>
                                                 ) : (

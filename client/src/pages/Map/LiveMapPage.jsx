@@ -236,17 +236,17 @@ const LiveMapPage = () => {
             o.assignedDriver?._id === driverId || o.assignedDriver === driverId
         );
         if (driverOrders.length === 0) {
-            return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669' };
+            return { label: 'AVAILABLE', bg: 'var(--badge-green-bg)', color: '#10B981' };
         }
         const hasInProgress = driverOrders.some(o => o.status === 'Delivering');
         if (hasInProgress) {
-            return { label: 'ON DELIVERY', bg: '#DBEAFE', color: '#1D4ED8' };
+            return { label: 'ON DELIVERY', bg: 'var(--badge-blue-bg)', color: '#3b82f6' };
         }
         const hasPending = driverOrders.some(o => o.status === 'Pending' || o.status === 'dispatched' || o.status === 'Dispatched');
         if (hasPending) {
-            return { label: 'PENDING DELIVERY', bg: '#FEF3C7', color: '#D97706' };
+            return { label: 'PENDING DELIVERY', bg: 'var(--badge-yellow-bg)', color: '#f59e0b' };
         }
-        return { label: 'AVAILABLE', bg: '#ECFDF5', color: '#059669' };
+        return { label: 'AVAILABLE', bg: 'var(--badge-green-bg)', color: '#10B981' };
     };
 
     return (
@@ -505,8 +505,8 @@ const LiveMapPage = () => {
                                             <span style={{ 
                                                 fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase',
                                                 padding: '0.2rem 0.5rem', borderRadius: '1rem',
-                                                background: o.status === 'Delivering' ? 'var(--badge-blue-bg)' : '#FEF3C7',
-                                                color: o.status === 'Delivering' ? '#1E40AF' : '#92400E'
+                                                background: o.status === 'Delivering' ? 'var(--badge-blue-bg)' : 'var(--badge-yellow-bg)',
+                                                color: o.status === 'Delivering' ? '#3b82f6' : '#f59e0b'
                                             }}>
                                                 {o.status}
                                             </span>

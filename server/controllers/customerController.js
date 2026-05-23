@@ -4,9 +4,40 @@ const Customer = require('../models/Customer');
 // @route   GET /api/customers
 const getCustomers = async (req, res) => {
     try {
-        const customers = await Customer.find({});
+        const customers = await Customer.aggregate([
+            {
+                $lookup: {
+                    from: 'orders',
+                    let: { customerId: '$_id', customerName: '$name' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $or: [
+                                        { $eq: ['$customer', '$$customerId'] },
+                                        { $eq: ['$customerName', '$$customerName'] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'orders'
+                }
+            },
+            {
+                $addFields: {
+                    totalOrders: { $size: '$orders' }
+                }
+            },
+            {
+                $project: {
+                    orders: 0
+                }
+            }
+        ]);
         res.json(customers);
     } catch (error) {
+        console.error('Error fetching customers:', error);
         res.status(500).json({ message: 'Error fetching customers' });
     }
 };

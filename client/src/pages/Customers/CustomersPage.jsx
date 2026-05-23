@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { Users, Plus, Search, Phone, MapPin, ChevronRight, Trash2 } from 'lucide-react';
+import { Users, Plus, Search, Phone, MapPin, Edit2, Trash2 } from 'lucide-react';
 import { getCustomers, deleteCustomer, createCustomer, updateCustomer } from '../../services';
 import CustomerModal from '../../components/modals/CustomerModal';
 
@@ -102,64 +102,96 @@ const CustomersPage = () => {
                                 style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem', background: 'var(--input-bg)' }}
                             />
                         </div>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <span style={{ padding: '0.5rem 1rem', background: 'var(--surface-hover)', borderRadius: '2rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)' }}>
+                                {filteredCustomers.length} Total Customers
+                            </span>
+                        </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem', padding: '1.5rem' }}>
-                        {filteredCustomers.length > 0 ? filteredCustomers.map((customer) => (
-                            <div key={customer._id} 
-                                onClick={() => openEditModal(customer)}
-                                className="customer-card storefront-product-card" 
-                                style={{ padding: '1.5rem', cursor: 'pointer' }}
-                            >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                    <div style={{ width: '48px', height: '48px', background: 'var(--surface-hover)', borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: '1.2rem', fontWeight: '700', color: '#4F46E5' }}>
-                                        {customer.name[0]}
-                                    </div>
-                                    <span style={{ 
-                                        padding: '0.25rem 0.625rem', 
-                                        borderRadius: '1rem', 
-                                        fontSize: '0.7rem', 
-                                        fontWeight: '700',
-                                        background: customer.jugBalance > 0 ? 'var(--badge-red-bg)' : 'var(--badge-green-bg)',
-                                        color: customer.jugBalance > 0 ? '#EF4444' : '#10B981'
-                                    }}>
-                                        {customer.jugBalance > 0 ? `Owes ${customer.jugBalance} Jugs` : 'Clear Balance'}
-                                    </span>
-                                </div>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.5rem' }}>{customer.name}</h4>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                                        <Phone size={14} />
-                                        <span>{customer.phone}</span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                                        <MapPin size={14} />
-                                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            {customer.addresses?.[0]?.street}, {customer.addresses?.[0]?.barangay}
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead style={{ background: 'var(--page-bg)', borderBottom: '1px solid var(--surface-hover)' }}>
+                            <tr>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Customer</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Contact Info</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Primary Address</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'center' }}>Total Orders</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'center' }}>Jug Balance</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredCustomers.length > 0 ? filteredCustomers.map((customer) => (
+                                <tr key={customer._id} style={{ borderBottom: '1px solid var(--surface-hover)', transition: 'background 0.2s' }} className="table-row-hover">
+                                    <td style={{ padding: '1.25rem 1.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <div style={{ width: '40px', height: '40px', background: 'var(--surface-hover)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: '700', color: '#4F46E5' }}>
+                                                {customer.name[0]?.toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <div style={{ fontWeight: '700', color: 'var(--text-main)' }}>{customer.name}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>ID: {customer._id.slice(-6).toUpperCase()}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '1.25rem 1.5rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                            <Phone size={14} />
+                                            {customer.phone}
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '1.25rem 1.5rem', maxWidth: '250px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                            <MapPin size={14} style={{ flexShrink: 0 }} />
+                                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {customer.addresses?.[0]?.street ? `${customer.addresses[0].street}, ${customer.addresses[0].barangay}` : 'No address provided'}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center' }}>
+                                        <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{customer.totalOrders}</span>
+                                    </td>
+                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center' }}>
+                                        <span style={{ 
+                                            padding: '0.375rem 0.75rem', 
+                                            borderRadius: '1rem', 
+                                            fontSize: '0.75rem', 
+                                            fontWeight: '700',
+                                            background: customer.jugBalance > 0 ? 'var(--badge-red-bg)' : (customer.jugBalance < 0 ? 'var(--badge-blue-bg)' : 'var(--badge-green-bg)'),
+                                            color: customer.jugBalance > 0 ? '#EF4444' : (customer.jugBalance < 0 ? '#3B82F6' : '#10B981'),
+                                            display: 'inline-block'
+                                        }}>
+                                            {customer.jugBalance > 0 ? `Owes ${customer.jugBalance}` : (customer.jugBalance < 0 ? `Owed ${Math.abs(customer.jugBalance)}` : 'Clear')}
                                         </span>
-                                    </div>
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--surface-hover)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>{customer.totalOrders} total orders</span>
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); handleDelete(customer._id); }}
-                                            style={{ background: 'var(--badge-red-bg)', border: 'none', cursor: 'pointer', color: '#EF4444', display: 'flex', alignItems: 'center', padding: '0.5rem', borderRadius: '0.5rem', transition: 'all 0.2s' }}
-                                            onMouseOver={(e) => e.currentTarget.style.filter = 'brightness(0.9)'}
-                                            onMouseOut={(e) => e.currentTarget.style.filter = 'none'}
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                    <ChevronRight size={18} color="var(--text-light)" />
-                                </div>
-                            </div>
-                        )) : (
-                            <div style={{ gridColumn: '1 / -1', padding: '3rem', textAlign: 'center', color: 'var(--text-light)' }}>
-                                {loading ? 'Loading customers...' : 'No customers found.'}
-                            </div>
-                        )}
-                    </div>
+                                    </td>
+                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                            <button 
+                                                onClick={() => openEditModal(customer)}
+                                                style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                title="Manage Customer"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDelete(customer._id)}
+                                                style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                title="Delete Customer"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-light)' }}>
+                                        {loading ? 'Loading customers...' : 'No customers found.'}
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </main>
         </div>

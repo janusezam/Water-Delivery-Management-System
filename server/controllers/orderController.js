@@ -23,6 +23,53 @@ const getOrders = async (req, res) => {
             query = { assignedDriver: req.user._id };
         }
 
+        const { page, limit, search, tab } = req.query;
+
+        if (tab && req.user && req.user.role !== 'user') {
+            const completionStatuses = ['delivered', 'Completed', 'Cancelled', 'cancelled'];
+            if (tab === 'active') {
+                query.status = { $nin: completionStatuses };
+            } else if (tab === 'completed') {
+                query.status = { $in: completionStatuses };
+            }
+        }
+
+        if (search) {
+            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const searchRegex = new RegExp(escapedSearch, 'i');
+            const searchOr = [
+                { customerName: searchRegex },
+                { $expr: { $regexMatch: { input: { $toString: '$_id' }, regex: escapedSearch, options: 'i' } } }
+            ];
+            if (query.$or) {
+                query = { $and: [query, { $or: searchOr }] };
+            } else {
+                query.$or = searchOr;
+            }
+        }
+
+        if (page && limit) {
+            const pageNum = parseInt(page, 10);
+            const limitNum = parseInt(limit, 10);
+            const skip = (pageNum - 1) * limitNum;
+
+            const totalCount = await Order.countDocuments(query);
+            const orders = await Order.find(query)
+                .populate('user', 'name email')
+                .populate('assignedDriver', 'name email')
+                .populate('items.product', 'name pricePerUnit')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limitNum);
+
+            return res.json({
+                data: orders,
+                totalPages: Math.ceil(totalCount / limitNum),
+                currentPage: pageNum,
+                totalCount
+            });
+        }
+
         const orders = await Order.find(query)
             .populate('user', 'name email')
             .populate('assignedDriver', 'name email')

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { Truck, Search, Filter, Plus, Clock, CheckCircle, XCircle, LayoutGrid, ClipboardList, Eye, Settings, Trash2, Ban, Package } from 'lucide-react';
+import { Truck, Search, Filter, Plus, Clock, CheckCircle, XCircle, LayoutGrid, ClipboardList, Eye, Settings, Trash2, Ban, Package, Edit2 } from 'lucide-react';
 import { getOrders, createOrder, deleteOrder } from '../../services';
 import OrderModal from '../../components/modals/OrderModal';
 import StorefrontModal from '../../components/modals/StorefrontModal';
@@ -21,10 +21,26 @@ const OrdersPage = () => {
     const [isCancelOpen, setIsCancelOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
 
-    const fetchOrders = async () => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [totalCount, setTotalCount] = useState(0);
+
+    const fetchOrders = async (page = 1, search = '', tab = 'active') => {
         try {
-            const { data } = await getOrders();
-            setOrders(data);
+            setLoading(true);
+            const { data } = await getOrders({ page, limit: 10, search, tab });
+            if (data && data.data !== undefined) {
+                setOrders(data.data);
+                setTotalPages(data.totalPages);
+                setCurrentPage(data.currentPage);
+                setTotalCount(data.totalCount);
+            } else {
+                setOrders(data || []);
+                setTotalPages(1);
+                setCurrentPage(1);
+                setTotalCount((data || []).length);
+            }
             setLoading(false);
         } catch (error) {
             console.error('Error fetching orders', error);
@@ -33,14 +49,24 @@ const OrdersPage = () => {
     };
 
     useEffect(() => {
-        fetchOrders();
-    }, []);
+        setCurrentPage(1);
+        const timeoutId = setTimeout(() => {
+            fetchOrders(1, searchTerm, activeTab);
+        }, 500);
+        return () => clearTimeout(timeoutId);
+    }, [searchTerm, activeTab]);
+
+    useEffect(() => {
+        if (currentPage > 1) {
+            fetchOrders(currentPage, searchTerm, activeTab);
+        }
+    }, [currentPage]);
 
     const handleDeleteOrder = async (orderId, orderShortId) => {
         if (!window.confirm(`Are you sure you want to permanently delete order #${orderShortId}? This cannot be undone.`)) return;
         try {
             await deleteOrder(orderId);
-            fetchOrders();
+            fetchOrders(currentPage, searchTerm, activeTab);
         } catch (error) {
             console.error('Delete order error:', error);
             const errMsg = error.response?.data?.message || 'Failed to delete order';
@@ -62,7 +88,7 @@ const OrdersPage = () => {
             await createOrder(payload);
             setIsModalOpen(false);
             setIsStorefrontOpen(false);
-            fetchOrders();
+            fetchOrders(currentPage, searchTerm, activeTab);
         } catch (error) {
             console.error('Order Submission Error:', error);
             alert('Failed to create order');
@@ -93,13 +119,8 @@ const OrdersPage = () => {
 
     const completionStatuses = ['delivered', 'Completed', 'Cancelled', 'cancelled'];
     
-    // For users, show all. For admin/staff, split by tab.
-    const filteredOrders = userProfile.role === 'user' 
-        ? orders 
-        : (activeTab === 'active' 
-            ? orders.filter(o => !completionStatuses.includes(o.status))
-            : orders.filter(o => completionStatuses.includes(o.status))
-          );
+    // We don't need local filtering since the backend now handles it.
+    // const filteredOrders = ...
 
     return (
         <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--page-bg)' }}>
@@ -173,12 +194,14 @@ const OrdersPage = () => {
                                 <input 
                                     type="text" 
                                     placeholder="Search by customer or order ID..." 
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                     style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem' }}
                                 />
                             </div>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <span style={{ padding: '0.5rem 1rem', background: 'var(--surface-hover)', borderRadius: '2rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)' }}>
-                                    {filteredOrders.length} {activeTab === 'active' ? 'Active' : 'Complete'} Orders
+                                    {totalCount} {userProfile.role !== 'user' ? (activeTab === 'active' ? 'Active' : 'Complete') : 'Total'} Orders
                                 </span>
                             </div>
                         </div>
@@ -197,7 +220,7 @@ const OrdersPage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredOrders.length > 0 ? filteredOrders.map((order) => {
+                                {orders.length > 0 ? orders.map((order) => {
                                     const style = getStatusStyle(order.status);
                                     const isCompleteView = completionStatuses.includes(order.status);
                                     
@@ -252,17 +275,17 @@ const OrdersPage = () => {
                                                             <button
                                                                 onClick={() => { setSelectedOrder(order); setIsTrackOpen(true); }}
                                                                 title="View Details"
-                                                                style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: 'var(--badge-blue-bg)', color: '#4F46E5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                                                                style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                             >
-                                                                <Eye size={16} />
+                                                                <Eye size={18} />
                                                             </button>
                                                             {order.status === 'Pending' && (
                                                                 <button
                                                                     onClick={() => { setSelectedOrder(order); setIsCancelOpen(true); }}
                                                                     title="Cancel Order"
-                                                                    style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #FEE2E2', background: 'var(--badge-red-bg)', color: '#EF4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                                                                    style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                                 >
-                                                                    <Ban size={16} />
+                                                                    <Ban size={18} />
                                                                 </button>
                                                             )}
                                                         </div>
@@ -271,18 +294,18 @@ const OrdersPage = () => {
                                                             <button
                                                                 onClick={() => { setSelectedOrder(order); setIsTrackOpen(true); }}
                                                                 title="View Details"
-                                                                style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid #C7D2FE', background: 'var(--badge-blue-bg)', color: '#4F46E5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                                                                style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                             >
-                                                                <Eye size={16} />
+                                                                <Eye size={18} />
                                                             </button>
                                                         ) : (
                                                             <>
                                                                 <button
                                                                     onClick={() => { setSelectedOrder(order); setIsManageOpen(true); }}
                                                                     title="Manage Order"
-                                                                    style={{ padding: '0.5rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: 'var(--surface-bg)', color: '#4F46E5', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                                                                    style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                                 >
-                                                                    <Settings size={16} />
+                                                                    <Edit2 size={18} />
                                                                 </button>
                                                                 {userProfile.role === 'admin' && (
                                                                     (() => {
@@ -294,16 +317,14 @@ const OrdersPage = () => {
                                                                                 disabled={isProtected}
                                                                                 title={isProtected ? "Cannot delete active or completed orders" : "Delete Order"}
                                                                                 style={{ 
-                                                                                    padding: '0.5rem', borderRadius: '0.5rem', 
-                                                                                    border: isProtected ? '1px solid var(--border-medium)' : '1px solid #FEE2E2', 
-                                                                                    background: isProtected ? 'var(--surface-hover)' : 'var(--badge-red-bg)', 
                                                                                     color: isProtected ? 'var(--text-light)' : '#EF4444', 
+                                                                                    background: 'none', 
+                                                                                    border: 'none', 
                                                                                     cursor: isProtected ? 'not-allowed' : 'pointer',
-                                                                                    opacity: isProtected ? 0.6 : 1,
-                                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
+                                                                                    padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center'
                                                                                 }}
                                                                             >
-                                                                                <Trash2 size={16} />
+                                                                                <Trash2 size={18} />
                                                                             </button>
                                                                         );
                                                                     })()
@@ -324,6 +345,45 @@ const OrdersPage = () => {
                                 )}
                             </tbody>
                         </table>
+                        
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', borderTop: '1px solid var(--surface-hover)', gap: '0.5rem' }}>
+                                <button 
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1}
+                                    style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: currentPage === 1 ? 'var(--surface-bg)' : 'white', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', color: currentPage === 1 ? 'var(--text-light)' : 'var(--text-main)', fontWeight: '600' }}
+                                >
+                                    Prev
+                                </button>
+                                
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                    <button
+                                        key={page}
+                                        onClick={() => setCurrentPage(page)}
+                                        style={{ 
+                                            padding: '0.5rem 1rem', 
+                                            borderRadius: '0.5rem', 
+                                            border: 'none', 
+                                            background: currentPage === page ? '#4F46E5' : 'transparent', 
+                                            color: currentPage === page ? 'white' : 'var(--text-main)', 
+                                            cursor: 'pointer', 
+                                            fontWeight: '600' 
+                                        }}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+
+                                <button 
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages}
+                                    style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: currentPage === totalPages ? 'var(--surface-bg)' : 'white', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', color: currentPage === totalPages ? 'var(--text-light)' : 'var(--text-main)', fontWeight: '600' }}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </main>
             </div>

@@ -328,15 +328,17 @@ const ProductsPage = () => {
                                                 <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                                                     <button 
                                                         onClick={() => openEditModal(product)}
-                                                        style={{ padding: '0.4rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: 'var(--surface-bg)', color: 'var(--text-muted)', cursor: 'pointer' }}
+                                                        style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                        title="Edit Product"
                                                     >
-                                                        <Edit2 size={16} />
+                                                        <Edit2 size={18} />
                                                     </button>
                                                     <button 
                                                         onClick={() => handleDelete(product._id)}
-                                                        style={{ padding: '0.4rem', borderRadius: '0.5rem', border: '1px solid #FCA5A5', background: 'var(--badge-red-bg)', color: '#EF4444', cursor: 'pointer' }}
+                                                        style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                        title="Delete Product"
                                                     >
-                                                        <Trash2 size={16} />
+                                                        <Trash2 size={18} />
                                                     </button>
                                                 </div>
                                             </td>

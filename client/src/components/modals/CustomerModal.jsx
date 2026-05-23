@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
@@ -8,6 +8,17 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
         addresses: [{ street: '', barangay: '', city: 'Cebu City', isDefault: true }],
         jugBalance: 0
     });
+
+    useEffect(() => {
+        if (isOpen) {
+            setFormData(customer || {
+                name: '',
+                phone: '',
+                addresses: [{ street: '', barangay: '', city: 'Cebu City', isDefault: true }],
+                jugBalance: 0
+            });
+        }
+    }, [isOpen, customer]);
 
     if (!isOpen) return null;
 

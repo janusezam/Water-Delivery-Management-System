@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { Truck, Plus, User, Info, MoreVertical, Smartphone, Search, Mail, Package, Trash2 } from 'lucide-react';
+import { Truck, Plus, User, Edit2, MoreVertical, Smartphone, Search, Mail, Package, Trash2 } from 'lucide-react';
 import { getDrivers, createDriver, updateDriver, getOrders, deleteDriver } from '../../services';
 import DriverModal from '../../components/modals/DriverModal';
 
@@ -112,15 +112,20 @@ const DriversPage = () => {
                         <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Drivers</h2>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', marginBottom: '1.25rem' }}>Manage your delivery personnel and vehicles.</p>
                         
-                        <div style={{ position: 'relative', width: '320px' }}>
-                            <Search style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-light)' }} size={18} />
-                            <input 
-                                type="text" 
-                                placeholder="Search by name, plate, or license..." 
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem', background: 'var(--surface-bg)' }}
-                            />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <div style={{ position: 'relative', width: '320px' }}>
+                                <Search style={{ position: 'absolute', top: '10px', left: '12px', color: 'var(--text-light)' }} size={18} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Search by name, plate, or license..." 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', outline: 'none', fontSize: '0.9rem', background: 'var(--surface-bg)' }}
+                                />
+                            </div>
+                            <span style={{ padding: '0.5rem 1rem', background: 'var(--surface-bg)', border: '1px solid var(--border-light)', borderRadius: '2rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)' }}>
+                                {filteredDrivers.length} Total Drivers
+                            </span>
                         </div>
                     </div>
                     <button 
@@ -133,94 +138,113 @@ const DriversPage = () => {
                     </button>
                 </header>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-                    {loading ? (
-                        <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center' }}>
-                            <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #EEF2FF', borderTopColor: '#4F46E5', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
-                            <p style={{ color: 'var(--text-muted)' }}>Loading drivers...</p>
-                        </div>
-                    ) : filteredDrivers.length > 0 ? filteredDrivers.map((driver) => {
-                        const status = getDriverDeliveryStatus(driver._id);
-                        
-                        return (
-                            <div key={driver._id} className="storefront-product-card" style={{ padding: '1.5rem', background: 'var(--surface-bg)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <div style={{ width: '48px', height: '48px', background: 'var(--badge-blue-bg)', borderRadius: '1rem', display: 'grid', placeItems: 'center', color: '#4F46E5' }}>
-                                            <User size={24} />
-                                        </div>
-                                        <div>
-                                            <h4 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>{driver.user?.name || 'Unknown'}</h4>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>ID: {driver._id.slice(-6).toUpperCase()}</p>
-                                        </div>
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
-                                        <span style={{ 
-                                            padding: '0.25rem 0.625rem', 
-                                            borderRadius: '1rem', 
-                                            fontSize: '0.7rem', 
-                                            fontWeight: '800',
-                                            background: status.bg,
-                                            color: status.color,
-                                            textTransform: 'uppercase'
-                                        }}>
-                                            {status.label}
-                                        </span>
-                                        {status.count > 0 && (
-                                            <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                <Package size={12} /> {status.count} Active
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div style={{ background: 'var(--page-bg)', borderRadius: '1rem', padding: '1rem', marginBottom: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div>
-                                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '0.25rem', fontWeight: '600' }}>VEHICLE</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)' }}>{driver.vehicleType || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '0.25rem', fontWeight: '600' }}>PLATE NO</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)' }}>{driver.plateNo || 'N/A'}</p>
-                                    </div>
-                                    <div style={{ gridColumn: '1 / -1' }}>
-                                        <p style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginBottom: '0.25rem', fontWeight: '600' }}>LICENSE NO</p>
-                                        <p style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{driver.licenseNo || 'Not provided'}</p>
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                    <a 
-                                        href={`mailto:${driver.user?.email || ''}`}
-                                        style={{ flex: 1, padding: '0.625rem', background: 'var(--surface-bg)', border: '1px solid var(--border-light)', borderRadius: '0.75rem', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textDecoration: 'none' }}
-                                    >
-                                        <Mail size={16} />
-                                        Email
-                                    </a>
-                                    <button 
-                                        onClick={() => openEditModal(driver)}
-                                        style={{ padding: '0.625rem', background: 'var(--surface-bg)', border: '1px solid var(--border-light)', borderRadius: '0.75rem', cursor: 'pointer', title: 'Edit Driver' }}
-                                    >
-                                        <Info size={18} color="var(--text-muted)" />
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDelete(driver._id)}
-                                        style={{ padding: '0.625rem', background: 'var(--badge-red-bg)', border: 'none', borderRadius: '0.75rem', cursor: 'pointer', title: 'Delete Driver', transition: 'all 0.2s' }}
-                                        onMouseOver={(e) => e.currentTarget.style.filter = 'brightness(0.9)'}
-                                        onMouseOut={(e) => e.currentTarget.style.filter = 'none'}
-                                    >
-                                        <Trash2 size={18} color="#EF4444" />
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    }) : (
-                        <div style={{ gridColumn: '1 / -1', padding: '4rem', textAlign: 'center', color: 'var(--text-light)', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px dashed var(--border-light)' }}>
-                            <Truck size={48} color="var(--text-light)" style={{ margin: '0 auto 1rem' }} />
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>No drivers found</h3>
-                            <p style={{ fontSize: '0.9rem' }}>{searchQuery ? 'Try adjusting your search terms.' : 'Add your first driver to get started.'}</p>
-                        </div>
-                    )}
+                <div className="glass" style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead style={{ background: 'var(--page-bg)', borderBottom: '1px solid var(--surface-hover)' }}>
+                            <tr>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Driver Profile</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Contact</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Vehicle Details</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>License No.</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '4rem', textAlign: 'center' }}>
+                                        <div className="animate-spin" style={{ width: '32px', height: '32px', border: '3px solid #EEF2FF', borderTopColor: '#4F46E5', borderRadius: '50%', margin: '0 auto 1rem' }}></div>
+                                        <p style={{ color: 'var(--text-muted)' }}>Loading drivers...</p>
+                                    </td>
+                                </tr>
+                            ) : filteredDrivers.length > 0 ? filteredDrivers.map((driver) => {
+                                const status = getDriverDeliveryStatus(driver._id);
+                                
+                                return (
+                                    <tr key={driver._id} style={{ borderBottom: '1px solid var(--surface-hover)', transition: 'background 0.2s' }} className="table-row-hover">
+                                        <td style={{ padding: '1.25rem 1.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                <div style={{ width: '40px', height: '40px', background: 'var(--badge-blue-bg)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4F46E5' }}>
+                                                    <User size={20} />
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontWeight: '700', color: 'var(--text-main)', fontSize: '0.95rem' }}>{driver.user?.name || 'Unknown'}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>ID: {driver._id.slice(-6).toUpperCase()}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1.25rem 1.5rem' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                                {driver.user?.email ? (
+                                                    <a href={`mailto:${driver.user?.email}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#4F46E5', fontSize: '0.85rem', textDecoration: 'none', fontWeight: '500' }}>
+                                                        <Mail size={14} /> {driver.user?.email}
+                                                    </a>
+                                                ) : (
+                                                    <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>No email</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1.25rem 1.5rem' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                                                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)' }}>{driver.vehicleType || 'N/A'}</span>
+                                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--surface-hover)', padding: '0.1rem 0.5rem', borderRadius: '0.25rem', width: 'fit-content' }}>Plate: {driver.plateNo || 'N/A'}</span>
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1.25rem 1.5rem' }}>
+                                            <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{driver.licenseNo || 'Not provided'}</span>
+                                        </td>
+                                        <td style={{ padding: '1.25rem 1.5rem' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.25rem' }}>
+                                                <span style={{ 
+                                                    padding: '0.375rem 0.75rem', 
+                                                    borderRadius: '1rem', 
+                                                    fontSize: '0.7rem', 
+                                                    fontWeight: '700',
+                                                    background: status.bg,
+                                                    color: status.color,
+                                                    textTransform: 'uppercase'
+                                                }}>
+                                                    {status.label}
+                                                </span>
+                                                {status.count > 0 && (
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.25rem' }}>
+                                                        <Package size={12} /> {status.count} Active Orders
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                <button 
+                                                    onClick={() => openEditModal(driver)}
+                                                    style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                    title="Manage Driver"
+                                                >
+                                                    <Edit2 size={18} />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleDelete(driver._id)}
+                                                    style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                    title="Delete Driver"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            }) : (
+                                <tr>
+                                    <td colSpan="6" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-light)' }}>
+                                        <Truck size={48} color="var(--border-medium)" style={{ margin: '0 auto 1rem' }} />
+                                        <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>No drivers found</h3>
+                                        <p style={{ fontSize: '0.9rem' }}>{searchQuery ? 'Try adjusting your search terms.' : 'Add your first driver to get started.'}</p>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </main>
         </div>

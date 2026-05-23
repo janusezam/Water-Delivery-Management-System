@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { CreditCard, Plus, Calendar, Search, Edit, Trash2, CheckCircle, AlertTriangle, Download, X } from 'lucide-react';
+import { CreditCard, Plus, Calendar, Search, Edit2, Trash2, CheckCircle, AlertTriangle, Download, X } from 'lucide-react';
 import { getExpenses, createExpense, updateExpense, deleteExpense, getExpenseSummary, exportExpenses } from '../../services';
 import ExpenseModal from '../../components/modals/ExpenseModal';
 import Toast from '../../components/common/Toast';
@@ -326,7 +326,7 @@ const ExpensesPage = () => {
                                                         <button 
                                                             onClick={() => handleToggleReviewed(expense)}
                                                             title={expense.is_reviewed ? "Mark as Unreviewed" : "Mark as Reviewed"}
-                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: expense.is_reviewed ? '#10B981' : '#9CA3AF', padding: '0.25rem' }}
+                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: expense.is_reviewed ? '#10B981' : '#9CA3AF', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                         >
                                                             <CheckCircle size={18} />
                                                         </button>
@@ -335,16 +335,16 @@ const ExpensesPage = () => {
                                                         <button 
                                                             onClick={() => openEditModal(expense)}
                                                             title="Edit"
-                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4F46E5', padding: '0.25rem' }}
+                                                            style={{ color: '#4F46E5', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                         >
-                                                            <Edit size={18} />
+                                                            <Edit2 size={18} />
                                                         </button>
                                                     )}
                                                     {isAdmin && (
                                                         <button 
                                                             onClick={() => handleDelete(expense._id)}
                                                             title="Delete"
-                                                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: '0.25rem' }}
+                                                            style={{ color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                         >
                                                             <Trash2 size={18} />
                                                         </button>

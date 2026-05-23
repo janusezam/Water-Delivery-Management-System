@@ -1,7 +1,7 @@
 import { axiosClient } from './axios';
 
-export const getOrders = () => {
-  return axiosClient.get('/api/orders');
+export const getOrders = (params = {}) => {
+  return axiosClient.get('/api/orders', { params });
 };
 
 export const getOrderById = (id) => {

@@ -7,17 +7,23 @@ import {
     Truck, 
     AlertTriangle,
     Plus,
-    DollarSign,
+    PhilippinePeso,
     ShoppingCart,
     MapPin,
-    Package
+    Package,
+    Activity,
+    Clock,
+    Droplets
 } from 'lucide-react';
-import { getReportSummary, getOrders } from '../../services';
+import { getReportSummary, getOrders, getComprehensiveReport } from '../../services';
+import { getTrips } from '../../services/tripSaleService';
 import Toast from '../../components/common/Toast';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [pendingOrders, setPendingOrders] = useState([]);
+    const [activeTrips, setActiveTrips] = useState([]);
+    const [recentActivity, setRecentActivity] = useState([]);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
@@ -29,13 +35,18 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const [summaryRes, ordersRes] = await Promise.all([
+                const [summaryRes, ordersRes, tripsRes, comprehensiveRes] = await Promise.all([
                     getReportSummary(),
-                    getOrders()
+                    getOrders(),
+                    getTrips(),
+                    getComprehensiveReport('month')
                 ]);
                 setStats(summaryRes.data);
                 const pending = ordersRes.data.filter(o => o.status === 'Pending');
                 setPendingOrders(pending);
+                const active = tripsRes.data.filter(t => t.status === 'active' || t.status === 'pending_review');
+                setActiveTrips(active);
+                setRecentActivity(comprehensiveRes.data.recentActivity || []);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -81,7 +92,7 @@ const AdminDashboard = () => {
                         {/* Stat Cards */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
                             {[
-                                { label: 'Total Revenue', value: `₱${(stats?.revenue?.total || 0).toLocaleString()}`, icon: <DollarSign size={20} color="#10B981" />, trend: 'MTD', bg: 'var(--badge-green-bg)' },
+                                { label: 'Total Revenue', value: `₱${(stats?.revenue?.total || 0).toLocaleString()}`, icon: <PhilippinePeso size={20} color="#10B981" />, trend: 'MTD', bg: 'var(--badge-green-bg)' },
                                 { label: 'Total Orders', value: (stats?.totalOrders || 0).toString(), icon: <ShoppingCart size={20} color="#4F46E5" />, trend: 'MTD', bg: 'var(--badge-blue-bg)' },
                                 { label: 'Active Drivers', value: (stats?.activeDrivers || 0).toString(), icon: <Users size={20} color="#F59E0B" />, trend: 'Available', bg: 'var(--badge-yellow-bg)' },
                                 { label: 'Outstanding Jugs', value: (stats?.jugs?.outstanding || 0).toString(), icon: <AlertTriangle size={20} color="#EF4444" />, trend: 'At Customers', bg: 'var(--badge-red-bg)' }
@@ -129,23 +140,76 @@ const AdminDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Recent Activity Placeholder */}
+                            {/* Active Roaming Trips */}
                             <div style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '1.5rem' }}>System Status</h3>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                                    {[
-                                        { label: 'Database Status', value: 'Connected', color: '#10B981' },
-                                        { label: 'Cloudinary Storage', value: 'Active', color: '#10B981' },
-                                        { label: 'Map Services', value: 'Operational', color: '#10B981' },
-                                        { label: 'Last System Sync', value: 'Just now', color: 'var(--text-muted)' }
-                                    ].map((item, i) => (
-                                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 3 ? '1px solid var(--surface-hover)' : 'none' }}>
-                                            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{item.label}</span>
-                                            <span style={{ fontSize: '0.9rem', fontWeight: '700', color: item.color }}>{item.value}</span>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: 'var(--text-main)' }}>Active Roaming Trips</h3>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#10B981', background: 'var(--badge-green-bg)', padding: '0.35rem 0.75rem', borderRadius: '2rem' }}>Live Sales</span>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.25rem' }}>
+                                    {activeTrips.length > 0 ? activeTrips.map((trip, i) => {
+                                        const currentRevenue = trip.sales?.reduce((sum, s) => sum + s.totalAmount, 0) || 0;
+                                        const statusColor = trip.status === 'active' ? '#4F46E5' : '#F59E0B';
+                                        const statusBg = trip.status === 'active' ? 'var(--badge-blue-bg)' : 'var(--badge-yellow-bg)';
+                                        return (
+                                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px solid var(--surface-hover)' }}>
+                                                <div style={{ width: '40px', height: '40px', background: statusBg, borderRadius: '0.75rem', display: 'grid', placeItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                                                    <Truck size={20} color={statusColor} />
+                                                </div>
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontWeight: '700', color: 'var(--text-main)', fontSize: '0.9rem' }}>{trip.driver?.name || 'Driver'}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{trip.receiptNo}</div>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <div style={{ fontWeight: '700', color: '#10B981', fontSize: '0.9rem' }}>₱{currentRevenue.toLocaleString()}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: statusColor, textTransform: 'capitalize', fontWeight: '600' }}>
+                                                        {trip.status.replace('_', ' ')}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }) : (
+                                        <div style={{ textAlign: 'center', padding: '3rem 2rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px dashed var(--border-light)' }}>
+                                            <Truck size={40} color="var(--text-light)" style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                                            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>No active roaming trips at the moment.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Activity Feed */}
+                        <div style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', padding: '2rem', marginTop: '2.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Activity size={20} color="#10B981" /> Recent Activity
+                            </h3>
+                            
+                            {recentActivity.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                                    {recentActivity.map((activity, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px solid var(--surface-hover)' }}>
+                                            <div style={{ 
+                                                width: '40px', height: '40px', borderRadius: '50%', display: 'grid', placeItems: 'center',
+                                                background: activity.type === 'order' ? 'var(--badge-blue-bg)' : 
+                                                           activity.type === 'walkin' ? 'var(--badge-green-bg)' : 'var(--badge-red-bg)'
+                                            }}>
+                                                {activity.type === 'order' && <Package size={18} color="#4F46E5" />}
+                                                {activity.type === 'walkin' && <PhilippinePeso size={18} color="#10B981" />}
+                                                {activity.type === 'expense' && <Droplets size={18} color="#EF4444" />}
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <p style={{ fontWeight: '600', color: 'var(--text-main)', fontSize: '0.9rem', marginBottom: '0.25rem' }}>{activity.description}</p>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                                                    <Clock size={12} />
+                                                    {new Date(activity.time).toLocaleString()}
+                                                </div>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            ) : (
+                                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No recent activity found</div>
+                            )}
                         </div>
                     </main>
                 )}

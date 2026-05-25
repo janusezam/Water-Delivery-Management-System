@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import axios from 'axios'
 import './index.css'
 import App from './App.jsx'
@@ -21,9 +20,7 @@ axios.interceptors.request.use(
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <GoogleOAuthProvider clientId="903946059443-m6lqrfifmqg0339hhri64e17i4qbgl13.apps.googleusercontent.com">
-      <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
-        <App />
-      </GoogleReCaptchaProvider>
+      <App />
     </GoogleOAuthProvider>
   </StrictMode>,
 )

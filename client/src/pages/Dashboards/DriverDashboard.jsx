@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
 import { 
@@ -8,7 +8,7 @@ import {
     Package,
     Navigation,
     Hash,
-    DollarSign,
+    PhilippinePeso,
     User,
     X,
     ExternalLink,
@@ -20,6 +20,8 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { getMyActiveTrip, recordSale, endTrip } from '../../services/tripSaleService';
+import { getCustomers } from '../../services/customerService';
 
 // Driver marker icon (blue arrow)
 const driverIcon = L.divIcon({
@@ -72,12 +74,14 @@ const DriverDashboard = () => {
     const [reportOrder, setReportOrder] = useState(null); // order to report issue for
     const [driverPosition, setDriverPosition] = useState(null);
     const [routeCoords, setRouteCoords] = useState(null);
+    const [activeTrip, setActiveTrip] = useState(null);
+    const [customers, setCustomers] = useState([]);
     const socket = useSocket('http://localhost:5000');
     
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const driverId = user._id;
 
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const { data } = await axios.get('http://localhost:5000/api/orders', {
@@ -93,11 +97,31 @@ const DriverDashboard = () => {
             console.error('Error fetching orders', error);
             setLoading(false);
         }
-    };
+    }, []);
+
+    const fetchActiveTrip = useCallback(async () => {
+        try {
+            const { data } = await getMyActiveTrip();
+            setActiveTrip(data);
+        } catch (error) {
+            console.error('Error fetching active trip', error);
+        }
+    }, []);
+
+    const fetchCustomersData = useCallback(async () => {
+        try {
+            const { data } = await getCustomers();
+            setCustomers(data);
+        } catch (error) {
+            console.error('Error fetching customers', error);
+        }
+    }, []);
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+        fetchActiveTrip();
+        fetchCustomersData();
+    }, [fetchOrders, fetchActiveTrip, fetchCustomersData]);
 
     // GPS Tracking Logic
     useEffect(() => {
@@ -125,7 +149,7 @@ const DriverDashboard = () => {
 
     const [deliveryConfirm, setDeliveryConfirm] = useState(null); // { orderId, jugsReturned }
 
-    const handleUpdateStatus = async (orderId, newStatus) => {
+    const handleUpdateStatus = useCallback(async (orderId, newStatus) => {
         // For delivery completion, show jug collection modal instead of simple confirm
         if (newStatus === 'delivered') {
             setDeliveryConfirm({ orderId, jugsReturned: 0 });
@@ -148,9 +172,9 @@ const DriverDashboard = () => {
             console.error('Error updating order status:', error);
             alert('Failed to update order status');
         }
-    };
+    }, [fetchOrders]);
 
-    const handleConfirmDelivery = async () => {
+    const handleConfirmDelivery = useCallback(async () => {
         if (!deliveryConfirm) return;
         try {
             const token = localStorage.getItem('token');
@@ -164,9 +188,9 @@ const DriverDashboard = () => {
             console.error('Error completing delivery:', error);
             alert('Failed to complete delivery');
         }
-    };
+    }, [deliveryConfirm, fetchOrders]);
 
-    const handleReportIssueSubmit = async (orderId, reason, note) => {
+    const handleReportIssueSubmit = useCallback(async (orderId, reason, note) => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(`http://localhost:5000/api/orders/${orderId}`,
@@ -179,7 +203,7 @@ const DriverDashboard = () => {
             console.error('Error reporting issue:', error);
             alert('Failed to report issue');
         }
-    };
+    }, [fetchOrders]);
 
     const getStatusBadge = (status) => {
         const map = {
@@ -280,7 +304,7 @@ const DriverDashboard = () => {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.25rem', borderTop: '1px solid var(--surface-hover)' }}>
-                    <DollarSign size={16} color="#10B981" />
+                    <PhilippinePeso size={16} color="#10B981" />
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total Amount:</span>
                     <span style={{ fontWeight: '800', color: 'var(--text-main)', fontSize: '1rem' }}>
                         ₱{(order.totalAmount || 0).toLocaleString()}
@@ -376,6 +400,83 @@ const DriverDashboard = () => {
                             GPS TRANSMITTING
                         </div>
                     </div>
+
+                    {/* Roaming Trip Panel */}
+                    {activeTrip && (
+                        <div style={{ marginBottom: '2rem', background: '#EEF2FF', borderRadius: '1.25rem', padding: '1.5rem', border: '1px solid #C7D2FE', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.1)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800', color: '#3730A3', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Truck size={20} /> Active Roaming Trip
+                                    </h3>
+                                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: '#4F46E5' }}>Receipt: {activeTrip.receiptNo}</p>
+                                </div>
+                                {activeTrip.status === 'active' ? (
+                                    <button 
+                                        onClick={async () => {
+                                            if (window.confirm('End this trip? You will need to return to the station to verify remaining inventory.')) {
+                                                await endTrip(activeTrip._id);
+                                                fetchActiveTrip();
+                                            }
+                                        }}
+                                        style={{ background: '#4F46E5', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '0.5rem', fontWeight: '700', cursor: 'pointer' }}
+                                    >
+                                        End Trip
+                                    </button>
+                                ) : (
+                                    <span style={{ background: '#FEF9C3', color: '#B45309', padding: '0.5rem 1rem', borderRadius: '0.5rem', fontWeight: '700', fontSize: '0.85rem' }}>
+                                        Pending Admin Verification
+                                    </span>
+                                )}
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                                <div style={{ flex: '1 1 300px' }}>
+                                    <h4 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: '#4338CA' }}>Inventory Remaining</h4>
+                                    {activeTrip.loadedItems.map(item => {
+                                        let sold = 0;
+                                        activeTrip.sales.forEach(sale => {
+                                            const saleItem = sale.items.find(i => i.product._id === item.product._id);
+                                            if (saleItem) sold += saleItem.qty;
+                                        });
+                                        const remaining = item.qtyLoaded - sold;
+                                        const pct = (remaining / item.qtyLoaded) * 100;
+                                        return (
+                                            <div key={item.product._id} style={{ marginBottom: '1rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: '600', color: '#3730A3', marginBottom: '0.25rem' }}>
+                                                    <span>{item.product.name}</span>
+                                                    <span>{remaining} / {item.qtyLoaded} left</span>
+                                                </div>
+                                                <div style={{ height: '8px', background: '#C7D2FE', borderRadius: '4px', overflow: 'hidden' }}>
+                                                    <div style={{ width: `${pct}%`, height: '100%', background: remaining > 0 ? '#4F46E5' : '#EF4444', transition: 'width 0.3s' }}></div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <div style={{ flex: '1 1 300px' }}>
+                                    <h4 style={{ margin: '0 0 1rem 0', fontSize: '0.9rem', color: '#4338CA' }}>Sales Summary</h4>
+                                    <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', border: '1px solid #E0E7FF' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Revenue:</span>
+                                            <span style={{ fontWeight: '800', color: '#10B981' }}>₱{activeTrip.sales.reduce((sum, s) => sum + s.totalAmount, 0)}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                            <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Sales Logged:</span>
+                                            <span style={{ fontWeight: '700', color: '#4F46E5' }}>{activeTrip.sales.length}</span>
+                                        </div>
+                                        {activeTrip.status === 'active' && (
+                                            <RecordSaleModal 
+                                                trip={activeTrip} 
+                                                customers={customers}
+                                                onSaleRecorded={fetchActiveTrip} 
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '4rem' }}>
@@ -712,6 +813,194 @@ const RouteMapModal = ({ order, driverPosition, onClose }) => {
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
             `}</style>
         </div>
+    );
+};
+
+const RecordSaleModal = ({ trip, customers, onSaleRecorded }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [customerName, setCustomerName] = useState('');
+    const [selectedCustomer, setSelectedCustomer] = useState('');
+    const [itemsToSell, setItemsToSell] = useState([]);
+    const [jugsCollected, setJugsCollected] = useState(0);
+
+    useEffect(() => {
+        if (isOpen && trip) {
+            const initialItems = trip.loadedItems.map(item => {
+                let sold = 0;
+                trip.sales.forEach(sale => {
+                    const saleItem = sale.items.find(i => i.product._id === item.product._id);
+                    if (saleItem) sold += saleItem.qty;
+                });
+                const remaining = item.qtyLoaded - sold;
+                return {
+                    product: item.product,
+                    price: item.pricePerUnit,
+                    remaining,
+                    qtyToSell: 0
+                };
+            });
+            setItemsToSell(initialItems);
+            setCustomerName('');
+            setSelectedCustomer('');
+            setJugsCollected(0);
+        }
+    }, [isOpen, trip]);
+
+    const handleSave = async (e) => {
+        e.preventDefault();
+        try {
+            // Validate and build items
+            const finalItems = itemsToSell
+                .filter(i => i.qtyToSell > 0)
+                .map(i => ({ product: i.product._id, qty: i.qtyToSell, price: i.price }));
+            
+            if (finalItems.length === 0) return alert('Please select at least one product to sell.');
+
+            let totalAmount = 0;
+            finalItems.forEach(i => totalAmount += (i.qty * i.price));
+
+            const payload = {
+                customerName: selectedCustomer ? customers.find(c => c._id === selectedCustomer)?.name : (customerName || 'Walk-up Customer'),
+                customer: selectedCustomer || null,
+                items: finalItems,
+                paymentMethod: 'cash',
+                totalAmount,
+                jugsCollected: selectedCustomer ? jugsCollected : 0
+            };
+
+            await recordSale(trip._id, payload);
+            setIsOpen(false);
+            onSaleRecorded();
+        } catch (error) {
+            alert(error.response?.data?.message || 'Failed to record sale');
+        }
+    };
+
+    const updateQty = (index, delta) => {
+        const newArr = [...itemsToSell];
+        const item = newArr[index];
+        const newQty = item.qtyToSell + delta;
+        if (newQty >= 0 && newQty <= item.remaining) {
+            item.qtyToSell = newQty;
+            setItemsToSell(newArr);
+        }
+    };
+
+    return (
+        <>
+            <button 
+                onClick={() => setIsOpen(true)}
+                style={{ width: '100%', background: '#4F46E5', color: 'white', padding: '0.75rem', borderRadius: '0.5rem', fontWeight: '700', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+            >
+                <PhilippinePeso size={16} /> Record Sale
+            </button>
+
+            {isOpen && (
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '90vw', maxWidth: '650px', background: 'var(--surface-bg)', borderRadius: '1.5rem', padding: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <h3 style={{ margin: '0 0 1rem 0', color: 'var(--text-main)', fontSize: '1.25rem', fontWeight: '800' }}>Record Cash Sale</h3>
+                        <form onSubmit={handleSave}>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.5rem' }}>Link Registered Customer (Optional)</label>
+                                <select value={selectedCustomer} onChange={e => { setSelectedCustomer(e.target.value); setCustomerName(''); }} style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', marginBottom: '0.5rem' }}>
+                                    <option value="">-- No Customer (Walk-up) --</option>
+                                    {customers.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+                                </select>
+                                {!selectedCustomer && (
+                                    <input type="text" placeholder="Walk-up Name (optional)" value={customerName} onChange={e => setCustomerName(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }} />
+                                )}
+                            </div>
+
+                            <div style={{ marginBottom: '1.5rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.75rem' }}>Select Items to Sell</label>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    {itemsToSell.map((item, idx) => {
+                                        const isSelected = item.qtyToSell > 0;
+                                        return (
+                                        <div key={idx} style={{ 
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                                            padding: '0.75rem', 
+                                            border: isSelected ? '2px solid #10B981' : '1px solid var(--border-light)', 
+                                            borderRadius: '0.75rem', 
+                                            background: isSelected ? '#F0FDF4' : 'var(--page-bg)',
+                                            transition: 'all 0.2s ease',
+                                            opacity: item.remaining === 0 ? 0.5 : 1
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                {item.product.imageUrl ? (
+                                                    <img src={item.product.imageUrl} alt={item.product.name} style={{ width: '52px', height: '52px', objectFit: 'cover', borderRadius: '0.5rem', border: '1px solid var(--border-light)' }} />
+                                                ) : (
+                                                    <div style={{ width: '52px', height: '52px', background: 'var(--surface-hover)', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Package size={24} color="var(--text-light)" />
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <div style={{ fontWeight: '700', color: 'var(--text-main)', fontSize: '0.95rem' }}>{item.product.name}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                                                        ₱{item.price} • {item.remaining > 0 ? <span style={{ color: '#10B981', fontWeight: '600' }}>{item.remaining} left in stock</span> : <span style={{ color: '#EF4444', fontWeight: '600' }}>Out of stock</span>}
+                                                    </div>
+                                                    {isSelected && (
+                                                        <div style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: '700', marginTop: '0.2rem' }}>
+                                                            Subtotal: ₱{(item.qtyToSell * item.price).toLocaleString()}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                <button 
+                                                    type="button" 
+                                                    disabled={item.qtyToSell === 0}
+                                                    onClick={() => updateQty(idx, -1)} 
+                                                    style={{ width: '36px', height: '36px', borderRadius: '0.5rem', border: '1px solid var(--border-medium)', background: 'var(--surface-bg)', cursor: item.qtyToSell === 0 ? 'not-allowed' : 'pointer', fontSize: '1.25rem', fontWeight: '700', color: '#4F46E5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                >
+                                                    −
+                                                </button>
+                                                <span style={{ fontSize: '1.1rem', fontWeight: '800', minWidth: '30px', textAlign: 'center', color: isSelected ? '#10B981' : 'var(--text-main)' }}>{item.qtyToSell}</span>
+                                                <button 
+                                                    type="button" 
+                                                    disabled={item.qtyToSell >= item.remaining}
+                                                    onClick={() => updateQty(idx, 1)} 
+                                                    style={{ width: '36px', height: '36px', borderRadius: '0.5rem', border: '1px solid var(--border-medium)', background: 'var(--surface-bg)', cursor: item.qtyToSell >= item.remaining ? 'not-allowed' : 'pointer', fontSize: '1.25rem', fontWeight: '700', color: '#4F46E5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {selectedCustomer && (
+                                <div style={{ marginBottom: '1.5rem', background: '#F0FDF4', padding: '1.25rem', borderRadius: '0.75rem', border: '1px solid #BBF7D0' }}>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: '700', color: '#166534', marginBottom: '0.75rem' }}>
+                                        Empty Jugs Collected
+                                    </label>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <button type="button" onClick={() => setJugsCollected(Math.max(0, jugsCollected - 1))} style={{ width: '40px', height: '40px', borderRadius: '0.5rem', border: '1px solid #166534', background: 'white', color: '#166534', fontWeight: '800', fontSize: '1.25rem', cursor: 'pointer' }}>-</button>
+                                        <span style={{ fontWeight: '800', fontSize: '1.5rem', color: '#166534', minWidth: '40px', textAlign: 'center' }}>{jugsCollected}</span>
+                                        <button type="button" onClick={() => setJugsCollected(jugsCollected + 1)} style={{ width: '40px', height: '40px', borderRadius: '0.5rem', border: '1px solid #166534', background: 'white', color: '#166534', fontWeight: '800', fontSize: '1.25rem', cursor: 'pointer' }}>+</button>
+                                    </div>
+                                    <p style={{ margin: '0.75rem 0 0', fontSize: '0.8rem', color: '#15803D' }}>This updates {customers.find(c => c._id === selectedCustomer)?.name}'s jug balance.</p>
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', paddingTop: '1rem', borderTop: '1px solid var(--border-light)' }}>
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Total:</span>
+                                    <span style={{ fontSize: '1.25rem', fontWeight: '800', color: '#10B981' }}>
+                                        ₱{itemsToSell.reduce((sum, item) => sum + (item.qtyToSell * item.price), 0).toLocaleString()}
+                                    </span>
+                                </div>
+                                <button type="button" onClick={() => setIsOpen(false)} style={{ padding: '0.75rem 1.5rem', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '700', color: 'var(--text-muted)' }}>Cancel</button>
+                                <button type="submit" disabled={itemsToSell.reduce((sum, item) => sum + item.qtyToSell, 0) === 0} style={{ padding: '0.75rem 1.5rem', background: '#10B981', color: 'white', border: 'none', borderRadius: '0.75rem', cursor: 'pointer', fontWeight: '700', opacity: itemsToSell.reduce((sum, item) => sum + item.qtyToSell, 0) === 0 ? 0.6 : 1 }}>Confirm Sale</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 

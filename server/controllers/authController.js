@@ -194,6 +194,11 @@ const verifyActivation = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profilePicture: user.profilePicture || null,
+        isGoogleUser: !!user.googleId,
+        mobileNumber: user.mobileNumber || null,
+        firstName: user.firstName || null,
+        lastName: user.lastName || null,
         token: generateToken(user._id)
     });
 };
@@ -269,6 +274,11 @@ const loginUser = async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            profilePicture: user.profilePicture || null,
+            isGoogleUser: !!user.googleId,
+            mobileNumber: user.mobileNumber || null,
+            firstName: user.firstName || null,
+            lastName: user.lastName || null,
             token: generateToken(user._id),
         });
     } else {
@@ -284,7 +294,7 @@ const googleLogin = async (req, res) => {
     console.log('Received Google Login Request:', tokenId ? 'ID Token' : accessToken ? 'Access Token' : 'NO TOKEN');
 
     try {
-        let name, email, googleId;
+        let name, email, googleId, picture;
 
         if (tokenId) {
             // Standard <GoogleLogin /> path (ID Token)
@@ -296,6 +306,7 @@ const googleLogin = async (req, res) => {
             name = payload.name;
             email = payload.email;
             googleId = payload.sub;
+            picture = payload.picture;
             console.log('Google ID Token Verified successfully');
         } else if (accessToken) {
             // Custom button path (Access Token)
@@ -303,6 +314,7 @@ const googleLogin = async (req, res) => {
             name = response.data.name;
             email = response.data.email;
             googleId = response.data.sub;
+            picture = response.data.picture;
             console.log('Google Access Token Verified successfully');
         } else {
             return res.status(400).json({ message: 'No token provided' });
@@ -310,17 +322,47 @@ const googleLogin = async (req, res) => {
 
         let user = await User.findOne({ email });
 
+        // Split full name into firstName and lastName for auto-filling
+        const nameParts = (name || '').trim().split(/\s+/);
+        const derivedFirstName = nameParts[0] || '';
+        const derivedLastName = nameParts.slice(1).join(' ') || '';
+
         if (!user) {
             user = await User.create({
                 name,
+                firstName: derivedFirstName,
+                lastName: derivedLastName,
                 email,
                 googleId,
+                profilePicture: picture || null,
                 password: Math.random().toString(36).slice(-8), // Dummy password
-                role: role || 'user'
+                role: role || 'user',
+                isActivated: true
             });
-        } else if (!user.googleId) {
-            user.googleId = googleId;
-            await user.save();
+        } else {
+            let modified = false;
+            
+            if (!user.googleId) {
+                user.googleId = googleId;
+                modified = true;
+            }
+            
+            if (picture && user.profilePicture !== picture) {
+                user.profilePicture = picture;
+                modified = true;
+            }
+
+            // Auto-fill firstName and lastName if they are currently blank
+            if (!user.firstName || !user.lastName) {
+                const existingNameParts = (user.name || name || '').trim().split(/\s+/);
+                if (!user.firstName) user.firstName = existingNameParts[0] || '';
+                if (!user.lastName) user.lastName = existingNameParts.slice(1).join(' ') || '';
+                modified = true;
+            }
+
+            if (modified) {
+                await user.save();
+            }
         }
 
         res.json({
@@ -328,6 +370,11 @@ const googleLogin = async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            profilePicture: user.profilePicture || null,
+            isGoogleUser: !!user.googleId,
+            mobileNumber: user.mobileNumber || null,
+            firstName: user.firstName || null,
+            lastName: user.lastName || null,
             token: generateToken(user._id),
         });
     } catch (error) {
@@ -443,6 +490,11 @@ const loginAdmin = async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            profilePicture: user.profilePicture || null,
+            isGoogleUser: !!user.googleId,
+            mobileNumber: user.mobileNumber || null,
+            firstName: user.firstName || null,
+            lastName: user.lastName || null,
             token: generateToken(user._id),
         });
     } else {

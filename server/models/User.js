@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
         unique: true,
         sparse: true
     },
+    profilePicture: {
+        type: String,
+        default: null
+    },
     activationOTP: String,
     activationOTPExpires: Date,
     resetPasswordOTP: String,

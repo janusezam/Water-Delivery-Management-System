@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Customer = require('../models/Customer');
 const Product = require('../models/Product');
+const TripSale = require('../models/TripSale');
 
 // @desc    Get all orders
 // @route   GET /api/orders
@@ -227,26 +228,104 @@ const updateOrder = async (req, res) => {
         const wasAlreadyCompleted = completionStatuses.includes(oldStatus);
 
         if (isNowCompleted && !wasAlreadyCompleted) {
-            // Deduct stock for each item
-            if (Array.isArray(currentOrder.items)) {
-                for (const item of currentOrder.items) {
-                    if (item.product && item.qty > 0) {
-                        await Product.findByIdAndUpdate(item.product, {
-                            $inc: { stockQty: -item.qty }
+            const driverId = assignedDriverId || currentOrder.assignedDriver;
+            let deductedFromTrip = false;
+
+            // Check if the assigned driver has an active trip
+            if (driverId) {
+                const activeTrip = await TripSale.findOne({
+                    driver: driverId,
+                    status: 'active'
+                });
+
+                if (activeTrip) {
+                    // Validate that the trip has enough remaining stock for each order item
+                    const soldCounts = {};
+                    activeTrip.sales.forEach(sale => {
+                        sale.items.forEach(si => {
+                            const pid = si.product.toString();
+                            soldCounts[pid] = (soldCounts[pid] || 0) + si.qty;
                         });
+                    });
+
+                    let canFulfillFromTrip = true;
+                    for (const item of currentOrder.items) {
+                        if (!item.product || item.qty <= 0) continue;
+                        const pid = item.product.toString();
+                        const loadedItem = activeTrip.loadedItems.find(l => l.product.toString() === pid);
+                        if (!loadedItem) { canFulfillFromTrip = false; break; }
+                        const alreadySold = soldCounts[pid] || 0;
+                        const remaining = loadedItem.qtyLoaded - alreadySold;
+                        if (item.qty > remaining) { canFulfillFromTrip = false; break; }
+                    }
+
+                    if (canFulfillFromTrip) {
+                        // Record this delivery as a sale in the trip
+                        const tripSaleItems = currentOrder.items
+                            .filter(i => i.product && i.qty > 0)
+                            .map(i => ({ product: i.product, qty: i.qty, price: i.price || 0 }));
+
+                        activeTrip.sales.push({
+                            customerName: currentOrder.customerName,
+                            customer: currentOrder.customer || null,
+                            items: tripSaleItems,
+                            totalAmount: currentOrder.totalAmount || 0,
+                            paymentMethod: 'order',
+                            orderId: currentOrder._id
+                        });
+
+                        await activeTrip.save();
+                        deductedFromTrip = true;
+                        // Do NOT deduct from warehouse — stock was already moved to truck when trip was created
+                    }
+                }
+            }
+
+            // Fallback: If no active trip or trip couldn't fulfill, deduct from warehouse
+            if (!deductedFromTrip) {
+                if (Array.isArray(currentOrder.items)) {
+                    for (const item of currentOrder.items) {
+                        if (item.product && item.qty > 0) {
+                            await Product.findByIdAndUpdate(item.product, {
+                                $inc: { stockQty: -item.qty }
+                            });
+                        }
                     }
                 }
             }
         }
         
-        // If status changes from completed back to something else (e.g. admin error), put stock back
+        // If status changes from completed back to something else (e.g. admin error), reverse the deduction
         if (!isNowCompleted && wasAlreadyCompleted) {
-            if (Array.isArray(currentOrder.items)) {
-                for (const item of currentOrder.items) {
-                    if (item.product && item.qty > 0) {
-                        await Product.findByIdAndUpdate(item.product, {
-                            $inc: { stockQty: item.qty }
-                        });
+            const driverId = currentOrder.assignedDriver;
+            let reversedFromTrip = false;
+
+            // Check if this order was recorded in a trip sale
+            if (driverId) {
+                const tripWithSale = await TripSale.findOne({
+                    driver: driverId,
+                    'sales.orderId': currentOrder._id
+                });
+
+                if (tripWithSale) {
+                    // Remove the sale entry that was created for this order
+                    tripWithSale.sales = tripWithSale.sales.filter(
+                        s => !s.orderId || s.orderId.toString() !== currentOrder._id.toString()
+                    );
+                    await tripWithSale.save();
+                    reversedFromTrip = true;
+                }
+            }
+
+            // Fallback: If it wasn't in a trip, restore warehouse stock
+            if (!reversedFromTrip) {
+                if (Array.isArray(currentOrder.items)) {
+                    for (const item of currentOrder.items) {
+                        if (item.product && item.qty > 0) {
+                            await Product.findByIdAndUpdate(item.product, {
+                                $inc: { stockQty: item.qty }
+                            });
+                        }
                     }
                 }
             }

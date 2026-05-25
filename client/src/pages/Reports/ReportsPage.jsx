@@ -3,7 +3,7 @@ import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
 import { 
     TrendingUp, TrendingDown, Package, Droplets, CreditCard, 
-    Calendar, CheckCircle, XCircle, Clock, Truck, Activity, DollarSign
+    Calendar, CheckCircle, XCircle, Clock, Truck, Activity, PhilippinePeso
 } from 'lucide-react';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -135,7 +135,7 @@ const ReportsPage = () => {
                                 {/* Revenue Card */}
                                 <div style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                        <div style={{ padding: '0.75rem', background: 'var(--badge-blue-bg)', borderRadius: '1rem' }}><DollarSign size={20} color="#4F46E5" /></div>
+                                        <div style={{ padding: '0.75rem', background: 'var(--badge-blue-bg)', borderRadius: '1rem' }}><PhilippinePeso size={20} color="#4F46E5" /></div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: report.revenue.growthPercent >= 0 ? '#10B981' : '#EF4444', background: report.revenue.growthPercent >= 0 ? 'var(--badge-green-bg)' : 'var(--badge-red-bg)', padding: '0.25rem 0.5rem', borderRadius: '2rem', fontSize: '0.75rem', fontWeight: '700' }}>
                                             {report.revenue.growthPercent >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                             {Math.abs(report.revenue.growthPercent).toFixed(1)}%
@@ -377,40 +377,6 @@ const ReportsPage = () => {
                                     </table>
                                 ) : (
                                     <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No driver activity logged in this period</div>
-                                )}
-                            </div>
-
-                            {/* 7. Recent Activity Feed */}
-                            <div style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', padding: '2rem' }}>
-                                <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <Activity size={20} color="#10B981" /> Recent Activity
-                                </h3>
-                                
-                                {report.recentActivity.length > 0 ? (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                                        {report.recentActivity.map((activity, i) => (
-                                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px solid var(--surface-hover)' }}>
-                                                <div style={{ 
-                                                    width: '40px', height: '40px', borderRadius: '50%', display: 'grid', placeItems: 'center',
-                                                    background: activity.type === 'order' ? 'var(--badge-blue-bg)' : 
-                                                               activity.type === 'walkin' ? 'var(--badge-green-bg)' : 'var(--badge-red-bg)'
-                                                }}>
-                                                    {activity.type === 'order' && <Package size={18} color="#4F46E5" />}
-                                                    {activity.type === 'walkin' && <DollarSign size={18} color="#10B981" />}
-                                                    {activity.type === 'expense' && <Droplets size={18} color="#EF4444" />}
-                                                </div>
-                                                <div style={{ flex: 1 }}>
-                                                    <p style={{ fontWeight: '600', color: 'var(--text-main)', fontSize: '0.9rem', marginBottom: '0.25rem' }}>{activity.description}</p>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                                                        <Clock size={12} />
-                                                        {new Date(activity.time).toLocaleString()}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No recent activity found</div>
                                 )}
                             </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
-import { CreditCard, Plus, Calendar, Search, Edit2, Trash2, CheckCircle, AlertTriangle, Download, X } from 'lucide-react';
+import { CreditCard, Plus, Calendar, Search, Edit2, Trash2, CheckCircle, AlertTriangle, Download, X, PhilippinePeso, Droplets, Activity, Hash, Package } from 'lucide-react';
 import { getExpenses, createExpense, updateExpense, deleteExpense, getExpenseSummary, exportExpenses } from '../../services';
 import ExpenseModal from '../../components/modals/ExpenseModal';
 import Toast from '../../components/common/Toast';
@@ -184,27 +184,66 @@ const ExpensesPage = () => {
 
                     {isAdmin && summary && (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
-                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Spend</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>₱{(summary.total_spend || 0).toLocaleString()}</p>
+                            {/* Total Spend */}
+                            <div style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <div style={{ padding: '0.75rem', background: 'var(--badge-red-bg)', borderRadius: '1rem' }}><PhilippinePeso size={20} color="#EF4444" /></div>
+                                </div>
+                                <h4 style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Total Spend</h4>
+                                <p style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)' }}>₱{(summary.total_spend || 0).toLocaleString()}</p>
+                                <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    Overall fleet gas expense
+                                </div>
                             </div>
-                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Liters</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{(summary.total_liters || 0).toLocaleString()}L</p>
+                            
+                            {/* Total Liters */}
+                            <div style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <div style={{ padding: '0.75rem', background: 'var(--badge-blue-bg)', borderRadius: '1rem' }}><Droplets size={20} color="#3B82F6" /></div>
+                                </div>
+                                <h4 style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Total Liters</h4>
+                                <p style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)' }}>{(summary.total_liters || 0).toLocaleString()}L</p>
+                                <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    Total fuel volume consumed
+                                </div>
                             </div>
-                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Avg Price / Liter</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.avg_price_per_liter ? `₱${summary.avg_price_per_liter}` : 'N/A'}</p>
+
+                            {/* Avg Price / Liter */}
+                            <div style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <div style={{ padding: '0.75rem', background: 'var(--badge-green-bg)', borderRadius: '1rem' }}><Activity size={20} color="#10B981" /></div>
+                                </div>
+                                <h4 style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Avg Price / Liter</h4>
+                                <p style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.avg_price_per_liter ? `₱${summary.avg_price_per_liter}` : 'N/A'}</p>
+                                <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    Average cost across stations
+                                </div>
                             </div>
-                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Fill-ups</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.number_of_fillups || 0}</p>
+
+                            {/* Fill-ups */}
+                            <div style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <div style={{ padding: '0.75rem', background: 'var(--badge-yellow-bg)', borderRadius: '1rem' }}><Hash size={20} color="#F59E0B" /></div>
+                                </div>
+                                <h4 style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Fill-ups</h4>
+                                <p style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)' }}>{summary.number_of_fillups || 0}</p>
+                                <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    Number of refueling events
+                                </div>
                             </div>
-                            <div className="glass" style={{ background: 'var(--surface-bg)', padding: '1.5rem', borderRadius: '1.25rem', border: '1px solid var(--border-light)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Cost per Gallon</p>
-                                <p style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)' }}>
+
+                            {/* Cost per Gallon */}
+                            <div style={{ padding: '1.5rem', background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <div style={{ padding: '0.75rem', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '1rem' }}><Package size={20} color="#8B5CF6" /></div>
+                                </div>
+                                <h4 style={{ color: 'var(--text-muted)', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.25rem' }}>Cost per Gallon</h4>
+                                <p style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)' }}>
                                     {summary.fuel_cost_per_gallon_delivered ? `₱${summary.fuel_cost_per_gallon_delivered}` : <span style={{ fontSize: '1.2rem', color: 'var(--text-light)' }}>N/A (No deliveries)</span>}
                                 </p>
+                                <div style={{ marginTop: '0.75rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    Based on deliveries made
+                                </div>
                             </div>
                         </div>
                     )}

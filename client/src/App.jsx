@@ -21,21 +21,37 @@ import ReportsPage from './pages/Reports/ReportsPage';
 import UsersPage from './pages/Users/UsersPage';
 import LiveMapPage from './pages/Map/LiveMapPage';
 import DriverRoutePage from './pages/Drivers/DriverRoutePage';
+import TripSalesPage from './pages/Trips/TripSalesPage';
 import CartPage from './pages/Cart/CartPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 function App() {
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
   return (
     <Router>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={
+          <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+            <Login />
+          </GoogleReCaptchaProvider>
+        } />
+        <Route path="/register" element={
+          <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+            <Register />
+          </GoogleReCaptchaProvider>
+        } />
         <Route path="/forgot-password" element={<ForgotPass />} />
         <Route path="/reset-password" element={<ResetPass />} />
         <Route path="/verify-activation" element={<VerifyOTP />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/login" element={
+          <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+            <AdminLogin />
+          </GoogleReCaptchaProvider>
+        } />
         
         {/* Dashboards */}
         <Route path="/dashboard/admin" element={
@@ -82,6 +98,11 @@ function App() {
         <Route path="/orders" element={
           <ProtectedRoute allowedRoles={['admin', 'staff', 'driver', 'user']}>
             <OrdersPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/trip-sales" element={
+          <ProtectedRoute allowedRoles={['admin', 'staff']}>
+            <TripSalesPage />
           </ProtectedRoute>
         } />
 

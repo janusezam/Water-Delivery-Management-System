@@ -16,6 +16,7 @@ const driverRoutes = require('./routes/driverRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
+const tripSaleRoutes = require('./routes/tripSaleRoutes');
 
 
 connectDB();
@@ -50,6 +51,7 @@ app.use('/api/drivers', driverRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/trip-sales', tripSaleRoutes);
 
 
 // Socket.IO

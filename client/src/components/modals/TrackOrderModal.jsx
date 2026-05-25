@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, MapPin, Package, Truck, CheckCircle, Clock, XCircle, User, DollarSign, Map, ExternalLink, AlertTriangle } from 'lucide-react';
+import { X, MapPin, Package, Truck, CheckCircle, Clock, XCircle, User, PhilippinePeso, Map, ExternalLink, AlertTriangle } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -244,7 +244,7 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
                         {/* Total */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: 'var(--page-bg)', borderRadius: '0.75rem', border: '1px solid var(--surface-hover)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                                <DollarSign size={16} color="#10B981" />
+                                <PhilippinePeso size={16} color="#10B981" />
                                 Total Amount
                             </div>
                             <span style={{ fontWeight: '900', fontSize: '1.25rem', color: 'var(--text-main)' }}>

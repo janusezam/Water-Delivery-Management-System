@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 import Header from '../../components/layout/Header';
 import Toast from '../../components/common/Toast';
-import { ShoppingBag, Plus, Minus, Trash2, CreditCard, Search, Droplets, DollarSign } from 'lucide-react';
+import { ShoppingBag, Plus, Minus, Trash2, CreditCard, Search, Droplets, PhilippinePeso } from 'lucide-react';
 import { getProducts, getCustomers, createWalkIn, getWalkIns } from '../../services';
 
 const WalkInPage = () => {
@@ -121,7 +121,7 @@ const WalkInPage = () => {
                         <div style={{ display: 'flex', gap: '1.5rem' }}>
                             <div style={{ flex: 1, padding: '1.25rem', background: 'var(--surface-bg)', borderRadius: '1rem', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                                 <div style={{ padding: '0.75rem', background: 'var(--badge-blue-bg)', borderRadius: '0.75rem' }}>
-                                    <DollarSign size={22} color="#4F46E5" />
+                                    <PhilippinePeso size={22} color="#4F46E5" />
                                 </div>
                                 <div>
                                     <p style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.2rem' }}>Today's Revenue</p>

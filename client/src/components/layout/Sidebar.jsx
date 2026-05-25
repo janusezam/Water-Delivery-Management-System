@@ -45,6 +45,7 @@ const Sidebar = ({ role }) => {
         { path: '/orders', icon: <Truck size={22} />, label: 'Orders' },
         { path: '/customers', icon: <Users size={22} />, label: 'Customers' },
         { path: '/products', icon: <Package size={22} />, label: 'Products' },
+        { path: '/trip-sales', icon: <Truck size={22} />, label: 'Trip Sales' },
         { path: '/drivers', icon: <Users size={22} />, label: 'Drivers' },
         { path: '/live-map', icon: <MapIcon size={22} />, label: 'Live Map' },
         { path: '/expenses', icon: <CreditCard size={22} />, label: 'Gas Expenses' },
@@ -57,6 +58,7 @@ const Sidebar = ({ role }) => {
         { path: '/orders', icon: <Truck size={22} />, label: 'Orders' },
         { path: '/customers', icon: <Users size={22} />, label: 'Customers' },
         { path: '/products', icon: <Package size={22} />, label: 'Products' },
+        { path: '/trip-sales', icon: <Truck size={22} />, label: 'Trip Sales' },
         { path: '/live-map', icon: <MapIcon size={22} />, label: 'Live Map' },
     ];
 
@@ -224,30 +226,6 @@ const Sidebar = ({ role }) => {
                 ))}
             </nav>
 
-            {/* Logout Section */}
-            <div
-                onClick={() => navigate('/login')}
-                style={{
-                    marginTop: 'auto',
-                    padding: isCollapsed ? '2rem 0' : '1.5rem 1.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: isCollapsed ? 'center' : 'flex-start',
-                    gap: '1rem',
-                    color: '#EF4444',
-                    cursor: 'pointer',
-                    fontSize: '0.95rem',
-                    fontWeight: '700',
-                    borderTop: '1px solid var(--border-light)',
-                    overflow: 'hidden',
-                    transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.background = 'var(--active-bg)'}
-                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
-            >
-                <LogOut size={22} style={{ flexShrink: 0 }} />
-                {!isCollapsed && <span>Logout</span>}
-            </div>
         </aside>
     );
 };

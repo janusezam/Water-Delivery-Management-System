@@ -7,7 +7,7 @@ import {
     Package,
     History,
     Hash,
-    DollarSign,
+    PhilippinePeso,
     User,
     Calendar,
     Clock,
@@ -180,7 +180,7 @@ const DeliveryHistory = () => {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--surface-hover)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <DollarSign size={16} color="#10B981" />
+                    <PhilippinePeso size={16} color="#10B981" />
                     <span style={{ fontWeight: '800', color: 'var(--text-main)', fontSize: '1rem' }}>
                         ₱{(order.totalAmount || 0).toLocaleString()}
                     </span>

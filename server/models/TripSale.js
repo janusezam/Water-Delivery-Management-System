@@ -130,6 +130,9 @@ TripSaleSchema.pre('save', async function () {
     }
 });
 
+TripSaleSchema.index({ driver: 1, status: 1 });
+TripSaleSchema.index({ createdAt: -1 });
+
 const TripSale = mongoose.model('TripSale', TripSaleSchema);
 
 module.exports = TripSale;

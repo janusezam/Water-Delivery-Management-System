@@ -96,7 +96,7 @@ const Sidebar = ({ role }) => {
             position: 'sticky',
             top: 0,
             transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-            zIndex: 100,
+            zIndex: 1020,
             padding: 0 // Explicitly override global padding
         }}>
             {/* Logo Section */}

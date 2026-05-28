@@ -4,6 +4,7 @@ import Header from '../../components/layout/Header';
 import { Truck, Plus, User, Edit2, MoreVertical, Smartphone, Search, Mail, Package, Trash2 } from 'lucide-react';
 import { getDrivers, createDriver, updateDriver, getOrders, deleteDriver } from '../../services';
 import DriverModal from '../../components/modals/DriverModal';
+import { toast } from 'react-hot-toast';
 
 const DriversPage = () => {
     const [drivers, setDrivers] = useState([]);
@@ -36,14 +37,16 @@ const DriversPage = () => {
         try {
             if (editingDriver) {
                 await updateDriver(editingDriver._id, formData);
+                toast.success('Driver profile updated successfully');
             } else {
                 await createDriver(formData);
+                toast.success('Driver created successfully');
             }
             setIsModalOpen(false);
             setEditingDriver(null);
             fetchData();
         } catch (error) {
-            alert('Failed to save driver');
+            toast.error(error.response?.data?.message || 'Failed to save driver');
         }
     };
 
@@ -51,9 +54,10 @@ const DriversPage = () => {
         if (window.confirm('Are you sure you want to delete this driver?')) {
             try {
                 await deleteDriver(id);
+                toast.success('Driver deleted successfully');
                 fetchData();
             } catch (error) {
-                alert('Failed to delete driver');
+                toast.error(error.response?.data?.message || 'Failed to delete driver');
             }
         }
     };

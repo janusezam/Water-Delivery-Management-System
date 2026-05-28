@@ -4,6 +4,7 @@ import Header from '../../components/layout/Header';
 import { Users, Plus, Search, Phone, MapPin, Edit2, Trash2 } from 'lucide-react';
 import { getCustomers, deleteCustomer, createCustomer, updateCustomer } from '../../services';
 import CustomerModal from '../../components/modals/CustomerModal';
+import { toast } from 'react-hot-toast';
 
 const CustomersPage = () => {
     const [customers, setCustomers] = useState([]);
@@ -31,9 +32,10 @@ const CustomersPage = () => {
         if (window.confirm('Are you sure you want to delete this customer?')) {
             try {
                 await deleteCustomer(id);
+                toast.success('Customer deleted successfully');
                 fetchCustomers();
             } catch (error) {
-                alert('Failed to delete customer');
+                toast.error(error.response?.data?.message || 'Failed to delete customer');
             }
         }
     };
@@ -42,14 +44,16 @@ const CustomersPage = () => {
         try {
             if (editingCustomer) {
                 await updateCustomer(editingCustomer._id, formData);
+                toast.success('Customer profile updated successfully');
             } else {
                 await createCustomer(formData);
+                toast.success('Customer added successfully');
             }
             setIsModalOpen(false);
             setEditingCustomer(null);
             fetchCustomers();
         } catch (error) {
-            alert('Failed to save customer');
+            toast.error(error.response?.data?.message || 'Failed to save customer');
         }
     };
 

@@ -26,11 +26,13 @@ import CartPage from './pages/Cart/CartPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { NotificationProvider } from './context/NotificationContext';
 
 function App() {
   const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
   return (
+    <NotificationProvider>
     <Router>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
@@ -153,6 +155,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
+    </NotificationProvider>
   );
 }
 

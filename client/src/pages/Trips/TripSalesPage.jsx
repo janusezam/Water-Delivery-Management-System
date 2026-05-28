@@ -59,9 +59,8 @@ const TripSalesPage = () => {
             fetchTrips();
             fetchDependencies(); // Refresh available drivers/products
         } catch (error) {
-            const errDetail = error.response?.data?.stack || error.response?.data?.message || error.message;
+            console.error('Backend Error Details:', error.response?.data?.stack || error.response?.data?.message || error.message);
             toast.error(error.response?.data?.message || 'Failed to create trip');
-            alert("Backend Error Details:\n" + errDetail);
         }
     };
 

@@ -7,4 +7,5 @@ export * from './expenseService';
 export * from './walkInService';
 export * from './reportService';
 export * from './userService';
+export * from './notificationService';
 export { axiosClient } from './axios';

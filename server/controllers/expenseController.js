@@ -1,6 +1,7 @@
 const GasExpense = require('../models/GasExpense');
 const Order = require('../models/Order');
 const Driver = require('../models/Driver');
+const { notifyRole } = require('../utils/notificationHelper');
 
 // @desc    Log a gas expense
 // @route   POST /api/expenses
@@ -32,6 +33,20 @@ const logExpense = async (req, res) => {
             .populate({ path: 'driver', populate: { path: 'user', select: 'name' } })
             .populate('createdBy', 'name role')
             .populate('trip');
+
+        // --- Notifications ---
+        // Notify admin when a driver logs a gas expense
+        if (req.user.role !== 'admin') {
+            const driverName = populated.driver?.user?.name || req.user.name || 'Driver';
+            notifyRole({
+                role: 'admin',
+                type: 'expense_logged',
+                title: 'Gas Expense Logged',
+                message: `${driverName} logged a gas expense of ₱${totalCost.toLocaleString()}`,
+                relatedModel: 'GasExpense',
+                relatedId: expense._id
+            });
+        }
 
         res.status(201).json(populated);
     } catch (error) {

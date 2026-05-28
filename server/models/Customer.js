@@ -34,6 +34,8 @@ const customerSchema = new mongoose.Schema({
     timestamps: true
 });
 
+customerSchema.index({ name: 1 });
+
 const Customer = mongoose.model('Customer', customerSchema);
 
 module.exports = Customer;

@@ -15,7 +15,7 @@ import {
     X,
     ExternalLink
 } from 'lucide-react';
-import axios from 'axios';
+import { getOrders } from '../../services';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -61,13 +61,13 @@ const DeliveryHistory = () => {
 
     const fetchHistory = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const { data } = await axios.get('http://localhost:5000/api/orders', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const { data } = await getOrders();
+            
+            // If backend returned paginated object { data, totalPages, ... }
+            const ordersList = Array.isArray(data) ? data : (data?.data || []);
             
             const completedStatuses = ['delivered', 'Completed', 'Cancelled', 'cancelled'];
-            const delivered = data.filter(o => completedStatuses.includes(o.status));
+            const delivered = ordersList.filter(o => completedStatuses.includes(o.status));
             
             // Sort by most recent first
             setHistory(delivered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));

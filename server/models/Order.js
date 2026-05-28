@@ -74,6 +74,11 @@ const orderSchema = new mongoose.Schema({
     timestamps: true
 });
 
+orderSchema.index({ status: 1 });
+orderSchema.index({ assignedDriver: 1 });
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ assignedDriver: 1, createdAt: -1 });
+
 const Order = mongoose.model('Order', orderSchema);
 
 module.exports = Order;

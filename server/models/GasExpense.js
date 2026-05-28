@@ -71,6 +71,9 @@ gasExpenseSchema.pre('save', async function () {
     }
 });
 
+gasExpenseSchema.index({ date: -1 });
+gasExpenseSchema.index({ driver: 1 });
+
 const GasExpense = mongoose.model('GasExpense', gasExpenseSchema);
 
 module.exports = GasExpense;

@@ -86,10 +86,10 @@ const ProductsPage = () => {
             setCart([]); // Clear cart on success
             localStorage.removeItem('user_cart');
             setIsStorefrontOpen(false);
-            alert('Order placed successfully! Waiting for admin approval.');
+            toast.success('Order placed successfully! Waiting for admin approval.');
         } catch (error) {
             console.error('Frontend Order Error:', error);
-            alert('Failed to place order');
+            toast.error(error.response?.data?.message || 'Failed to place order');
         }
     };
 

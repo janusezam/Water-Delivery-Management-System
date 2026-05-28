@@ -2,6 +2,8 @@ const Order = require('../models/Order');
 const Customer = require('../models/Customer');
 const Product = require('../models/Product');
 const TripSale = require('../models/TripSale');
+const User = require('../models/User');
+const { createNotification, notifyRole, notifyRoles } = require('../utils/notificationHelper');
 
 // @desc    Get all orders
 // @route   GET /api/orders
@@ -143,6 +145,19 @@ const createOrder = async (req, res) => {
         });
 
         const createdOrder = await order.save();
+
+        // --- Notifications ---
+        // Notify admin & staff about new order
+        notifyRoles({
+            roles: ['admin', 'staff'],
+            type: 'order_created',
+            title: 'New Order',
+            message: `New order from ${resolvedCustomerName}`,
+            relatedModel: 'Order',
+            relatedId: createdOrder._id,
+            excludeUserId: req.user._id
+        });
+
         res.status(201).json(createdOrder);
     } catch (error) {
         console.error('Error creating order:', error);
@@ -286,9 +301,24 @@ const updateOrder = async (req, res) => {
                 if (Array.isArray(currentOrder.items)) {
                     for (const item of currentOrder.items) {
                         if (item.product && item.qty > 0) {
-                            await Product.findByIdAndUpdate(item.product, {
-                                $inc: { stockQty: -item.qty }
-                            });
+                            const updatedProd = await Product.findByIdAndUpdate(
+                                item.product,
+                                { $inc: { stockQty: -item.qty } },
+                                { new: true }
+                            );
+
+                            if (updatedProd && updatedProd.stockQty <= 10) {
+                                notifyRoles({
+                                    roles: ['admin', 'staff'],
+                                    type: 'low_stock',
+                                    title: updatedProd.stockQty <= 0 ? 'Out of Stock!' : 'Low Stock Alert',
+                                    message: updatedProd.stockQty <= 0 
+                                        ? `🚨 ${updatedProd.name} is out of stock!`
+                                        : `⚠️ ${updatedProd.name} stock is low (${updatedProd.stockQty} remaining)`,
+                                    relatedModel: 'Product',
+                                    relatedId: updatedProd._id
+                                });
+                            }
                         }
                     }
                 }
@@ -398,6 +428,133 @@ const updateOrder = async (req, res) => {
         .populate('user', 'name email')
         .populate('assignedDriver', 'name email')
         .populate('items.product', 'name pricePerUnit');
+
+        // --- Notifications ---
+        const orderRef = `Order #${orderId.toString().slice(-6).toUpperCase()}`;
+
+        // 1) Driver assigned → notify the driver
+        if (req.body.assignedDriver && req.body.assignedDriver !== currentOrder.assignedDriver?.toString()) {
+            createNotification({
+                recipientId: req.body.assignedDriver,
+                type: 'order_assigned',
+                title: 'New Delivery Assigned',
+                message: `${orderRef} for ${currentOrder.customerName} has been assigned to you`,
+                relatedModel: 'Order',
+                relatedId: orderId
+            });
+            // Notify customer that driver is assigned
+            if (currentOrder.user) {
+                const driverUser = await User.findById(req.body.assignedDriver).select('name');
+                createNotification({
+                    recipientId: currentOrder.user,
+                    type: 'order_assigned',
+                    title: 'Driver Assigned',
+                    message: `${driverUser?.name || 'A driver'} has been assigned to deliver your order`,
+                    relatedModel: 'Order',
+                    relatedId: orderId
+                });
+            }
+        }
+
+        // 2) Status changed
+        if (newStatus && newStatus !== oldStatus) {
+            // Delivery completed → notify admin + customer
+            if (['delivered', 'Completed'].includes(newStatus)) {
+                const driverName = updatedOrder.assignedDriver?.name || 'Driver';
+                notifyRole({
+                    role: 'admin',
+                    type: 'delivery_completed',
+                    title: 'Delivery Completed',
+                    message: `${orderRef} delivered by ${driverName}`,
+                    relatedModel: 'Order',
+                    relatedId: orderId,
+                    excludeUserId: req.user._id
+                });
+                if (currentOrder.user) {
+                    createNotification({
+                        recipientId: currentOrder.user,
+                        type: 'delivery_completed',
+                        title: 'Order Delivered',
+                        message: `Your ${orderRef} has been delivered!`,
+                        relatedModel: 'Order',
+                        relatedId: orderId
+                    });
+                }
+            }
+
+            // Delivery failed → notify admin + customer
+            if (newStatus === 'Failed Attempt') {
+                const driverName = updatedOrder.assignedDriver?.name || 'Driver';
+                notifyRole({
+                    role: 'admin',
+                    type: 'delivery_failed',
+                    title: 'Delivery Failed',
+                    message: `${orderRef} failed attempt by ${driverName}`,
+                    relatedModel: 'Order',
+                    relatedId: orderId,
+                    excludeUserId: req.user._id
+                });
+                if (currentOrder.user) {
+                    createNotification({
+                        recipientId: currentOrder.user,
+                        type: 'delivery_failed',
+                        title: 'Delivery Attempt Failed',
+                        message: `Delivery attempt for your ${orderRef} was unsuccessful`,
+                        relatedModel: 'Order',
+                        relatedId: orderId
+                    });
+                }
+            }
+
+            // Order cancelled → notify admin/staff + customer
+            if (['Cancelled', 'cancelled'].includes(newStatus)) {
+                notifyRoles({
+                    roles: ['admin', 'staff'],
+                    type: 'order_cancelled',
+                    title: 'Order Cancelled',
+                    message: `${orderRef} from ${currentOrder.customerName} has been cancelled`,
+                    relatedModel: 'Order',
+                    relatedId: orderId,
+                    excludeUserId: req.user._id
+                });
+                // Notify assigned driver if any
+                if (currentOrder.assignedDriver) {
+                    createNotification({
+                        recipientId: currentOrder.assignedDriver,
+                        type: 'order_cancelled',
+                        title: 'Order Cancelled',
+                        message: `${orderRef} assigned to you has been cancelled`,
+                        relatedModel: 'Order',
+                        relatedId: orderId
+                    });
+                }
+            }
+
+            // Status change → notify customer about review/status update
+            if (currentOrder.user && !['delivered', 'Completed', 'Failed Attempt', 'Cancelled', 'cancelled'].includes(newStatus)) {
+                createNotification({
+                    recipientId: currentOrder.user,
+                    type: 'order_status',
+                    title: 'Order Status Updated',
+                    message: `Your ${orderRef} status changed to ${newStatus}`,
+                    relatedModel: 'Order',
+                    relatedId: orderId
+                });
+            }
+
+            // Notify driver about status changes made by admin/staff
+            if (currentOrder.assignedDriver && req.user._id.toString() !== currentOrder.assignedDriver.toString()
+                && !['Cancelled', 'cancelled'].includes(newStatus)) {
+                createNotification({
+                    recipientId: currentOrder.assignedDriver,
+                    type: 'order_status',
+                    title: 'Order Status Updated',
+                    message: `${orderRef} status changed to ${newStatus}`,
+                    relatedModel: 'Order',
+                    relatedId: orderId
+                });
+            }
+        }
 
         res.json(updatedOrder);
     } catch (error) {

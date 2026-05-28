@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, ChevronRight, Moon, Sun, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { Bell, ChevronRight, Moon, Sun, Settings, LogOut, ChevronDown, Check, CheckCheck, Trash2, Package, Truck, MapPin, Fuel, ShoppingCart, AlertTriangle, X } from 'lucide-react';
 import ProfileSettingsModal from '../modals/ProfileSettingsModal';
 import { getMyProfile } from '../../services';
+import { useNotifications } from '../../context/NotificationContext';
 
 const Header = ({ breadcrumbs = [] }) => {
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
@@ -12,7 +13,19 @@ const Header = ({ breadcrumbs = [] }) => {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [notifOpen, setNotifOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const notifRef = useRef(null);
+
+    const {
+        notifications,
+        unreadCount,
+        isLoading,
+        hasMore,
+        markAsRead,
+        markAllAsRead,
+        loadMore
+    } = useNotifications();
 
     useEffect(() => {
         const savedMode = localStorage.getItem('theme');
@@ -57,12 +70,15 @@ const Header = ({ breadcrumbs = [] }) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setDropdownOpen(false);
             }
+            if (notifRef.current && !notifRef.current.contains(e.target)) {
+                setNotifOpen(false);
+            }
         };
-        if (dropdownOpen) {
+        if (dropdownOpen || notifOpen) {
             document.addEventListener('mousedown', handleClickOutside);
         }
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [dropdownOpen]);
+    }, [dropdownOpen, notifOpen]);
 
     const toggleTheme = () => {
         if (isDarkMode) {
@@ -88,12 +104,110 @@ const Header = ({ breadcrumbs = [] }) => {
         setShowSettings(true);
     };
 
+    // Get icon for notification type
+    const getNotifIcon = (type) => {
+        const iconMap = {
+            order_created: <ShoppingCart size={16} />,
+            order_status: <Package size={16} />,
+            order_assigned: <Truck size={16} />,
+            order_cancelled: <X size={16} />,
+            delivery_completed: <Check size={16} />,
+            delivery_failed: <AlertTriangle size={16} />,
+            trip_created: <MapPin size={16} />,
+            trip_assigned: <MapPin size={16} />,
+            trip_ended: <MapPin size={16} />,
+            trip_completed: <Check size={16} />,
+            trip_cancelled: <X size={16} />,
+            low_stock: <AlertTriangle size={16} />,
+            expense_logged: <Fuel size={16} />
+        };
+        return iconMap[type] || <Bell size={16} />;
+    };
+
+    // Get color accent for notification type
+    const getNotifColor = (type) => {
+        if (['delivery_completed', 'trip_completed'].includes(type)) return '#10B981';
+        if (['delivery_failed', 'low_stock'].includes(type)) return '#F59E0B';
+        if (['order_cancelled', 'trip_cancelled'].includes(type)) return '#EF4444';
+        if (['order_assigned', 'trip_assigned', 'trip_created'].includes(type)) return '#6366F1';
+        if (['order_created'].includes(type)) return '#3B82F6';
+        if (['expense_logged'].includes(type)) return '#8B5CF6';
+        return '#6B7280';
+    };
+
+    // Time ago helper
+    const timeAgo = (dateStr) => {
+        const now = new Date();
+        const date = new Date(dateStr);
+        const diffMs = now - date;
+        const diffSec = Math.floor(diffMs / 1000);
+        const diffMin = Math.floor(diffSec / 60);
+        const diffHr = Math.floor(diffMin / 60);
+        const diffDay = Math.floor(diffHr / 24);
+
+        if (diffSec < 60) return 'Just now';
+        if (diffMin < 60) return `${diffMin}m ago`;
+        if (diffHr < 24) return `${diffHr}h ago`;
+        if (diffDay < 7) return `${diffDay}d ago`;
+        return date.toLocaleDateString();
+    };
+
+    // Handle notification click — navigate to relevant page based on role and entity
+    const handleNotifClick = (notif) => {
+        if (!notif.isRead) {
+            markAsRead(notif._id);
+        }
+
+        const userRole = user?.role;
+
+        // Navigate based on related model and user role
+        if (notif.relatedModel === 'Order') {
+            if (userRole === 'driver') {
+                navigate('/dashboard/driver');
+            } else {
+                navigate('/orders');
+            }
+        } else if (notif.relatedModel === 'TripSale') {
+            if (userRole === 'driver') {
+                navigate('/dashboard/driver');
+            } else {
+                navigate('/trip-sales');
+            }
+        } else if (notif.relatedModel === 'Product') {
+            navigate('/products');
+        } else if (notif.relatedModel === 'GasExpense') {
+            navigate('/expenses');
+        }
+
+        setNotifOpen(false);
+    };
+
+    // Scroll handler for infinite scroll in notifications
+    const handleNotifScroll = (e) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.target;
+        if (scrollHeight - scrollTop - clientHeight < 50 && hasMore && !isLoading) {
+            loadMore();
+        }
+    };
+
     return (
         <>
             <style dangerouslySetInnerHTML={{__html: `
                 @keyframes dropdownSlideIn {
                     from { opacity: 0; transform: translateY(-8px) scale(0.96); }
                     to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                @keyframes bellShake {
+                    0%, 100% { transform: rotate(0deg); }
+                    15% { transform: rotate(14deg); }
+                    30% { transform: rotate(-12deg); }
+                    45% { transform: rotate(10deg); }
+                    60% { transform: rotate(-8deg); }
+                    75% { transform: rotate(4deg); }
+                }
+                @keyframes badgePulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.15); }
                 }
                 .header-profile-trigger {
                     display: flex;
@@ -114,17 +228,22 @@ const Header = ({ breadcrumbs = [] }) => {
                     background: var(--active-bg);
                     border-color: rgba(79, 70, 229, 0.2);
                 }
-                .profile-dropdown {
+                .profile-dropdown, .notif-dropdown {
                     position: absolute;
                     top: calc(100% + 8px);
                     right: 0;
-                    width: 300px;
                     background: var(--modal-bg);
                     border-radius: 1rem;
                     box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-light);
                     z-index: 200;
                     animation: dropdownSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
                     overflow: hidden;
+                }
+                .profile-dropdown {
+                    width: 300px;
+                }
+                .notif-dropdown {
+                    width: 400px;
                 }
                 .dropdown-menu-item {
                     display: flex;
@@ -165,6 +284,104 @@ const Header = ({ breadcrumbs = [] }) => {
                 .chevron-rotate.open {
                     transform: rotate(180deg);
                 }
+                .notif-bell-btn {
+                    position: relative;
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    color: var(--text-muted);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0.5rem;
+                    border-radius: 0.625rem;
+                    transition: all 0.2s ease;
+                }
+                .notif-bell-btn:hover {
+                    background: var(--surface-hover);
+                    color: var(--text-main);
+                }
+                .notif-bell-btn.active {
+                    background: var(--active-bg);
+                    color: #4F46E5;
+                }
+                .notif-bell-btn.has-unread .bell-icon {
+                    animation: bellShake 0.6s ease-in-out;
+                }
+                .notif-badge {
+                    position: absolute;
+                    top: 2px;
+                    right: 2px;
+                    min-width: 18px;
+                    height: 18px;
+                    background: linear-gradient(135deg, #EF4444, #DC2626);
+                    color: white;
+                    border-radius: 999px;
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0 4px;
+                    border: 2px solid var(--surface-bg);
+                    animation: badgePulse 2s ease-in-out infinite;
+                    line-height: 1;
+                }
+                .notif-item {
+                    display: flex;
+                    gap: 0.75rem;
+                    padding: 0.875rem 1rem;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                    border-bottom: 1px solid var(--border-light);
+                    position: relative;
+                }
+                .notif-item:hover {
+                    background: var(--surface-hover);
+                }
+                .notif-item.unread {
+                    background: var(--active-bg, rgba(79, 70, 229, 0.04));
+                }
+                .notif-item.unread::before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    width: 3px;
+                    background: #4F46E5;
+                    border-radius: 0 2px 2px 0;
+                }
+                .notif-icon-wrap {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 0.625rem;
+                    display: grid;
+                    place-items: center;
+                    flex-shrink: 0;
+                }
+                .notif-list::-webkit-scrollbar {
+                    width: 5px;
+                }
+                .notif-list::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .notif-list::-webkit-scrollbar-thumb {
+                    background: var(--border-light);
+                    border-radius: 10px;
+                }
+                .notif-empty {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 3rem 1rem;
+                    color: var(--text-muted);
+                    gap: 0.75rem;
+                }
+                .notif-empty svg {
+                    opacity: 0.3;
+                }
             `}} />
 
             <header style={{
@@ -176,7 +393,7 @@ const Header = ({ breadcrumbs = [] }) => {
                 borderBottom: '1px solid var(--border-light)',
                 position: 'sticky',
                 top: 0,
-                zIndex: 50,
+                zIndex: 1010,
                 animation: 'fadeIn 0.3s ease-out'
             }}>
                 {/* Breadcrumbs */}
@@ -214,10 +431,170 @@ const Header = ({ breadcrumbs = [] }) => {
                         {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                     </button>
 
-                    {/* Notifications */}
-                    <div style={{ position: 'relative', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                        <Bell size={20} />
-                        <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', background: '#EF4444', borderRadius: '50%', border: '2px solid var(--surface-bg)' }}></span>
+                    {/* Notifications Bell */}
+                    <div ref={notifRef} style={{ position: 'relative' }}>
+                        <button
+                            className={`notif-bell-btn ${notifOpen ? 'active' : ''} ${unreadCount > 0 ? 'has-unread' : ''}`}
+                            onClick={() => {
+                                setNotifOpen(!notifOpen);
+                                setDropdownOpen(false);
+                            }}
+                            title="Notifications"
+                            id="notification-bell"
+                        >
+                            <Bell size={20} className="bell-icon" />
+                            {unreadCount > 0 && (
+                                <span className="notif-badge">
+                                    {unreadCount > 99 ? '99+' : unreadCount}
+                                </span>
+                            )}
+                        </button>
+
+                        {/* Notification Dropdown */}
+                        {notifOpen && (
+                            <div className="notif-dropdown">
+                                {/* Header */}
+                                <div style={{
+                                    padding: '1rem 1.25rem',
+                                    borderBottom: '1px solid var(--border-light)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>
+                                            Notifications
+                                        </span>
+                                        {unreadCount > 0 && (
+                                            <span style={{
+                                                background: 'linear-gradient(135deg, #4F46E5, #3730A3)',
+                                                color: 'white',
+                                                fontSize: '0.65rem',
+                                                fontWeight: '700',
+                                                padding: '0.15rem 0.5rem',
+                                                borderRadius: '999px'
+                                            }}>
+                                                {unreadCount} new
+                                            </span>
+                                        )}
+                                    </div>
+                                    {unreadCount > 0 && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                markAllAsRead();
+                                            }}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                color: '#4F46E5',
+                                                fontSize: '0.78rem',
+                                                fontWeight: '600',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.3rem',
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '0.375rem',
+                                                transition: 'background 0.15s'
+                                            }}
+                                            onMouseEnter={(e) => e.target.style.background = 'var(--active-bg)'}
+                                            onMouseLeave={(e) => e.target.style.background = 'none'}
+                                            title="Mark all as read"
+                                        >
+                                            <CheckCheck size={14} />
+                                            Mark all read
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Notification List */}
+                                <div
+                                    className="notif-list"
+                                    style={{
+                                        maxHeight: '420px',
+                                        overflowY: 'auto',
+                                        overflowX: 'hidden'
+                                    }}
+                                    onScroll={handleNotifScroll}
+                                >
+                                    {notifications.length === 0 ? (
+                                        <div className="notif-empty">
+                                            <Bell size={40} />
+                                            <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>No notifications yet</span>
+                                            <span style={{ fontSize: '0.8rem' }}>We'll notify you when something happens</span>
+                                        </div>
+                                    ) : (
+                                        notifications.map((notif) => {
+                                            const color = getNotifColor(notif.type);
+                                            return (
+                                                <div
+                                                    key={notif._id}
+                                                    className={`notif-item ${!notif.isRead ? 'unread' : ''}`}
+                                                    onClick={() => handleNotifClick(notif)}
+                                                >
+                                                    <div
+                                                        className="notif-icon-wrap"
+                                                        style={{ background: `${color}15`, color }}
+                                                    >
+                                                        {getNotifIcon(notif.type)}
+                                                    </div>
+                                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                                        <div style={{
+                                                            fontSize: '0.83rem',
+                                                            fontWeight: notif.isRead ? '500' : '650',
+                                                            color: 'var(--text-main)',
+                                                            marginBottom: '0.2rem',
+                                                            lineHeight: 1.3
+                                                        }}>
+                                                            {notif.title}
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: '0.78rem',
+                                                            color: 'var(--text-muted)',
+                                                            lineHeight: 1.4,
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
+                                                            whiteSpace: 'nowrap'
+                                                        }}>
+                                                            {notif.message}
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: '0.7rem',
+                                                            color: notif.isRead ? 'var(--text-muted)' : '#4F46E5',
+                                                            fontWeight: notif.isRead ? '400' : '600',
+                                                            marginTop: '0.3rem'
+                                                        }}>
+                                                            {timeAgo(notif.createdAt)}
+                                                        </div>
+                                                    </div>
+                                                    {!notif.isRead && (
+                                                        <div style={{
+                                                            width: '8px',
+                                                            height: '8px',
+                                                            borderRadius: '50%',
+                                                            background: '#4F46E5',
+                                                            flexShrink: 0,
+                                                            marginTop: '0.4rem'
+                                                        }} />
+                                                    )}
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                    {isLoading && (
+                                        <div style={{
+                                            padding: '1rem',
+                                            textAlign: 'center',
+                                            color: 'var(--text-muted)',
+                                            fontSize: '0.8rem'
+                                        }}>
+                                            Loading...
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div style={{ height: '24px', width: '1px', background: 'var(--border-light)' }}></div>
@@ -226,7 +603,7 @@ const Header = ({ breadcrumbs = [] }) => {
                     <div ref={dropdownRef} style={{ position: 'relative' }}>
                         <div
                             className={`header-profile-trigger ${dropdownOpen ? 'active' : ''}`}
-                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            onClick={() => { setDropdownOpen(!dropdownOpen); setNotifOpen(false); }}
                             id="header-profile-trigger"
                         >
                             <div style={{ textAlign: 'right' }}>

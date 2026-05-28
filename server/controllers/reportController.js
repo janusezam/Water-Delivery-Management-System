@@ -163,16 +163,22 @@ const getComprehensiveReport = async (req, res) => {
             driverPerformanceMap[driverUserId].fuelLiters += exp.liters;
         });
 
+        const driverUserIds = Object.keys(driverPerformanceMap);
+        const drivers = await Driver.find({ user: { $in: driverUserIds } }).populate('user', 'name');
+        
         const performanceArray = [];
-        for (const [userId, stats] of Object.entries(driverPerformanceMap)) {
-            const driverDoc = await Driver.findOne({ user: userId }).populate('user', 'name');
+        drivers.forEach(driverDoc => {
             if (driverDoc && driverDoc.user) {
-                performanceArray.push({
-                    name: driverDoc.user.name,
-                    ...stats
-                });
+                const userId = driverDoc.user._id.toString();
+                const stats = driverPerformanceMap[userId];
+                if (stats) {
+                    performanceArray.push({
+                        name: driverDoc.user.name,
+                        ...stats
+                    });
+                }
             }
-        }
+        });
         performanceArray.sort((a, b) => b.deliveries - a.deliveries);
 
         // 7. Recent Activity

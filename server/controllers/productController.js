@@ -1,4 +1,7 @@
 const Product = require('../models/Product');
+const { notifyRoles } = require('../utils/notificationHelper');
+
+const LOW_STOCK_THRESHOLD = 10;
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -44,6 +47,29 @@ const updateProduct = async (req, res) => {
             }
 
             const updatedProduct = await product.save();
+
+            // --- Notifications ---
+            // Check for low stock after update
+            if (updatedProduct.stockQty <= LOW_STOCK_THRESHOLD && updatedProduct.stockQty > 0) {
+                notifyRoles({
+                    roles: ['admin', 'staff'],
+                    type: 'low_stock',
+                    title: 'Low Stock Alert',
+                    message: `⚠️ ${updatedProduct.name} stock is low (${updatedProduct.stockQty} remaining)`,
+                    relatedModel: 'Product',
+                    relatedId: updatedProduct._id
+                });
+            } else if (updatedProduct.stockQty <= 0) {
+                notifyRoles({
+                    roles: ['admin', 'staff'],
+                    type: 'low_stock',
+                    title: 'Out of Stock!',
+                    message: `🚨 ${updatedProduct.name} is out of stock!`,
+                    relatedModel: 'Product',
+                    relatedId: updatedProduct._id
+                });
+            }
+
             res.json(updatedProduct);
         } else {
             res.status(404).json({ message: 'Product not found' });

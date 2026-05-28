@@ -2,6 +2,7 @@ const TripSale = require('../models/TripSale');
 const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 const Driver = require('../models/Driver');
+const { createNotification, notifyRole, notifyRoles } = require('../utils/notificationHelper');
 
 // @desc    Create new trip
 // @route   POST /api/trip-sales
@@ -29,15 +30,41 @@ const createTrip = async (req, res) => {
             startedAt: Date.now()
         });
 
-        // 3. Deduct stock
+        // 3. Deduct stock and check for low stock alerts
         for (const item of loadedItems) {
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { stockQty: -item.qtyLoaded }
-            });
+            const updatedProd = await Product.findByIdAndUpdate(
+                item.product,
+                { $inc: { stockQty: -item.qtyLoaded } },
+                { new: true }
+            );
+
+            if (updatedProd && updatedProd.stockQty <= 10) {
+                notifyRoles({
+                    roles: ['admin', 'staff'],
+                    type: 'low_stock',
+                    title: updatedProd.stockQty <= 0 ? 'Out of Stock!' : 'Low Stock Alert',
+                    message: updatedProd.stockQty <= 0 
+                        ? `🚨 ${updatedProd.name} is out of stock!`
+                        : `⚠️ ${updatedProd.name} stock is low (${updatedProd.stockQty} remaining)`,
+                    relatedModel: 'Product',
+                    relatedId: updatedProd._id
+                });
+            }
         }
 
         // 4. Update Driver status
         await Driver.findOneAndUpdate({ user: driver }, { status: 'on-trip' });
+
+        // --- Notifications ---
+        // Notify the driver about their new trip
+        createNotification({
+            recipientId: driver,
+            type: 'trip_assigned',
+            title: 'New Trip Assigned',
+            message: `A new trip with ${loadedItems.length} product(s) has been assigned to you`,
+            relatedModel: 'TripSale',
+            relatedId: trip._id
+        });
 
         res.status(201).json(trip);
     } catch (error) {
@@ -176,9 +203,24 @@ const recordSale = async (req, res) => {
 // @route   PUT /api/trip-sales/:id/end
 const endTrip = async (req, res) => {
     try {
-        const trip = await TripSale.findByIdAndUpdate(req.params.id, {
-            status: 'pending_review'
-        }, { new: true });
+        const trip = await TripSale.findById(req.params.id);
+        if (!trip) return res.status(404).json({ message: 'Trip not found' });
+
+        trip.status = 'pending_review';
+        await trip.save();
+
+        // --- Notifications ---
+        // Notify admin & staff that trip ended and needs review
+        notifyRoles({
+            roles: ['admin', 'staff'],
+            type: 'trip_ended',
+            title: 'Trip Ended',
+            message: `Trip #${trip._id.toString().slice(-6).toUpperCase()} has ended and is pending review`,
+            relatedModel: 'TripSale',
+            relatedId: trip._id,
+            excludeUserId: req.user._id
+        });
+
         res.json(trip);
     } catch (error) {
         console.error('Error ending trip:', error);
@@ -238,6 +280,17 @@ const completeTrip = async (req, res) => {
         // Update Driver status
         await Driver.findOneAndUpdate({ user: trip.driver }, { status: 'available' });
 
+        // --- Notifications ---
+        // Notify driver that their trip was reviewed and completed
+        createNotification({
+            recipientId: trip.driver,
+            type: 'trip_completed',
+            title: 'Trip Completed',
+            message: `Your trip #${trip._id.toString().slice(-6).toUpperCase()} has been reviewed and completed`,
+            relatedModel: 'TripSale',
+            relatedId: trip._id
+        });
+
         res.json(trip);
     } catch (error) {
         console.error('Error completing trip:', error);
@@ -265,6 +318,17 @@ const cancelTrip = async (req, res) => {
 
         // Update Driver status
         await Driver.findOneAndUpdate({ user: trip.driver }, { status: 'available' });
+
+        // --- Notifications ---
+        // Notify driver that their trip was cancelled
+        createNotification({
+            recipientId: trip.driver,
+            type: 'trip_cancelled',
+            title: 'Trip Cancelled',
+            message: `Your trip #${trip._id.toString().slice(-6).toUpperCase()} has been cancelled`,
+            relatedModel: 'TripSale',
+            relatedId: trip._id
+        });
 
         res.json(trip);
     } catch (error) {

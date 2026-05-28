@@ -4,6 +4,12 @@ const socketHandler = (io) => {
     io.on('connection', (socket) => {
         console.log('User connected:', socket.id);
 
+        // User joins their personal notification room
+        socket.on('user:join', (userId) => {
+            socket.join(`user-${userId}`);
+            console.log(`User ${userId} joined notification room`);
+        });
+
         // Driver joins their own room and the 'drivers' group
         socket.on('driver:join', (driverId) => {
             socket.join(`driver-${driverId}`);

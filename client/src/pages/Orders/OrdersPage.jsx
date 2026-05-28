@@ -8,6 +8,7 @@ import StorefrontModal from '../../components/modals/StorefrontModal';
 import ManageOrderModal from '../../components/modals/ManageOrderModal';
 import TrackOrderModal from '../../components/modals/TrackOrderModal';
 import CancelOrderModal from '../../components/modals/CancelOrderModal';
+import { toast } from 'react-hot-toast';
 
 const OrdersPage = () => {
     const userProfile = JSON.parse(localStorage.getItem('user') || '{}');
@@ -66,11 +67,12 @@ const OrdersPage = () => {
         if (!window.confirm(`Are you sure you want to permanently delete order #${orderShortId}? This cannot be undone.`)) return;
         try {
             await deleteOrder(orderId);
+            toast.success('Order deleted successfully');
             fetchOrders(currentPage, searchTerm, activeTab);
         } catch (error) {
             console.error('Delete order error:', error);
             const errMsg = error.response?.data?.message || 'Failed to delete order';
-            alert(errMsg);
+            toast.error(errMsg);
         }
     };
 
@@ -88,10 +90,11 @@ const OrdersPage = () => {
             await createOrder(payload);
             setIsModalOpen(false);
             setIsStorefrontOpen(false);
+            toast.success('Order created successfully');
             fetchOrders(currentPage, searchTerm, activeTab);
         } catch (error) {
             console.error('Order Submission Error:', error);
-            alert('Failed to create order');
+            toast.error(error.response?.data?.message || 'Failed to create order');
         }
     };
 

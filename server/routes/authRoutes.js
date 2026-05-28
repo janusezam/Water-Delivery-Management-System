@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { authLimiter } = require('../middleware/rateLimiter');
+
+router.use(authLimiter);
+
 const { 
     registerUser, 
     verifyActivation,

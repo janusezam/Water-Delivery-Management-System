@@ -84,14 +84,6 @@ const CustomersPage = () => {
                         <h2 style={{ fontSize: '1.875rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Customers</h2>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem' }}>Manage your customer base and jug balances.</p>
                     </div>
-                    <button 
-                        onClick={openAddModal}
-                        className="btn-primary" 
-                        style={{ background: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.75rem', fontWeight: '600', color: 'white', border: 'none', cursor: 'pointer' }}
-                    >
-                        <Plus size={20} />
-                        <span>Add Customer</span>
-                    </button>
                 </header>
 
                 <div className="glass" style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>

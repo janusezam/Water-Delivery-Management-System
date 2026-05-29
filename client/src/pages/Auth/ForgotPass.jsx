@@ -14,6 +14,10 @@ const ForgotPass = () => {
     const navigate = useNavigate();
 
     React.useEffect(() => {
+        document.body.classList.remove('dark-mode');
+    }, []);
+
+    React.useEffect(() => {
         let interval;
         if (step === 2) {
             interval = setInterval(() => {

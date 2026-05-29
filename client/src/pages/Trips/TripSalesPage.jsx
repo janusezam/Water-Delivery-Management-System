@@ -351,8 +351,8 @@ const VerifyTripModal = ({ trip, onClose, onSave }) => {
     };
 
     return (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: '90vw', maxWidth: '600px', background: 'var(--surface-bg)', borderRadius: '1.5rem', padding: '2rem' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '90vw', maxWidth: '600px', background: 'var(--surface-bg)', borderRadius: '1.5rem', padding: '2rem', maxHeight: '90vh', overflowY: 'auto' }}>
                 <h3 style={{ margin: '0 0 1rem 0', fontWeight: '800', fontSize: '1.25rem' }}>Verify & Complete Trip</h3>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
                     Driver: <strong>{trip.driver?.name}</strong> • Revenue to collect: <strong>₱{trip.sales.reduce((sum, s) => sum + s.totalAmount, 0)}</strong>
@@ -385,7 +385,7 @@ const VerifyTripModal = ({ trip, onClose, onSave }) => {
 
 const ViewTripProgressModal = ({ trip, onClose }) => {
     return (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ width: '90vw', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--surface-bg)', borderRadius: '1.5rem', padding: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h3 style={{ margin: 0, fontWeight: '800', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

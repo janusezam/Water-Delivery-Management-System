@@ -90,14 +90,14 @@ const TrackOrderModal = ({ isOpen, onClose, order }) => {
 
     return (
         <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)'
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', zIndex: 9999, backdropFilter: 'blur(4px)'
         }}>
             <div className="modal-content" style={{
-                background: 'var(--input-bg)', borderRadius: '1.5rem', width: '700px', maxWidth: '95vw',
+                background: 'var(--surface-bg)', borderRadius: '1.5rem', width: '90vw', maxWidth: '700px',
                 position: 'relative', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
-                maxHeight: '92vh', overflowY: 'auto'
+                maxHeight: '90vh', overflowY: 'auto'
             }}>
                 {/* Header */}
                 <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--surface-hover)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -132,14 +132,6 @@ const DriversPage = () => {
                             </span>
                         </div>
                     </div>
-                    <button 
-                        onClick={openAddModal}
-                        className="btn-primary" 
-                        style={{ background: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.75rem', fontWeight: '600', color: 'white', border: 'none', cursor: 'pointer' }}
-                    >
-                        <Plus size={20} />
-                        <span>Add Driver</span>
-                    </button>
                 </header>
 
                 <div className="glass" style={{ background: 'var(--surface-bg)', borderRadius: '1.25rem', border: '1px solid var(--border-light)', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>

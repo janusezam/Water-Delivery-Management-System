@@ -209,18 +209,18 @@ const ProfileSettingsModal = ({ isOpen, onClose }) => {
             <div className="profile-modal-overlay" onClick={onClose} style={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(0, 0, 0, 0.5)',
+                background: 'rgba(0, 0, 0, 0.6)',
                 backdropFilter: 'blur(4px)',
-                zIndex: 1000,
+                zIndex: 9999,
                 display: 'grid',
                 placeItems: 'center',
                 padding: '2rem'
             }}>
                 {/* Modal Card */}
                 <div className="profile-modal-card" onClick={e => e.stopPropagation()} style={{
-                    background: 'var(--modal-bg)',
+                    background: 'var(--surface-bg)',
                     borderRadius: '1.25rem',
-                    width: '100%',
+                    width: '90vw',
                     maxWidth: '560px',
                     maxHeight: '90vh',
                     overflow: 'hidden',

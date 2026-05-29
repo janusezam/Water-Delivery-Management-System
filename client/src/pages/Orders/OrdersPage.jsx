@@ -142,20 +142,16 @@ const OrdersPage = () => {
                                 {userProfile.role === 'user' ? 'Track your delivery orders.' : 'Manage all delivery requests and their statuses.'}
                             </p>
                         </div>
-                        <button 
-                            onClick={() => {
-                                if (userProfile.role === 'user') {
-                                    setIsStorefrontOpen(true);
-                                } else {
-                                    setIsModalOpen(true);
-                                }
-                            }}
-                            className="btn-primary" 
-                            style={{ background: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.75rem', fontWeight: '600', color: 'white', border: 'none', cursor: 'pointer' }}
-                        >
-                            <Plus size={20} />
-                            <span>{userProfile.role === 'user' ? 'New Request' : 'Create Delivery'}</span>
-                        </button>
+                        {userProfile.role !== 'user' && (
+                            <button 
+                                onClick={() => setIsModalOpen(true)}
+                                className="btn-primary" 
+                                style={{ background: '#4F46E5', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 1.25rem', borderRadius: '0.75rem', fontWeight: '600', color: 'white', border: 'none', cursor: 'pointer' }}
+                            >
+                                <Plus size={20} />
+                                <span>Create Delivery</span>
+                            </button>
+                        )}
                     </header>
 
                     {/* Tabs for Admin/Staff */}
@@ -351,37 +347,82 @@ const OrdersPage = () => {
                         
                         {/* Pagination Controls */}
                         {totalPages > 1 && (
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem', borderTop: '1px solid var(--surface-hover)', gap: '0.5rem' }}>
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                padding: '1.25rem', 
+                                borderTop: '1px solid var(--border-light)', 
+                                gap: '0.375rem',
+                                background: 'var(--surface-bg)'
+                            }}>
                                 <button 
                                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                                     disabled={currentPage === 1}
-                                    style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: currentPage === 1 ? 'var(--surface-bg)' : 'white', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', color: currentPage === 1 ? 'var(--text-light)' : 'var(--text-main)', fontWeight: '600' }}
+                                    style={{ 
+                                        padding: '0.5rem 0.875rem', 
+                                        borderRadius: '0.625rem', 
+                                        border: '1px solid var(--border-light)', 
+                                        background: 'var(--surface-bg)', 
+                                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer', 
+                                        color: currentPage === 1 ? 'var(--text-light)' : 'var(--text-main)', 
+                                        fontWeight: '700',
+                                        fontSize: '0.85rem',
+                                        transition: 'all 0.2s'
+                                    }}
                                 >
-                                    Prev
+                                    Previous
                                 </button>
                                 
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                    <button
-                                        key={page}
-                                        onClick={() => setCurrentPage(page)}
-                                        style={{ 
-                                            padding: '0.5rem 1rem', 
-                                            borderRadius: '0.5rem', 
-                                            border: 'none', 
-                                            background: currentPage === page ? '#4F46E5' : 'transparent', 
-                                            color: currentPage === page ? 'white' : 'var(--text-main)', 
-                                            cursor: 'pointer', 
-                                            fontWeight: '600' 
-                                        }}
-                                    >
-                                        {page}
-                                    </button>
-                                ))}
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
+                                    // Logic to show a limited number of page buttons if there are many pages
+                                    const isNearCurrent = Math.abs(page - currentPage) <= 1;
+                                    const isEdge = page === 1 || page === totalPages;
+                                    
+                                    if (!isNearCurrent && !isEdge && totalPages > 5) {
+                                        if (page === 2 || page === totalPages - 1) {
+                                            return <span key={page} style={{ color: 'var(--text-light)', padding: '0 0.25rem' }}>...</span>;
+                                        }
+                                        return null;
+                                    }
+
+                                    return (
+                                        <button
+                                            key={page}
+                                            onClick={() => setCurrentPage(page)}
+                                            style={{ 
+                                                minWidth: '36px',
+                                                height: '36px',
+                                                borderRadius: '0.625rem', 
+                                                border: currentPage === page ? 'none' : '1px solid transparent', 
+                                                background: currentPage === page ? '#4F46E5' : 'transparent', 
+                                                color: currentPage === page ? 'white' : 'var(--text-main)', 
+                                                cursor: 'pointer', 
+                                                fontWeight: '800',
+                                                fontSize: '0.85rem',
+                                                transition: 'all 0.2s',
+                                                boxShadow: currentPage === page ? '0 4px 10px rgba(79, 70, 229, 0.3)' : 'none'
+                                            }}
+                                        >
+                                            {page}
+                                        </button>
+                                    );
+                                })}
 
                                 <button 
                                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                                     disabled={currentPage === totalPages}
-                                    style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', border: '1px solid var(--border-light)', background: currentPage === totalPages ? 'var(--surface-bg)' : 'white', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', color: currentPage === totalPages ? 'var(--text-light)' : 'var(--text-main)', fontWeight: '600' }}
+                                    style={{ 
+                                        padding: '0.5rem 0.875rem', 
+                                        borderRadius: '0.625rem', 
+                                        border: '1px solid var(--border-light)', 
+                                        background: 'var(--surface-bg)', 
+                                        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', 
+                                        color: currentPage === totalPages ? 'var(--text-light)' : 'var(--text-main)', 
+                                        fontWeight: '700',
+                                        fontSize: '0.85rem',
+                                        transition: 'all 0.2s'
+                                    }}
                                 >
                                     Next
                                 </button>

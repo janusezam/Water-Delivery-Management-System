@@ -161,13 +161,13 @@ const StorefrontModal = ({ isOpen, onClose, onSave, initialCart, onCartUpdate })
 
     return (
         <div className="modal-overlay" style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            position: 'fixed', inset: 0,
             background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)'
+            justifyContent: 'center', zIndex: 9999, backdropFilter: 'blur(8px)'
         }}>
             <div style={{
-                background: 'var(--input-bg)', borderRadius: '1.5rem', width: '90%', maxWidth: '800px',
-                height: '80vh', display: 'flex', flexDirection: 'column', position: 'relative',
+                background: 'var(--surface-bg)', borderRadius: '1.5rem', width: '90vw', maxWidth: '800px',
+                height: '85vh', display: 'flex', flexDirection: 'column', position: 'relative',
                 overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
             }}>
                 {/* Header */}

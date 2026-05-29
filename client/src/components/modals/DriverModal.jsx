@@ -39,23 +39,23 @@ const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
     return (
         <div className="modal-overlay" style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
+            inset: 0,
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000,
+            zIndex: 9999,
             backdropFilter: 'blur(4px)'
         }}>
-            <div className="modal-content glass" style={{
-                background: 'var(--modal-bg)',
+            <div className="modal-content" style={{
+                background: 'var(--surface-bg)',
                 padding: '2rem',
                 borderRadius: '1.5rem',
-                width: '400px',
-                position: 'relative'
+                width: '90vw',
+                maxWidth: '450px',
+                position: 'relative',
+                maxHeight: '90vh',
+                overflowY: 'auto'
             }}>
                 <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                     <X size={24} />

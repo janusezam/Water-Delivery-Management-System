@@ -13,6 +13,10 @@ const ResetPass = () => {
     const navigate = useNavigate();
     const { email, otp } = location.state || {};
 
+    React.useEffect(() => {
+        document.body.classList.remove('dark-mode');
+    }, []);
+
     const handleReset = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {

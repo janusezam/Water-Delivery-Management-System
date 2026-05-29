@@ -15,6 +15,10 @@ const VerifyOTP = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        document.body.classList.remove('dark-mode');
+    }, []);
+
+    useEffect(() => {
         const storedEmail = localStorage.getItem('verify_email');
         if (!storedEmail) {
             navigate('/register');

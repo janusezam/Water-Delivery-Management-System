@@ -38,7 +38,7 @@ const CancelOrderModal = ({ isOpen, onClose, order, onCancelSuccess }) => {
             display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
             <div style={{
-                width: '90vw', maxWidth: '450px', background: 'var(--input-bg)', borderRadius: '1.5rem',
+                width: '90vw', maxWidth: '450px', background: 'var(--surface-bg)', borderRadius: '1.5rem',
                 padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
                 animation: 'modalSlideUp 0.3s ease-out'
             }}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, ShieldAlert, Lock, Mail, ArrowRight, ChevronLeft } from 'lucide-react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
@@ -11,6 +11,10 @@ const AdminLogin = () => {
     const { executeRecaptcha } = useGoogleReCaptcha();
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.body.classList.remove('dark-mode');
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();

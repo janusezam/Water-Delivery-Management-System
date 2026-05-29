@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Truck, Droplet, MapPin } from 'lucide-react';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -12,6 +12,10 @@ const Login = () => {
     const { executeRecaptcha } = useGoogleReCaptcha();
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.body.classList.remove('dark-mode');
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();

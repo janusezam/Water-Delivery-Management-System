@@ -13,12 +13,12 @@ const ProductSelectionModal = ({ isOpen, onClose, product, onAddToCart, onBuyNow
 
     return (
         <div className="modal-overlay" style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            position: 'fixed', inset: 0,
             background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', zIndex: 1100, backdropFilter: 'blur(4px)'
+            justifyContent: 'center', zIndex: 9999, backdropFilter: 'blur(4px)'
         }}>
             <div className="modal-content" style={{
-                background: 'var(--input-bg)', borderRadius: '1.25rem', width: '90%', maxWidth: '400px',
+                background: 'var(--surface-bg)', borderRadius: '1.25rem', width: '90vw', maxWidth: '400px',
                 padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>

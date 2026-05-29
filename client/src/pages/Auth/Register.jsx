@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, User as UserIcon, Phone, Droplet, Truck, MapPin } from 'lucide-react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
@@ -16,6 +16,10 @@ const Register = () => {
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.body.classList.remove('dark-mode');
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

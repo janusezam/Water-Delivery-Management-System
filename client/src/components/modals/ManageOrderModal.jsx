@@ -62,13 +62,13 @@ const ManageOrderModal = ({ isOpen, onClose, order, onUpdate }) => {
 
     return (
         <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)'
+            position: 'fixed', inset: 0,
+            background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', zIndex: 9999, backdropFilter: 'blur(4px)'
         }}>
             <div className="modal-content" style={{
-                background: 'var(--input-bg)', padding: '2rem', borderRadius: '1.5rem',
-                width: '500px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                background: 'var(--surface-bg)', padding: '2rem', borderRadius: '1.5rem',
+                width: '90vw', maxWidth: '500px', position: 'relative', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
                 maxHeight: '90vh', overflowY: 'auto'
             }}>
                 <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-light)' }}>

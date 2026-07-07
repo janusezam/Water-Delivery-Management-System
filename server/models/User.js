@@ -48,7 +48,14 @@ const userSchema = new mongoose.Schema({
     activationOTP: String,
     activationOTPExpires: Date,
     resetPasswordOTP: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    address: {
+        street: { type: String, default: '' },
+        barangay: { type: String, default: '' },
+        city: { type: String, default: 'Cebu City' },
+        lat: { type: Number },
+        lng: { type: Number }
+    }
 }, {
     timestamps: true
 });

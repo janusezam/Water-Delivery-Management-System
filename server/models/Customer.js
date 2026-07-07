@@ -5,10 +5,17 @@ const addressSchema = new mongoose.Schema({
     street: { type: String, required: true },
     barangay: { type: String, required: true },
     city: { type: String, default: 'Seaside City' },
-    isDefault: { type: Boolean, default: false }
+    isDefault: { type: Boolean, default: false },
+    lat: { type: Number },
+    lng: { type: Number }
 });
 
 const customerSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
     name: {
         type: String,
         required: true,

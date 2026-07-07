@@ -7,9 +7,13 @@ const driverSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    licenseNo: {
+    phone: {
         type: String,
-        required: true
+        default: ''
+    },
+    address: {
+        type: String,
+        default: ''
     },
     vehicleType: {
         type: String,

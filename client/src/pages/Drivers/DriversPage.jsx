@@ -101,7 +101,7 @@ const DriversPage = () => {
     const filteredDrivers = drivers.filter(d => 
         (d.user?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (d.plateNo || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (d.licenseNo || '').toLowerCase().includes(searchQuery.toLowerCase())
+        (d.phone || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -141,7 +141,7 @@ const DriversPage = () => {
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Driver Profile</th>
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Contact</th>
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Vehicle Details</th>
-                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>License No.</th>
+                                <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Address</th>
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status</th>
                                 <th style={{ padding: '1rem 1.5rem', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
                             </tr>
@@ -179,6 +179,11 @@ const DriversPage = () => {
                                                 ) : (
                                                     <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>No email</span>
                                                 )}
+                                                {driver.phone && (
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                                        <Smartphone size={14} /> {driver.phone}
+                                                    </span>
+                                                )}
                                             </div>
                                         </td>
                                         <td style={{ padding: '1.25rem 1.5rem' }}>
@@ -187,8 +192,10 @@ const DriversPage = () => {
                                                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--surface-hover)', padding: '0.1rem 0.5rem', borderRadius: '0.25rem', width: 'fit-content' }}>Plate: {driver.plateNo || 'N/A'}</span>
                                             </div>
                                         </td>
-                                        <td style={{ padding: '1.25rem 1.5rem' }}>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{driver.licenseNo || 'Not provided'}</span>
+                                        <td style={{ padding: '1.25rem 1.5rem', maxWidth: '200px' }}>
+                                            <span style={{ fontSize: '0.85rem', fontWeight: '500', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                                                {driver.address || 'Not provided'}
+                                            </span>
                                         </td>
                                         <td style={{ padding: '1.25rem 1.5rem' }}>
                                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.25rem' }}>

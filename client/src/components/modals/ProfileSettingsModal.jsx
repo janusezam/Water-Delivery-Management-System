@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Shield, Mail, Phone, Save, Eye, EyeOff, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { X, User, Shield, Mail, Phone, Save, Eye, EyeOff, CheckCircle, AlertCircle, Loader, MapPin, Navigation } from 'lucide-react';
 import { getMyProfile, updateMyProfile } from '../../services';
 import toast from 'react-hot-toast';
 
@@ -13,6 +13,14 @@ const ProfileSettingsModal = ({ isOpen, onClose }) => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
+    const [address, setAddress] = useState({
+        street: '',
+        barangay: '',
+        city: 'Cebu City',
+        lat: null,
+        lng: null
+    });
+    const [gettingLocation, setGettingLocation] = useState(false);
 
     // Password form
     const [currentPassword, setCurrentPassword] = useState('');
@@ -36,6 +44,7 @@ const ProfileSettingsModal = ({ isOpen, onClose }) => {
             setFirstName(data.firstName || '');
             setLastName(data.lastName || '');
             setMobileNumber(data.mobileNumber || '');
+            setAddress(data.address || { street: '', barangay: '', city: 'Cebu City', lat: null, lng: null });
         } catch (error) {
             toast.error('Failed to load profile');
         } finally {
@@ -47,7 +56,7 @@ const ProfileSettingsModal = ({ isOpen, onClose }) => {
         e.preventDefault();
         setSaving(true);
         try {
-            const { data } = await updateMyProfile({ firstName, lastName, mobileNumber });
+            const { data } = await updateMyProfile({ firstName, lastName, mobileNumber, address });
             setProfile(data);
             // Update localStorage
             const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -55,6 +64,7 @@ const ProfileSettingsModal = ({ isOpen, onClose }) => {
             user.firstName = data.firstName;
             user.lastName = data.lastName;
             user.mobileNumber = data.mobileNumber;
+            user.address = data.address;
             localStorage.setItem('user', JSON.stringify(user));
             
             // Dispatch custom event to notify other components (e.g. Header)
@@ -66,6 +76,53 @@ const ProfileSettingsModal = ({ isOpen, onClose }) => {
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleGetLocation = () => {
+        if (!navigator.geolocation) {
+            toast.error('Geolocation is not supported by your browser');
+            return;
+        }
+
+        setGettingLocation(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    // Use OpenStreetMap Nominatim API for reverse geocoding
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                    const data = await response.json();
+                    
+                    if (data && data.address) {
+                        const street = data.address.road || data.address.street || data.address.suburb || '';
+                        const barangay = data.address.village || data.address.neighbourhood || data.address.suburb || '';
+                        const city = data.address.city || data.address.town || data.address.county || 'Cebu City';
+                        
+                        setAddress({
+                            street,
+                            barangay,
+                            city,
+                            lat: latitude,
+                            lng: longitude
+                        });
+                        toast.success('Location found successfully!');
+                    } else {
+                        toast.error('Could not determine address from location');
+                    }
+                } catch (error) {
+                    console.error('Error fetching address:', error);
+                    toast.error('Failed to get address from location');
+                } finally {
+                    setGettingLocation(false);
+                }
+            },
+            (error) => {
+                console.error('Geolocation error:', error);
+                toast.error('Failed to get location. Please ensure location permissions are granted.');
+                setGettingLocation(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
     };
 
     const handleChangePassword = async (e) => {
@@ -424,6 +481,71 @@ const ProfileSettingsModal = ({ isOpen, onClose }) => {
                                         />
                                     </div>
                                 </div>
+
+                                {/* Home Address */}
+                                {profile.role !== 'admin' && (
+                                    <div style={{ marginBottom: '2rem' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                            <label style={{ ...labelStyle, marginBottom: 0 }}>Home Address</label>
+                                            <button 
+                                                type="button" 
+                                                onClick={handleGetLocation}
+                                                disabled={gettingLocation}
+                                                style={{ 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    gap: '0.35rem', 
+                                                    background: 'var(--surface-hover)', 
+                                                    border: 'none', 
+                                                    padding: '0.4rem 0.75rem', 
+                                                    borderRadius: '2rem', 
+                                                    fontSize: '0.75rem', 
+                                                    fontWeight: '600', 
+                                                    color: '#4F46E5',
+                                                    cursor: gettingLocation ? 'not-allowed' : 'pointer'
+                                                }}
+                                            >
+                                                {gettingLocation ? <Loader size={12} className="animate-spin" /> : <Navigation size={12} />}
+                                                Use My Exact Location
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem', background: 'var(--page-bg)', borderRadius: '1rem', border: '1px solid var(--border-light)' }}>
+                                            <div style={{ position: 'relative' }}>
+                                                <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
+                                                <input
+                                                    type="text"
+                                                    value={address.street}
+                                                    onChange={e => setAddress({ ...address, street: e.target.value })}
+                                                    className="profile-settings-input"
+                                                    style={inputStyle}
+                                                    placeholder="Street / House No."
+                                                />
+                                            </div>
+                                            <div style={{ position: 'relative' }}>
+                                                <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
+                                                <input
+                                                    type="text"
+                                                    value={address.barangay}
+                                                    onChange={e => setAddress({ ...address, barangay: e.target.value })}
+                                                    className="profile-settings-input"
+                                                    style={inputStyle}
+                                                    placeholder="Barangay"
+                                                />
+                                            </div>
+                                            <div style={{ position: 'relative' }}>
+                                                <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
+                                                <input
+                                                    type="text"
+                                                    value={address.city}
+                                                    onChange={e => setAddress({ ...address, city: e.target.value })}
+                                                    className="profile-settings-input"
+                                                    style={inputStyle}
+                                                    placeholder="City"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
 
                                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

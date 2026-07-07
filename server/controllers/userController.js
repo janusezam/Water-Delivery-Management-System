@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Customer = require('../models/Customer');
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -84,6 +85,7 @@ const getProfile = async (req, res) => {
             role: user.role,
             profilePicture: user.profilePicture || null,
             isGoogleUser: !!user.googleId,
+            address: user.address || {},
             createdAt: user.createdAt
         });
     } catch (error) {
@@ -101,12 +103,15 @@ const updateProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const { firstName, lastName, mobileNumber, currentPassword, newPassword } = req.body;
+        const { firstName, lastName, mobileNumber, currentPassword, newPassword, address } = req.body;
 
         // Update basic info
         if (firstName !== undefined) user.firstName = firstName;
         if (lastName !== undefined) user.lastName = lastName;
         if (mobileNumber !== undefined) user.mobileNumber = mobileNumber;
+        if (address !== undefined) {
+            user.address = { ...user.address, ...address };
+        }
 
         // Password change
         if (newPassword) {
@@ -122,6 +127,54 @@ const updateProfile = async (req, res) => {
 
         const updatedUser = await user.save();
 
+        // Sync with Customer model
+        let customer = await Customer.findOne({ user: updatedUser._id });
+        if (!customer) {
+            customer = await Customer.findOne({ email: updatedUser.email }) || await Customer.findOne({ phone: updatedUser.mobileNumber, phone: { $ne: '' } });
+        }
+
+        if (customer) {
+            customer.user = updatedUser._id;
+            customer.name = updatedUser.name;
+            customer.phone = updatedUser.mobileNumber;
+            if (updatedUser.address && updatedUser.address.street) {
+                if (customer.addresses && customer.addresses.length > 0) {
+                    customer.addresses[0].street = updatedUser.address.street;
+                    customer.addresses[0].barangay = updatedUser.address.barangay;
+                    customer.addresses[0].city = updatedUser.address.city;
+                    customer.addresses[0].lat = updatedUser.address.lat;
+                    customer.addresses[0].lng = updatedUser.address.lng;
+                } else {
+                    customer.addresses = [{
+                        street: updatedUser.address.street,
+                        barangay: updatedUser.address.barangay,
+                        city: updatedUser.address.city,
+                        lat: updatedUser.address.lat,
+                        lng: updatedUser.address.lng,
+                        isDefault: true
+                    }];
+                }
+            }
+            await customer.save();
+        } else {
+            // Create customer if they provided basic needed info
+            if (updatedUser.name && updatedUser.mobileNumber && updatedUser.address?.street) {
+                await Customer.create({
+                    user: updatedUser._id,
+                    name: updatedUser.name,
+                    phone: updatedUser.mobileNumber,
+                    addresses: [{
+                        street: updatedUser.address.street,
+                        barangay: updatedUser.address.barangay,
+                        city: updatedUser.address.city,
+                        lat: updatedUser.address.lat,
+                        lng: updatedUser.address.lng,
+                        isDefault: true
+                    }]
+                });
+            }
+        }
+
         res.json({
             _id: updatedUser._id,
             firstName: updatedUser.firstName || '',
@@ -131,7 +184,8 @@ const updateProfile = async (req, res) => {
             mobileNumber: updatedUser.mobileNumber || '',
             role: updatedUser.role,
             profilePicture: updatedUser.profilePicture || null,
-            isGoogleUser: !!updatedUser.googleId
+            isGoogleUser: !!updatedUser.googleId,
+            address: updatedUser.address || {}
         });
     } catch (error) {
         console.error('Error in updateProfile:', error);

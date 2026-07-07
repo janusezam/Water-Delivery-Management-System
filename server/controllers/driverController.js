@@ -35,7 +35,7 @@ const getDrivers = async (req, res) => {
 // @desc    Create a driver profile
 // @route   POST /api/drivers
 const createDriver = async (req, res) => {
-    const { userId, name, email, password, licenseNo, vehicleType, plateNo } = req.body;
+    const { userId, name, email, password, phone, address, vehicleType, plateNo } = req.body;
     try {
         let finalUserId = userId;
 
@@ -62,7 +62,8 @@ const createDriver = async (req, res) => {
 
         const driver = await Driver.create({
             user: finalUserId,
-            licenseNo: licenseNo || 'N/A',
+            phone: phone || '',
+            address: address || '',
             vehicleType,
             plateNo
         });
@@ -100,7 +101,8 @@ const updateDriver = async (req, res) => {
         if (driver) {
             driver.vehicleType = req.body.vehicleType || driver.vehicleType;
             driver.plateNo = req.body.plateNo || driver.plateNo;
-            driver.licenseNo = req.body.licenseNo || driver.licenseNo;
+            if (req.body.phone !== undefined) driver.phone = req.body.phone;
+            if (req.body.address !== undefined) driver.address = req.body.address;
             
             const updatedDriver = await driver.save();
             const populatedDriver = await Driver.findById(updatedDriver._id).populate('user', 'name email');

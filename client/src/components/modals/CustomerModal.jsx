@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Link2, User } from 'lucide-react';
 
 const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
     const [formData, setFormData] = useState(customer || {
@@ -52,9 +52,17 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
                     <X size={24} />
                 </button>
                 
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', color: 'var(--text-main)' }}>
-                    {customer ? 'Edit Customer' : 'Add New Customer'}
-                </h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                        {customer ? 'Edit Customer' : 'Add New Customer'}
+                    </h3>
+                    {customer?.user && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: '#ECFDF5', color: '#059669', padding: '0.35rem 0.75rem', borderRadius: '2rem', fontSize: '0.75rem', fontWeight: '600' }}>
+                            <Link2 size={14} />
+                            Linked to User Account
+                        </div>
+                    )}
+                </div>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
@@ -70,7 +78,9 @@ const CustomerModal = ({ isOpen, onClose, onSave, customer = null }) => {
                         />
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Phone Number</label>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.5rem' }}>
+                            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)' }}>Phone Number (Contact Info)</label>
+                        </div>
                         <input 
                             type="text" 
                             required

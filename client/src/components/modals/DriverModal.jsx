@@ -6,6 +6,8 @@ const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
         name: '',
         email: '',
         password: '',
+        phone: '',
+        address: '',
         vehicleType: 'tricycle',
         plateNo: ''
     });
@@ -15,6 +17,8 @@ const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
             setFormData({
                 name: driver.user?.name || driver.name || '',
                 email: driver.user?.email || driver.email || '',
+                phone: driver.phone || driver.user?.mobileNumber || '',
+                address: driver.address || driver.user?.address?.street || '',
                 vehicleType: driver.vehicleType || 'tricycle',
                 plateNo: driver.plateNo || ''
             });
@@ -23,6 +27,8 @@ const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
                 name: '',
                 email: '',
                 password: '',
+                phone: '',
+                address: '',
                 vehicleType: 'tricycle',
                 plateNo: ''
             });
@@ -74,6 +80,28 @@ const DriverModal = ({ isOpen, onClose, onSave, driver = null }) => {
                             className="input-field"
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Phone Number (Contact Info)</label>
+                        <input 
+                            type="text" 
+                            className="input-field"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                            placeholder="09123456789"
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.5rem' }}>Address</label>
+                        <input 
+                            type="text" 
+                            className="input-field"
+                            value={formData.address}
+                            onChange={(e) => setFormData({...formData, address: e.target.value})}
+                            placeholder="Full address"
                             style={{ width: '100%', padding: '0.75rem', borderRadius: '0.75rem', border: '1px solid var(--border-light)', color: 'var(--text-main)', background: 'var(--input-bg)' }}
                         />
                     </div>

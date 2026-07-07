@@ -1,4 +1,5 @@
 const Customer = require('../models/Customer');
+const User = require('../models/User');
 
 // @desc    Get all customers
 // @route   GET /api/customers
@@ -84,6 +85,36 @@ const updateCustomer = async (req, res) => {
             customer.jugBalance = req.body.jugBalance !== undefined ? req.body.jugBalance : customer.jugBalance;
 
             const updatedCustomer = await customer.save();
+
+            // Sync with User model if linked
+            if (updatedCustomer.user) {
+                const userToUpdate = await User.findById(updatedCustomer.user);
+                if (userToUpdate) {
+                    userToUpdate.name = updatedCustomer.name;
+                    userToUpdate.mobileNumber = updatedCustomer.phone;
+                    
+                    if (updatedCustomer.addresses && updatedCustomer.addresses.length > 0) {
+                        const primaryAddr = updatedCustomer.addresses.find(a => a.isDefault) || updatedCustomer.addresses[0];
+                        userToUpdate.address = {
+                            street: primaryAddr.street,
+                            barangay: primaryAddr.barangay,
+                            city: primaryAddr.city,
+                            lat: primaryAddr.lat,
+                            lng: primaryAddr.lng
+                        };
+                    }
+                    
+                    // Also attempt to split name back to firstName and lastName
+                    const nameParts = (updatedCustomer.name || '').trim().split(/\s+/);
+                    if (nameParts.length > 0) {
+                        userToUpdate.firstName = nameParts[0];
+                        userToUpdate.lastName = nameParts.slice(1).join(' ');
+                    }
+                    
+                    await userToUpdate.save();
+                }
+            }
+
             res.json(updatedCustomer);
         } else {
             res.status(404).json({ message: 'Customer not found' });
